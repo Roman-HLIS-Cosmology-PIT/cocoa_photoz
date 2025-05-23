@@ -46,7 +46,7 @@ w = -0.9
 path = "../../external_modules/data/lsst_y1"
 data_file = "lsst_y1_M1_GGL0.05.dataset"
 
-def init_cosmolike(external_nz_modeling):
+def init_cosmolike(external_nz_modeling,mod_nz):
     ini = getdist.inifile.IniFile(
         os.path.normpath(os.path.join(path,data_file)))    
 
@@ -56,10 +56,10 @@ def init_cosmolike(external_nz_modeling):
     lens_ntomo = ini.int("lens_ntomo")
     lens_file = ini.relativeFileName("nz_lens_file")
 
-    (source_file, source_nz_local) = modified_nz()
+    (source_file, source_nz_local) = mod_nz()
 
     if (0 == external_nz_modeling):
-        "same way as old cosmolike"
+        print(f"Old cosmolike feature: nz from file: {source_file}")
         ci.init_redshift_distributions_from_files(
             lens_multihisto_file=lens_file,
             lens_ntomo=int(lens_ntomo), 
@@ -67,7 +67,7 @@ def init_cosmolike(external_nz_modeling):
             source_ntomo=int(source_ntomo))
 
     elif (1 == external_nz_modeling):
-        "new cosmolike feature - cocoa_lsst_y1/commit/1e7965bdce7ce568dcc8e6401c81bae201e0ba60"
+        print("New cosmolike feature: nz from array: source_nz_local")
         ci.init_source_sample_size(int(source_ntomo))
         ci.init_lens_sample_size(int(lens_ntomo))
         ci.set_source_sample(source_nz_local)
@@ -84,12 +84,12 @@ def init_cosmolike(external_nz_modeling):
                   ini.relativeFileName('mask_file'), 
                   ini.relativeFileName('data_file'))
 
-def modified_nz():
-    spath = "../../external_modules/data/lsst_y1/lsst_y1_source"
-    x = np.genfromtxt(spath+".nz")
-    x[:,1] += .1
-    np.savetxt(spath+"_modified.nz",x)
-    return spath+"_modified.nz",x
+# def modified_nz():
+#     spath = "../../external_modules/data/lsst_y1/lsst_y1_source"
+#     x = np.genfromtxt(spath+".nz")
+#     x[:,1] += .1
+#     np.savetxt(spath+"_modified.nz",x)
+#     return spath+"_modified.nz",x
 
 def get_camb_cosmology(omegam = omegam, omegab = omegab, H0 = H0, ns = ns, 
                     As_1e9 = As_1e9, w = w, w0pwa = w0pwa, AccuracyBoost = 1.0, 
@@ -190,7 +190,7 @@ def get_camb_cosmology(omegam = omegam, omegab = omegab, H0 = H0, ns = ns,
 
     return (log10k_interp_2D, z_interp_2D, lnPL, lnPNL, G_growth, z_interp_1D, chi)
 
-def xi(external_nz_modeling,ntheta = ntheta, 
+def xi(external_nz_modeling,mod_nz,ntheta = ntheta, 
     theta_min_arcmin = theta_min_arcmin, 
     theta_max_arcmin = theta_max_arcmin, 
     omegam = omegam, 
@@ -213,7 +213,7 @@ def xi(external_nz_modeling,ntheta = ntheta,
     CLAccuracyBoost = 1.0, 
     CLIntegrationAccuracy = 1):   
     
-    init_cosmolike(external_nz_modeling)
+    init_cosmolike(external_nz_modeling,mod_nz)
 
     (log10k_interp_2D, z_interp_2D, lnPL, lnPNL, G_growth, z_interp_1D, chi) = get_camb_cosmology(omegam=omegam, 
         omegab=omegab, H0=H0, ns=ns, As_1e9=As_1e9, w=w, w0pwa=w0pwa, AccuracyBoost=AccuracyBoost, kmax=kmax,
