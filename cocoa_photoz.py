@@ -43,7 +43,7 @@ LSST_A1_2 = -1.51541
 w0pwa = -0.9
 w = -0.9
 
-path = "../../external_modules/data/lsst_y1"
+path = "../../../external_modules/data/lsst_y1"
 data_file = "lsst_y1_M1_GGL0.05.dataset"
 
 def init_cosmolike(external_nz_modeling,mod_nz):
