@@ -22,23 +22,24 @@ nz_fid = np.genfromtxt(path)
 
 
 epsilon = 0.01
-tomo_bin = 1
 n_z = nz_fid.shape[0]
+n_tomo = nz_fid.shape[1] - 1
 z_vals = nz_fid[:,0]
 
 def compute_derivative(args):
-    z_idx = args
+    z_idx, tomo_bin = args
     nz_per = nz_fid.copy()
     nz_per[z_idx, tomo_bin] += epsilon
     nz_per[:,tomo_bin] /= np.trapz(y=nz_per[:,tomo_bin], x=z_vals)
-    (theta_per, xip_per, xim_per) = \
-        cp.xi(external_nz_modeling=1,mod_nz=nz_per)
+    (theta_per, xip_per, xim_per) = cp.xi(external_nz_modeling=1,mod_nz=nz_per)
     dxi_dn = (xip_per[:,0,0] - xip_fid[:,0,0]) / epsilon
-    print(z_idx)
+    print("z_idx, tomo_bin: ",z_idx,tomo_bin)
     return dxi_dn
 
-jobs = list(range(n_z))
+jobs = [(zi, tb) for tb in range(1,n_tomo+1) for zi in range(n_z)]
 
-n_cores=4
-with Pool(processes=n_cores) as pool:
-    results = pool.map(compute_derivative, jobs)
+
+list(map(compute_derivative,jobs))
+
+# with Pool() as pool:
+#     results = pool.map(compute_derivative, jobs)
