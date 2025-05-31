@@ -46,20 +46,32 @@ w = -0.9
 path = "../../../external_modules/data/lsst_y1"
 data_file = "lsst_y1_M1_GGL0.05.dataset"
 
-def init_cosmolike(external_nz_modeling,mod_nz):
-    ini = getdist.inifile.IniFile(
+ini = getdist.inifile.IniFile(
         os.path.normpath(os.path.join(path,data_file)))    
+ci.initial_setup()
 
-    ci.initial_setup()
+source_ntomo = ini.int("source_ntomo")
+lens_ntomo = ini.int("lens_ntomo")
+lens_file = ini.relativeFileName("nz_lens_file")
+
+ci.init_accuracy_boost(1.0, 1.0, int(1))
+ci.init_IA( ia_model = int(IA_model), 
+            ia_redshift_evolution = int(IA_redshift_evolution))
+ci.init_probes(possible_probes = CLprobe)
+ci.init_binning(int(ntheta), theta_min_arcmin, theta_max_arcmin)
+# ci.init_data_real(ini.relativeFileName('cov_file'), 
+#                 ini.relativeFileName('mask_file'), 
+#                 ini.relativeFileName('data_file'))
+
+ci.init_cosmo_runmode(is_linear = False)
+
+def init_cosmolike(external_nz_modeling,mod_nz):
+
     ci.external_nz_modeling = external_nz_modeling
-    source_ntomo = ini.int("source_ntomo")
-    lens_ntomo = ini.int("lens_ntomo")
-    lens_file = ini.relativeFileName("nz_lens_file")
-
-    (source_file, source_nz_local) = mod_nz()
+    source_nz_local = mod_nz
 
     if (0 == external_nz_modeling):
-        print(f"Old cosmolike feature: nz from file: {source_file}")
+        # print(f"Old cosmolike feature: nz from file: {source_file}")
         ci.init_redshift_distributions_from_files(
             lens_multihisto_file=lens_file,
             lens_ntomo=int(lens_ntomo), 
@@ -67,29 +79,13 @@ def init_cosmolike(external_nz_modeling,mod_nz):
             source_ntomo=int(source_ntomo))
 
     elif (1 == external_nz_modeling):
-        print("New cosmolike feature: nz from array: source_nz_local")
+        # print("New cosmolike feature: nz from array: source_nz_local")
         ci.init_source_sample_size(int(source_ntomo))
         ci.init_lens_sample_size(int(lens_ntomo))
         ci.set_source_sample(source_nz_local)
         ci.init_ntomo_powerspectra()
 
-    ci.init_accuracy_boost(1.0, 1.0, int(1))
-    ci.init_cosmo_runmode(is_linear = False)
-    ci.init_IA( ia_model = int(IA_model), 
-            ia_redshift_evolution = int(IA_redshift_evolution))
 
-    ci.init_probes(possible_probes = CLprobe)
-    ci.init_binning(int(ntheta), theta_min_arcmin, theta_max_arcmin)
-    ci.init_data_real(ini.relativeFileName('cov_file'), 
-                  ini.relativeFileName('mask_file'), 
-                  ini.relativeFileName('data_file'))
-
-# def modified_nz():
-#     spath = "../../external_modules/data/lsst_y1/lsst_y1_source"
-#     x = np.genfromtxt(spath+".nz")
-#     x[:,1] += .1
-#     np.savetxt(spath+"_modified.nz",x)
-#     return spath+"_modified.nz",x
 
 def get_camb_cosmology(omegam = omegam, omegab = omegab, H0 = H0, ns = ns, 
                     As_1e9 = As_1e9, w = w, w0pwa = w0pwa, AccuracyBoost = 1.0, 
