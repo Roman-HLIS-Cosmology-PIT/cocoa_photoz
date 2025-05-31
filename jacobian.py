@@ -11,15 +11,13 @@ import functools
 import matplotlib.pyplot as plt
 import cocoa_photoz as cp
 
-# Libs to explore the derivative of xi_+ wrt n(z)
 from scipy.signal import unit_impulse
 from multiprocessing import Pool
 
-path = "../../../external_modules/data/lsst_y1/lsst_y1_source.nz"
+# path = "../../../external_modules/data/lsst_y1/lsst_y1_source.nz"
+path = "/gpfs/scratch/pit-roman-hlis/Diogo/cocoapy310/Cocoa/projects/lsst_y1/data/lsst_y1_source.nz"
 nz_fid = np.genfromtxt(path)
-(theta_fid, xip_fid, xim_fid) = \
-    cp.xi(external_nz_modeling=1,mod_nz=nz_fid)
-
+(theta_fid, xip_fid, xim_fid) = cp.xi(external_nz_modeling=1,mod_nz=nz_fid)
 
 epsilon = 0.01
 n_z = nz_fid.shape[0]
@@ -38,8 +36,9 @@ def compute_derivative(args):
 
 jobs = [(zi, tb) for tb in range(1,n_tomo+1) for zi in range(n_z)]
 
-
 list(map(compute_derivative,jobs))
+
+
 
 # with Pool() as pool:
 #     results = pool.map(compute_derivative, jobs)

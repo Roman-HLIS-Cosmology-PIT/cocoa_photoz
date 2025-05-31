@@ -43,11 +43,11 @@ LSST_A1_2 = -1.51541
 w0pwa = -0.9
 w = -0.9
 
-path = "../../../external_modules/data/lsst_y1"
+# path = "../../../external_modules/data/lsst_y1"
+path = "/gpfs/scratch/pit-roman-hlis/Diogo/cocoapy310/Cocoa/projects/lsst_y1/data"
 data_file = "lsst_y1_M1_GGL0.05.dataset"
 
-ini = getdist.inifile.IniFile(
-        os.path.normpath(os.path.join(path,data_file)))    
+ini = getdist.inifile.IniFile(os.path.normpath(os.path.join(path,data_file)))
 ci.initial_setup()
 
 source_ntomo = ini.int("source_ntomo")
@@ -84,7 +84,6 @@ def init_cosmolike(external_nz_modeling,mod_nz):
         ci.init_lens_sample_size(int(lens_ntomo))
         ci.set_source_sample(source_nz_local)
         ci.init_ntomo_powerspectra()
-
 
 
 def get_camb_cosmology(omegam = omegam, omegab = omegab, H0 = H0, ns = ns, 
@@ -242,14 +241,3 @@ def xi(external_nz_modeling,mod_nz,ntheta = ntheta,
         
     (xip, xim) = ci.xi_pm_tomo()    
     return (ci.get_binning_real_space(), xip, xim)
-
-
-# (theta0, xip0, xim0) = xi(external_nz_modeling=0)
-# (theta1, xip1, xim1) = xi(external_nz_modeling=1)
-
-# print(xip0[:,0,0]==xip1[:,0,0])
-
-# plt.plot(theta0,theta0*xip0[:,0,0]*1e4)
-# plt.plot(theta0,theta0*xip1[:,0,0]*1e4,ls="--")
-# plt.xscale("log")
-# plt.savefig("test.pdf")
