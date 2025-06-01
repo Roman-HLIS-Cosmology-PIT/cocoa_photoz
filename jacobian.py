@@ -15,17 +15,17 @@ from math import factorial
 from scipy.signal import unit_impulse
 from multiprocessing import Pool
 
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-path_jacob = "/home/grads/data/Diogo/cocoapy310/Cocoa/projects/lsst_y1/cocoa_photoz/test.txt" # where to save the jacobian matrix
-path = "../../../external_modules/data/lsst_y1/lsst_y1_source.nz"
+# #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+path_jacob = "/gpfs/scratch/pit-roman-hlis/Diogo/cocoapy310/Cocoa/projects/lsst_y1/cocoa_photoz/results_jacobian/jacobian.txt" # where to save the jacobian matrix
+path = "/gpfs/scratch/pit-roman-hlis/Diogo/cocoapy310/Cocoa/projects/lsst_y1/data/lsst_y1_source.nz"
 nz_fid = np.genfromtxt(path)
 n_z = nz_fid.shape[0]
 n_tomo = nz_fid.shape[1] - 1
-z_vals = nz_fid[:,0]
+z_vals = nz_fid[:,0].copy()
 combs = int(factorial(n_tomo+2-1)/(2*factorial(n_tomo-1))) # number of non-repeated combinations of i,j in n_tomo
 jacob_dim1 = cp.ntheta * combs # size of the 2pt function
-# jacob_dim2 = 
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# # jacob_dim2 = 
+# #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 (theta_fid, xip_fid, xim_fid) = cp.xi(external_nz_modeling=1,mod_nz=nz_fid)
 
@@ -40,15 +40,13 @@ def compute_derivative(args):
     (theta_per, xip_per, xim_per) = cp.xi(external_nz_modeling=1,mod_nz=nz_per)
     
     dxi_dn = np.array([((xip_per[:,tbi,tbj] - xip_fid[:,tbi,tbj]) / epsilon) for tbi in range(n_tomo) for tbj in range(n_tomo) if tbj>=tbi]).reshape(1,jacob_dim1)
-
+    print("z_idx, tomo_z_bin: ", z_idx, tomo_z_bin)
     return dxi_dn
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 jobs = [(zi, tb) for tb in range(n_tomo) for zi in range(n_z)]
 
-derivs_map = map(compute_derivative,jobs)
-
 with open(path_jacob,"a") as f:
-    derivs = list(derivs_map)
-    np.savetxt(f,derivs)
+    for job in jobs:
+        derivs = compute_derivative(job)
+        np.savetxt(f,derivs)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
