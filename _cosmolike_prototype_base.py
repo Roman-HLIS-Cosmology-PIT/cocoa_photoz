@@ -289,14 +289,47 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       # (3) call set_source_sample
       source_nz_local = self.source_nz.copy()
 
+      ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      # DHFS MOD START
+      nz_fid = self.source_nz.copy()
+      epsilon = 0.01
+      n_tomo=5
+      ntheta=26
+      from math import factorial
+      combs = int(factorial(n_tomo+2-1)/(2*factorial(n_tomo-1))) # number of non-repeated combinations of i,j in n_tomo
+      jacob_dim1 = ntheta * combs # size of the 2pt function
       # insert mod function here <-
       #source_nz_local = f(source_nz_local, nuisance parameters)
+      def compute_derivative(args):
+        z_idx, tomo_z_bin = args
+        nz_per = nz_fid.copy()
+        nz_per[z_idx, tomo_z_bin+1] += epsilon
+        nz_per[:,tomo_z_bin+1] /= np.trapz(y=nz_per[:,tomo_z_bin+1], x=nz_fid[:,0])
+        source_nz_local = nz_per
+        ci.set_source_sample(source_nz_local)
+        (xip_per, xim_per) = ci.xi_pm_tomo()
+        
+        # dxi_dn = np.array([((xip_per[:,tbi,tbj] - xip_fid[:,tbi,tbj]) / epsilon) for tbi in range(n_tomo) for tbj in range(n_tomo) if tbj>=tbi]).reshape(1,jacob_dim1)
+        self.dxi_dn = np.array([((xip_per[:,tbi,tbj]) / epsilon) for tbi in range(n_tomo) for tbj in range(n_tomo) if tbj>=tbi]).reshape(1,jacob_dim1)
+        print("z_idx, tomo_z_bin: ", z_idx, tomo_z_bin)
+        return self.dxi_dn
 
-      ci.set_source_sample(source_nz_local)
+      # ci.set_source_sample(source_nz_local)
       
-      # DHFS MOD START
-      self.xi_diogo_test = ci.xi_pm_tomo()
+      jobs = [(zi, tb) for tb in range(n_tomo) for zi in range(len(nz_fid[:,0]))]
+      # jobs = [(zi, tb) for tb in range(1) for zi in range(1)]
+      path_jacob = "/gpfs/scratch/pit-roman-hlis/Diogo/cocoapy310/Cocoa/test.txt"
+      with open(path_jacob,"a") as f:
+        for job in jobs:
+            print(job)
+            derivs = compute_derivative(job)
+            np.savetxt(f,derivs)
+      # list(map(compute_derivative,jobs))
+      # self.xi_diogo_test = ci.xi_pm_tomo()
       # DHFS MOD END 
+      ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       # user may choose to still add photo-z bias or not (here we ad)
       ci.set_nuisance_shear_photoz(

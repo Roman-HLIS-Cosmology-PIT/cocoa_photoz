@@ -14,4 +14,4 @@ model.logposterior(override_values)
 likelihood = model.likelihood["lsst_y1.lsst_y1_cosmic_shear"]
 
 
-print("likelihood.xi_diogo_test:",likelihood.xi_diogo_test)
+print("likelihood.xi_diogo_test:",likelihood.dxi_dn)
