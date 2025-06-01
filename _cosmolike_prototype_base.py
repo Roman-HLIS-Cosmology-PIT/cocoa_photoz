@@ -293,6 +293,10 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       #source_nz_local = f(source_nz_local, nuisance parameters)
 
       ci.set_source_sample(source_nz_local)
+      
+      # DHFS MOD START
+      self.xi_diogo_test = ci.xi_pm_tomo()
+      # DHFS MOD END 
 
       # user may choose to still add photo-z bias or not (here we ad)
       ci.set_nuisance_shear_photoz(
