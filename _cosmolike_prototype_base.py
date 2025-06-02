@@ -16,9 +16,7 @@ from getdist import IniFile
 
 import euclidemu2 as ee2
 
-import math
-
-path_jacob = "/gpfs/scratch/pit-roman-hlis/Diogo/cocoapy310/Cocoa/test1.txt" # DHFS MOD
+path_jacob = "/gpfs/scratch/pit-roman-hlis/Diogo/cocoapy310/Cocoa/test_central_difference.txt" # DHFS MOD
 
 import cosmolike_lsst_y1_interface as ci
 
@@ -292,31 +290,31 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       # (1) deep copy the numpy array (so we keep track of the fiducial
       # (2) modify the copy
       # (3) call set_source_sample
-      source_nz_local = self.source_nz.copy()
+      # source_nz_local = self.source_nz.copy()
 
       ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       # DHFS MOD START
       
-      nz_fid = self.source_nz.copy()
-      ci.set_source_sample(nz_fid)
-      xip_fid = ci.xi_pm_tomo()[0].copy()
+      # ci.set_source_sample(nz_fid)
+      # xip_fid = ci.xi_pm_tomo()[0].copy()
 
-      epsilon, n_tomo, ntheta = 0.01, self.source_ntomo, self.ntheta
-      from math import factorial # DHFS MOD
-      combs = int(factorial(n_tomo+2-1)/(2*factorial(n_tomo-1))) # number of non-repeated combinations of i,j in n_tomo
-      jacob_dim1 = ntheta * combs # size of the 2pt function
       # insert mod function here <-
       #source_nz_local = f(source_nz_local, nuisance parameters)
-      test_fisher = fisher.Fisher(ci,xip_fid,n_tomo,jacob_dim1)
 
       # ci.set_source_sample(source_nz_local)
+
+      nz_fid = self.source_nz.copy()
+      n_tomo = self.source_ntomo
+      n_theta = self.ntheta
+      test_fisher = fisher.Fisher(ci,nz_fid,n_tomo,n_theta)
       
       jobs = [(zi, tb) for tb in range(n_tomo) for zi in range(len(nz_fid[:,0]))]
 
       with open(path_jacob,"a") as f:
         for job in jobs:
-            derivs = test_fisher.compute_derivative(job,self.source_nz.copy(),nz_fid)
+            # derivs = test_fisher.forward_difference(job)
+            derivs = test_fisher.central_difference(job)
             print("z, ntomo: ",job)
             np.savetxt(f,derivs)
       # DHFS MOD END 
