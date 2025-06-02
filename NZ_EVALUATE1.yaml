@@ -1,3 +1,5 @@
+output: ./projects/lsst_y1/chains/EXAMPLE_EVALUATE1
+
 timing: True
 debug: False
 stop_at_error: True
@@ -234,5 +236,3 @@ sampler:
       #LSST_BTA_1: 1.01257
       w0pwa: -0.9
       w: -0.9
-
-output: ./projects/lsst_y1/chains/EXAMPLE_EVALUATE1
