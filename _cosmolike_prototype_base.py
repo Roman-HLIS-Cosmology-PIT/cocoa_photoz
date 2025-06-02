@@ -308,38 +308,17 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       jacob_dim1 = ntheta * combs # size of the 2pt function
       # insert mod function here <-
       #source_nz_local = f(source_nz_local, nuisance parameters)
-      test_fisher = fisher.Fisher(ci,xip_fid,n_tomo,jacob_dim1) #ci,xip_fid,n_tomo,jacob_dim1
-      ## ~~~~~~~~~~~~~~~~~~~~~~~~~DERIVE FUNC~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      # def compute_derivative(args):
-      #   z_idx, tomo_z_bin = args
-
-      #   nz_per = self.source_nz.copy()
-      #   nz_per[z_idx, tomo_z_bin+1] += epsilon
-      #   nz_per[:,tomo_z_bin+1] /= np.trapz(y=nz_per[:,tomo_z_bin+1], x=nz_fid[:,0])
-
-      #   ci.set_source_sample(nz_per)
-      #   xip_per = ci.xi_pm_tomo()[0].copy()
-        
-      #   self.dxi_dn = np.array([((xip_per[:,tbi,tbj] - xip_fid[:,tbi,tbj]) / epsilon) for tbi in range(n_tomo) for tbj in range(n_tomo) if tbj>=tbi]).reshape(1,jacob_dim1)
-      #   return self.dxi_dn
-      ## ~~~~~~~~~~~~~~~~~~~~~~~~~DERIVE FUNC~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      test_fisher = fisher.Fisher(ci,xip_fid,n_tomo,jacob_dim1)
 
       # ci.set_source_sample(source_nz_local)
       
       jobs = [(zi, tb) for tb in range(n_tomo) for zi in range(len(nz_fid[:,0]))]
-      # jobs = [(zi, tb) for tb in range(1) for zi in range(1)]
-      # with open(path_jacob,"a") as f:
-      #   for job in jobs:
-      #       derivs = compute_derivative(job)
-      #       print("z, ntomo: ",job)
-      #       np.savetxt(f,derivs)
+
       with open(path_jacob,"a") as f:
         for job in jobs:
             derivs = test_fisher.compute_derivative(job,self.source_nz.copy(),nz_fid)
             print("z, ntomo: ",job)
             np.savetxt(f,derivs)
-      # list(map(compute_derivative,jobs))
-      # self.xi_diogo_test = ci.xi_pm_tomo()
       # DHFS MOD END 
       ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
