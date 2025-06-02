@@ -33,14 +33,15 @@ class Fisher:
         z_idx, tomo_z_bin = args
 
         nz_per_p = self.nz_fid.copy()
-        nz_per_m = self.nz_fid.copy()
         nz_per_p[z_idx, tomo_z_bin+1] += epsilon
         nz_per_p[:,tomo_z_bin+1] /= np.trapz(y=nz_per_p[:,tomo_z_bin+1], x=self.nz_fid[:,0])
-        nz_per_m[z_idx, tomo_z_bin+1] -= epsilon
-        nz_per_m[:,tomo_z_bin+1] /= np.trapz(y=nz_per_m[:,tomo_z_bin+1], x=self.nz_fid[:,0])
-
         self.ci.set_source_sample(nz_per_p)
         xip_per_p = self.ci.xi_pm_tomo()[0].copy()
+        
+        nz_per_m = self.nz_fid.copy()
+        nz_per_m[z_idx, tomo_z_bin+1] -= epsilon
+        nz_per_m[nz_per_m[:, tomo_z_bin+1]<0, tomo_z_bin+1] = 0 # maks rows where column tomo_z_bin+1 is negative and use fancy indexing
+        nz_per_m[:,tomo_z_bin+1] /= np.trapz(y=nz_per_m[:,tomo_z_bin+1], x=self.nz_fid[:,0])
         self.ci.set_source_sample(nz_per_m)
         xip_per_m = self.ci.xi_pm_tomo()[0].copy()
         
