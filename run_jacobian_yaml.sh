@@ -9,7 +9,7 @@
 #SBATCH --mail-type=all    # Send email at begin and end of job
 #SBATCH --mail-user=souzadio.jpl.nasa.gov
 
-yaml_file=/gpfs/scratch/pit-roman-hlis/Diogo/cocoapy310/Cocoa/projects/lsst_y1/cocoa_photoz/NZ_EVALUATE1.yaml
+yaml_file=/gpfs/scratch/pit-roman-hlis/Diogo/cocoapy310/Cocoa/projects/lsst_y1/cocoa_photoz/yamls/NZ_EVALUATE${SLURM_ARRAY_TASK_ID}.yaml
 
 echo Running on host `hostname`
 echo Time is `date`
