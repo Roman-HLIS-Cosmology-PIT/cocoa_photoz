@@ -2,7 +2,7 @@ outs_jacobian/*
 !outs_jacobian/README.md
 results_jacobian/*
 !results_jacobian/README.md
-des_cosmolike_prototype_base/*
-*des_cosmolike_prototype_base/_cosmolike_prototype_base.py
+cosmolike_prototype_base_des/*
+*cosmolike_prototype_base_des/_cosmolike_prototype_base.py
 projects/
 __pycache__/
