@@ -63,5 +63,6 @@ class Fisher:
     
     def fisher_matrix(self,args):
         dxipdn = self.central_difference(args)
-        fisher_mat = dxipdn.T @ self.inv_cov @ dxipdn
+        inv_cov_xip = self.inv_cov[0:390,0:390]
+        fisher_mat = dxipdn @ inv_cov_xip @ dxipdn.T
         return fisher_mat

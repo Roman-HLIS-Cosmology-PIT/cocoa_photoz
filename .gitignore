@@ -1,0 +1,6 @@
+outs_jacobian/*
+!outs_jacobian/README.md
+results_jacobian/*
+!results_jacobian/README.md
+projects/
+__pycache__/

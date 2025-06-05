@@ -315,6 +315,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       print('------------------------------------------------')
       # path_jacob = f"/gpfs/scratch/pit-roman-hlis/Diogo/cocoapy310/Cocoa/test_forward_difference/test_forward_difference_eps{epsilon}.txt" # DHFS MOD
       path_jacob = f"/gpfs/scratch/pit-roman-hlis/Diogo/cocoapy310/Cocoa/test_central_difference/test_central_difference_eps{epsilon}.txt" # DHFS MOD
+      # path_jacob = f"/gpfs/scratch/pit-roman-hlis/Diogo/cocoapy310/Cocoa/fisher_matrix_lst_y1.txt" # DHFS MOD
       test_fisher = fisher.Fisher(ci,nz_fid,n_tomo,n_theta,epsilon)
       
       jobs = [(zi, tb) for tb in range(n_tomo) for zi in range(len(nz_fid[:,0]))]
@@ -323,6 +324,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
         for job in jobs:
             # derivs = test_fisher.forward_difference(job)
             derivs = test_fisher.central_difference(job)
+            # derivs = test_fisher.fisher_matrix(job)
             print("z, ntomo: ",job)
             np.savetxt(f,derivs)
       # DHFS MOD END 
