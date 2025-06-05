@@ -1,4 +1,4 @@
-output: ./projects/lsst_y1/chains/EXAMPLE_EVALUATE0
+output: ./projects/lsst_y1/chains/EXAMPLE_EVALUATE12
 
 timing: True
 debug: False
@@ -19,7 +19,7 @@ likelihood:
     print_datavector: False
     ggl_exclude: [[4,0],[5,0],[5,1],[6,0],[6,1],[6,2],[7,0],[7,1],[7,2],[7,3]] 
     external_nz_modeling: 1
-    epsilon: 1e-20
+    epsilon: 1e-8
     
 params:
   As_1e9:

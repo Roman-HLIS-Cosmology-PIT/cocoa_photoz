@@ -39,37 +39,44 @@ CAMBAccuracyBoost = 1.1
 non_linear_emul = 2
 CLprobe="xi"
 
-path_cocoa="/gpfs/scratch/pit-roman-hlis/Diogo/cocoapy310/Cocoa/projects/lsst_y1/cocoa_photoz"
-path= "../../../external_modules/data/lsst_y1"
-data_file="lsst_y1_M1_GGL0.05.dataset"
+survey = 'lsst_y1'
 
-IA_model = 0
-IA_redshift_evolution = 3
+path_cocoa="/gpfs/scratch/pit-roman-hlis/Diogo/cocoapy310/Cocoa/"
+titles = {'lsst_y1': 'LSST Y1 Source', 'roman_real': 'Roman Real Y1 Source', 'des_y3': 'DES Y3 Source'}
 
-ntheta = 26 
-theta_min_arcmin = 2.5 
-theta_max_arcmin = 900
+def survey_params(survey):
+    if survey == 'lsst_y1':
+        path= f"../../../external_modules/data/{survey}"
+        data_file="lsst_y1_M1_GGL0.05.dataset"
 
-As_1e9 = 2.1
-ns = 0.96605
-H0 = 67.32
-omegab = 0.04
-omegam = 0.3
-mnu = 0.06
-LSST_DZ_S1 = 0.0414632
-LSST_DZ_S2 = 0.00147332
-LSST_DZ_S3 = 0.0237035
-LSST_DZ_S4 = -0.0773436
-LSST_DZ_S5 = -8.67127e-05
-LSST_M1 = 0.0191832
-LSST_M2 = -0.0431752
-LSST_M3 = -0.034961
-LSST_M4 = -0.0158096
-LSST_M5 = -0.0158096
-LSST_A1_1 = 0.606102
-LSST_A1_2 = -1.51541
-w0pwa = -0.9
-w = -0.9
+        IA_model = 0
+        IA_redshift_evolution = 3
+
+        ntheta = 26 
+        theta_min_arcmin = 2.5 
+        theta_max_arcmin = 900
+
+        LSST_DZ_S1 = 0.0414632
+        LSST_DZ_S2 = 0.00147332
+        LSST_DZ_S3 = 0.0237035
+        LSST_DZ_S4 = -0.0773436
+        LSST_DZ_S5 = -8.67127e-05
+        LSST_M1 = 0.0191832
+        LSST_M2 = -0.0431752
+        LSST_M3 = -0.034961
+        LSST_M4 = -0.0158096
+        LSST_M5 = -0.0158096
+        LSST_A1_1 = 0.606102
+        LSST_A1_2 = -1.51541
+        return path, data_file, IA_model, IA_redshift_evolution
+    elif survey == 'roman_real':
+        pass    
+    else:
+        print("\n-----CRITICAL-----")
+        print(f'\nSurvey "{survey}" not found\n')
+        print("-----CRITICAL-----\n")
+
+(path, data_file, IA_model, IA_redshift_evolution) = survey_params(survey=survey)
 
 # NEED TO START COSMOLIKE 
 
@@ -142,7 +149,7 @@ def get_fisher_matrix(dtwoptdn_relative_path,twopt="xip"):
     fisher_mat = dxipdn @ inv_cov_xip @ dxipdn.T
     return fisher_mat
 
-dtwoptdn_relative_path = "/results_jacobian/test_central_difference/test_central_difference_eps0.0001.txt"
+dtwoptdn_relative_path = f"results_jacobian/{survey}/test_central_difference/test_central_difference_eps0.0001.txt"
 # x = get_fisher_matrix(dtwoptdn_relative_path,twopt="xip")
 # print(x.shape)
 
@@ -152,7 +159,8 @@ def plot_fisher_matrix(dtwoptdn_relative_path,twopt="xip"):
 
     im = plt.imshow(fisher_mat,cmap='seismic',vmin=-1,vmax=+1)
     plt.colorbar(im)
-    plt.savefig('.figures/fisher_xip_lsst_y1.pdf')
+    plt.title(f'Fisher matrix: {titles[survey]}')
+    plt.savefig(f'./plot_fisher_matrix__plot_fisher_matrix_{twopt}__{survey}.pdf')
     return 0
 
 plot_fisher_matrix(dtwoptdn_relative_path,twopt="xip")
