@@ -311,8 +311,8 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       print(f"epsilon: {epsilon}")
       print('------------------------------------------------')
       print('------------------------------------------------')
-      # path_jacob = f"./results_jacobian/lsst/test_forward_difference/test_forward_difference_eps{epsilon}.txt" # DHFS MOD
-      path_jacob = f"./results_jacobian/lsst/test_central_difference/test_central_difference_eps{epsilon}.txt" # DHFS MOD
+      # path_jacob = f"./results_jacobian/lsst_y1/test_forward_difference/test_forward_difference_eps{epsilon}.txt" # DHFS MOD
+      path_jacob = f"./results_jacobian/lsst_y1/test_central_difference/test_central_difference_eps{epsilon}.txt" # DHFS MOD
       test_fisher = fisher.Fisher(ci,nz_fid,n_tomo,n_theta,epsilon)
       
       jobs = [(zi, tb) for tb in range(n_tomo) for zi in range(len(nz_fid[:,0]))]
