@@ -7,7 +7,8 @@
 #SBATCH --cpus-per-task=28
 #SBATCH --time=7-00:00:00
 
-yaml_path=/gpfs/scratch/pit-roman-hlis/Diogo/cocoapy310/Cocoa/projects/lsst_y1/cocoa_photoz/yamls/lsst/NZ_EVALUATE${SLURM_ARRAY_TASK_ID}.yaml
+# yaml_file=/gpfs/scratch/pit-roman-hlis/Diogo/cocoapy310/Cocoa/projects/lsst_y1/cocoa_photoz/yamls/lsst_y1/NZ_EVALUATE${SLURM_ARRAY_TASK_ID}.yaml
+yaml_file=/gpfs/scratch/pit-roman-hlis/Diogo/cocoapy310/Cocoa/projects/lsst_y1/cocoa_photoz/yamls/roman_real/NZ_EVALUATE${SLURM_ARRAY_TASK_ID}.yaml
 
 echo Running on host `hostname`
 echo Time is `date`
