@@ -25,7 +25,7 @@ likelihood:
     IA_model: 0
     IA_redshift_evolution: 3
     external_nz_modeling: 1
-    epsilon: 1e-18
+    epsilon: 1e-12
     
 params:
   As_1e9:

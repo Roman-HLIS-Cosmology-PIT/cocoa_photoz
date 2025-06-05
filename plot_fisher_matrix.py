@@ -6,7 +6,10 @@ from matplotlib import pyplot as plt
 import numpy as np
 # import euclidemu2
 import scipy
-import cosmolike_lsst_y1_interface as ci
+
+# import cosmolike_lsst_y1_interface as ci
+import cosmolike_roman_real_interface as ci
+
 from getdist import IniFile
 import itertools
 import iminuit
@@ -39,38 +42,28 @@ CAMBAccuracyBoost = 1.1
 non_linear_emul = 2
 CLprobe="xi"
 
-survey = 'lsst_y1'
+survey = 'roman_real'
 
 path_cocoa="/gpfs/scratch/pit-roman-hlis/Diogo/cocoapy310/Cocoa/"
 titles = {'lsst_y1': 'LSST Y1 Source', 'roman_real': 'Roman Real Y1 Source', 'des_y3': 'DES Y3 Source'}
 
 def survey_params(survey):
     if survey == 'lsst_y1':
-        path= f"../../../external_modules/data/{survey}"
+        path= path_cocoa+f"external_modules/data/{survey}"
         data_file="lsst_y1_M1_GGL0.05.dataset"
 
         IA_model = 0
         IA_redshift_evolution = 3
 
-        ntheta = 26 
-        theta_min_arcmin = 2.5 
-        theta_max_arcmin = 900
-
-        LSST_DZ_S1 = 0.0414632
-        LSST_DZ_S2 = 0.00147332
-        LSST_DZ_S3 = 0.0237035
-        LSST_DZ_S4 = -0.0773436
-        LSST_DZ_S5 = -8.67127e-05
-        LSST_M1 = 0.0191832
-        LSST_M2 = -0.0431752
-        LSST_M3 = -0.034961
-        LSST_M4 = -0.0158096
-        LSST_M5 = -0.0158096
-        LSST_A1_1 = 0.606102
-        LSST_A1_2 = -1.51541
         return path, data_file, IA_model, IA_redshift_evolution
     elif survey == 'roman_real':
-        pass    
+        path= path_cocoa+f"external_modules/data/{survey}/data_challenge1_real"
+        data_file="dc1.dataset"
+
+        IA_model = 0
+        IA_redshift_evolution = 3
+
+        return path, data_file, IA_model, IA_redshift_evolution
     else:
         print("\n-----CRITICAL-----")
         print(f'\nSurvey "{survey}" not found\n')
@@ -82,6 +75,13 @@ def survey_params(survey):
 
 ini = IniFile(os.path.normpath(os.path.join(path, data_file)))
 
+print()
+print("============")
+print(path)
+print(ini)
+print("============")
+print()
+
 ci.initial_setup()
 ci.init_accuracy_boost(1.0, 1.0, int(1))
 ci.init_cosmo_runmode(is_linear = False)
@@ -91,6 +91,7 @@ ci.init_redshift_distributions_from_files(
       lens_ntomo=int(ini.int("lens_ntomo")), 
       source_multihisto_file=ini.relativeFileName('nz_source_file'),
       source_ntomo=int(ini.int("source_ntomo")))
+
 
 ci.init_IA( ia_model = int(IA_model), 
             ia_redshift_evolution = int(IA_redshift_evolution))
@@ -102,9 +103,16 @@ ci.init_binning(int(ini.int("n_theta")),
                 ini.float("theta_min_arcmin"), 
                 ini.float("theta_max_arcmin"))
 
+# if survey == 'roman_real':
+#     ggl_exclude = [[4,0],[5,0],[5,1],[6,0],[6,1],[6,2],[7,0],[7,1],[7,2],[7,3]] 
+#     ci.init_ggl_exclude(np.array(ggl_exclude).flatten())
+# else:
+#     pass    
+
 ci.init_data_real(ini.relativeFileName('cov_file'), 
                   ini.relativeFileName('mask_file'), 
                   ini.relativeFileName('data_file'))
+
 
 #~~~~~~~~~~~~~~~~~~~~~~~~
 #~~~~~~~~~~~~~~~~~~~~~~~~
@@ -143,6 +151,11 @@ def get_important_dimensions(twopt):
 
 def get_fisher_matrix(dtwoptdn_relative_path,twopt="xip"):
     twopt_dim = get_important_dimensions(twopt)
+    print()
+    print()
+    print('TEST',ci.get_inv_cov_masked())
+    print()
+    print()
     inv_cov_masked = np.array(ci.get_inv_cov_masked())
     dxipdn = np.genfromtxt(path_cocoa+dtwoptdn_relative_path)
     inv_cov_xip = inv_cov_masked[0:twopt_dim,0:twopt_dim]

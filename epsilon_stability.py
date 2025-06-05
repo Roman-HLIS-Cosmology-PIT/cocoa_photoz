@@ -1,9 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+# TODO: Specify i, j, a, theta_a, k, n^k, b, z_b
+
 path = "/gpfs/scratch/pit-roman-hlis/Diogo/cocoapy310/Cocoa/results_jacobian/"
 
-survey = 'roman_real'
+survey = 'lsst_y1'
 
 titles = {'lsst_y1': 'LSST Y1 Source', 'roman_real': 'Roman Real Y1 Source', 'des_y3': 'DES Y3 Source'}
 
@@ -11,18 +13,19 @@ titles = {'lsst_y1': 'LSST Y1 Source', 'roman_real': 'Roman Real Y1 Source', 'de
 log_a = -14
 eps_values1 = list(np.round(np.logspace(log_a,-1,-log_a),decimals=20))+[2e-1,3e-1,4e-1,5e-1,6e-1,7e-1]
 
-row = 0
-col = 0
+row = 1
+col = 1
 
 dxipdn_forward = []
 dxipdn_central = []
 
 def plot_epsilon_stability():
     plt.figure()
+    print(f'forward ; central ; forward / central')
     for i,eps in enumerate(eps_values1):
         x1 = np.genfromtxt(path+survey+f"/test_forward_difference/test_forward_difference_eps{eps_values1[i]}.txt")[row,col]
         x2 = np.genfromtxt(path+survey+f"/test_central_difference/test_central_difference_eps{eps_values1[i]}.txt")[row,col]
-        print(x1,x2)
+        print(f'{x1} ; {x2} ; {x1/x2}')
         dxipdn_forward.append(x1)
         dxipdn_central.append(x2)
 
@@ -61,4 +64,4 @@ def plot_jacobian_vs_epsilon():
     plt.tight_layout()
     plt.savefig(f"./epsilon_stability__plot_jacobian_vs_epsilon__{survey}.pdf") # python script + function + survey
 
-plot_jacobian_vs_epsilon()
+# plot_jacobian_vs_epsilon()

@@ -1,4 +1,4 @@
-output: ./projects/lsst_y1/chains/EXAMPLE_EVALUATE10
+output: ./projects/lsst_y1/chains/EXAMPLE_EVALUATE25
 
 timing: True
 debug: False
@@ -25,7 +25,7 @@ likelihood:
     IA_model: 0
     IA_redshift_evolution: 3
     external_nz_modeling: 1
-    epsilon: 1e-10
+    epsilon: 7e-1
     
 params:
   As_1e9:
