@@ -1,14 +1,23 @@
+# survey  = 'lsst_y1'
+survey  = 'roman_real'
+
 import sys, platform, os
 os.environ['OMP_NUM_THREADS'] = '8'
 import matplotlib
 import math
 from matplotlib import pyplot as plt
 import numpy as np
-# import euclidemu2
+import euclidemu2
 import scipy
 
-# import cosmolike_lsst_y1_interface as ci
-import cosmolike_roman_real_interface as ci
+if survey == 'lsst_y1':
+    import cosmolike_lsst_y1_interface as ci
+elif survey == 'roman_real':
+    import cosmolike_roman_real_interface as ci
+
+print('------------------------------')
+print('cosmolike interface used', ci)
+print('------------------------------')
 
 from getdist import IniFile
 import itertools
@@ -41,8 +50,6 @@ matplotlib.rcParams['text.usetex'] = False
 CAMBAccuracyBoost = 1.1
 non_linear_emul = 2
 CLprobe="xi"
-
-survey = 'roman_real'
 
 path_cocoa="/gpfs/scratch/pit-roman-hlis/Diogo/cocoapy310/Cocoa/"
 titles = {'lsst_y1': 'LSST Y1 Source', 'roman_real': 'Roman Real Y1 Source', 'des_y3': 'DES Y3 Source'}
@@ -103,16 +110,15 @@ ci.init_binning(int(ini.int("n_theta")),
                 ini.float("theta_min_arcmin"), 
                 ini.float("theta_max_arcmin"))
 
-# if survey == 'roman_real':
-#     ggl_exclude = [[4,0],[5,0],[5,1],[6,0],[6,1],[6,2],[7,0],[7,1],[7,2],[7,3]] 
-#     ci.init_ggl_exclude(np.array(ggl_exclude).flatten())
-# else:
-#     pass    
+if survey == 'roman_real':
+    ggl_exclude = [[4,0],[5,0],[5,1],[6,0],[6,1],[6,2],[7,0],[7,1],[7,2],[7,3]] 
+    ci.init_ggl_exclude(np.array(ggl_exclude).flatten())
+elif survey == 'lsst_y1':
+    pass
 
 ci.init_data_real(ini.relativeFileName('cov_file'), 
                   ini.relativeFileName('mask_file'), 
                   ini.relativeFileName('data_file'))
-
 
 #~~~~~~~~~~~~~~~~~~~~~~~~
 #~~~~~~~~~~~~~~~~~~~~~~~~
