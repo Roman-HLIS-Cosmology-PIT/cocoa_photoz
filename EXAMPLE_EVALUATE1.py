@@ -40,7 +40,7 @@ for survey in surveys:
         path= "../external_modules/data/lsst_y1"
         data_file="lsst_y1_M1_GGL0.05.dataset"
     elif survey == 'roman_real':
-        path= ".././external_modules/data/roman_real"
+        path= "../external_modules/data/roman_real"
         data_file="example1.dataset"
 
     IA_model = 0
