@@ -37,11 +37,11 @@ for survey in surveys:
     non_linear_emul = 2
     CLprobe="xi"
     if survey == 'lsst_y1':
-        path= "../../../external_modules/data/lsst_y1"
+        path= "../external_modules/data/lsst_y1"
         data_file="lsst_y1_M1_GGL0.05.dataset"
     elif survey == 'roman_real':
-        path= "../../../external_modules/data/roman_real/data_challenge1_real"
-        data_file="dc1.dataset"
+        path= ".././external_modules/data/roman_real"
+        data_file="example1.dataset"
 
     IA_model = 0
     IA_redshift_evolution = 3
