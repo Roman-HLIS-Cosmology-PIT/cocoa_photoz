@@ -8,17 +8,17 @@ import sys
 import time
 from . import fisher # DHFS MOD
 
-
 # Local
 from cobaya.likelihoods.base_classes import DataSetLikelihood
 from cobaya.log import LoggedError
 from getdist import IniFile
 
 import euclidemu2 as ee2
+import math
 
 import cosmolike_roman_real_interface as ci
 
-survey = "roman" # DHFS MOD
+survey = "roman"
 
 class _cosmolike_prototype_base(DataSetLikelihood):
 
@@ -34,15 +34,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
     self.cov_file = ini.relativeFileName('cov_file')
 
     self.mask_file = ini.relativeFileName('mask_file')
-    print()
-    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-    print('self.path: ',self.path)
-    print('self.probe: ',self.probe)
-    print('self.mask_file: ',self.mask_file)
-    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-    print()
+
     self.lens_file = ini.relativeFileName('nz_lens_file')
 
     self.source_file = ini.relativeFileName('nz_source_file')
@@ -56,18 +48,10 @@ class _cosmolike_prototype_base(DataSetLikelihood):
     self.theta_min_arcmin = ini.float("theta_min_arcmin")
 
     self.theta_max_arcmin = ini.float("theta_max_arcmin")
-
-    # ------------------------------------------------------------------------
- 
-    self.nz_interp_1d=int(500 + 250*self.accuracyboost)
-    # EUCLID EMULATOR CAN ONLY HANDLE 100 Z's BELOW Z=10
-    max_nz_interp_2d=150
-    if self.non_linear_emul == 1:
-      max_nz_interp_2d=99
-    else: 
-      max_nz_interp_2d=150
-    self.nz_interp_2d=int(min(60 + 15*self.accuracyboost,150))
     
+    # ------------------------------------------------------------------------
+    self.nz_interp_1d=int(500 + 250*self.accuracyboost)
+    self.nz_interp_2d=int(min(60 + 15*self.accuracyboost,150))
     self.nk_interp_2d=int(500 + 250*self.accuracyboost)
 
     self.z_interp_1D = np.linspace(0, 3.0, max(100,int(0.80*self.nz_interp_2d)))
@@ -100,11 +84,9 @@ class _cosmolike_prototype_base(DataSetLikelihood):
 
     # ------------------------------------------------------------------------
 
-    # DHFS MOD START  
     if self.debug:
       ci.set_log_level_debug()
-    # DHFS MOD END  
-
+      
     ci.initial_setup()
     
     ci.init_accuracy_boost(
@@ -115,8 +97,8 @@ class _cosmolike_prototype_base(DataSetLikelihood):
     ci.init_probes(possible_probes=self.probe)
 
     ci.init_binning(int(self.ntheta), self.theta_min_arcmin, self.theta_max_arcmin)
-    
-    ci.init_ggl_exclude(np.array(self.ggl_exclude).flatten()) #DHFS MOD
+
+    ci.init_ggl_exclude(np.array(self.ggl_exclude).flatten())
 
     ci.init_cosmo_runmode(is_linear=False)
 
@@ -124,6 +106,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       ia_model = int(self.IA_model), 
       ia_redshift_evolution = int(self.IA_redshift_evolution))
 
+    #DHFS MOD START    
     if self.external_nz_modeling: 
       (self.lens_nz, self.source_nz) = ci.read_redshift_distributions(
           lens_multihisto_file=self.lens_file,
@@ -133,13 +116,14 @@ class _cosmolike_prototype_base(DataSetLikelihood):
         ) 
       ci.init_lens_sample_size(int(self.lens_ntomo))
       ci.init_source_sample_size(int(self.source_ntomo))
-      ci.init_ntomo_powerspectra() # must be called after set_source/lens_size 
+      ci.init_ntomo_powerspectra() # must be called after set_source/lens_size  
     else:
       ci.init_redshift_distributions_from_files(
         lens_multihisto_file=self.lens_file,
         lens_ntomo=int(self.lens_ntomo), 
         source_multihisto_file=self.source_file,
-        source_ntomo=int(self.source_ntomo))  
+        source_ntomo=int(self.source_ntomo))
+    #DHFS MOD END
 
     ci.init_data_real(self.cov_file, self.mask_file, self.data_vector_file)
      
@@ -147,14 +131,12 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       # (b1, b2, bs2, b3, bmag). 0 = one amplitude per bin
       ci.init_bias(bias_model=self.bias_model)
 
-
-    # DHFS MOD START    
+    
     # NOTE: Can't set contamination and generate PCA at the same time.
     #       Because PCA generation will reset contamination.
 
     if self.use_baryonic_simulations_for_dv_contamination:
-      ci.init_baryons_contamination(self.which_baryonic_simulations_for_dv_contamination)  
-    # DHFS MOD END
+      ci.init_baryons_contamination(self.which_baryonic_simulations_for_dv_contamination)
 
     if self.create_baryon_pca:
       self.use_baryon_pca = False
@@ -172,9 +154,9 @@ class _cosmolike_prototype_base(DataSetLikelihood):
 
     self.npcs = 4
     self.baryon_pcs_qs = np.zeros(self.npcs)
-
+        
     if self.non_linear_emul == 1:
-      self.emulator = ee2
+      self.emulator = ee2.PyEuclidEmulator()
 
   # ------------------------------------------------------------------------
   # ------------------------------------------------------------------------
@@ -216,30 +198,17 @@ class _cosmolike_prototype_base(DataSetLikelihood):
 
   def set_cosmo_related(self):
     h = self.provider.get_param("H0")/100.0
-
-    # Compute linear matter power spectrum
+    # Compute linear & non-linear matter power spectrum
     PKL = self.provider.get_Pk_interpolator(("delta_tot", "delta_tot"),
       nonlinear=False, extrap_kmax = self.extrap_kmax)
-
-    # Compute non-linear matter power spectrum
     PKNL = self.provider.get_Pk_interpolator(("delta_tot", "delta_tot"),
       nonlinear=True, extrap_kmax = self.extrap_kmax)
-
-    lnPL  = np.empty(self.len_pkz_interp_2D)
-    lnPNL = np.empty(self.len_pkz_interp_2D)
-    
-    t1 = PKNL.logP(self.z_interp_2D, self.k_interp_2D).flatten()
-    t2 = PKL.logP(self.z_interp_2D, self.k_interp_2D).flatten()
-    
-    # Cosmolike wants k in h/Mpc
-    log10k_interp_2D = self.log10k_interp_2D - np.log10(h)
-    
-    for i in range(self.len_z_interp_2D):
-      lnPL[i::self.len_z_interp_2D]  = t2[i*self.len_k_interp_2D:(i+1)*self.len_k_interp_2D]
-    lnPL  += np.log((h**3))
+  
+    log10k_interp_2D = self.log10k_interp_2D - np.log10(h) # Cosmolike wants k in h/Mpc
+    lnPL = PKL.logP(self.z_interp_2D,self.k_interp_2D).flatten(order='F')+np.log(h**3)
 
     if self.non_linear_emul == 1:
-
+    
       params = {
         'Omm'  : self.provider.get_param("omegam"),
         'As'   : self.provider.get_param("As"),
@@ -251,35 +220,33 @@ class _cosmolike_prototype_base(DataSetLikelihood):
         'wa'   : 0.0
       }
 
-      kbt = np.power(10.0, np.linspace(-2.0589, 0.973, self.len_k_interp_2D))
-      kbt, tmp_bt = self.emulator.get_boost(params, self.z_interp_2D, kbt)
-      logkbt = np.log10(kbt)
+      nz = self.len_z_interp_2D
+      nk = self.len_k_interp_2D
+      kbt = 10**np.linspace(-2.0589, 0.973, nk)
+      #kbt, tmp_bt = ee2.get_boost(params, self.z_interp_2D, kbt)
+      kbt, tmp_bt = ee2.get_boost2(params, self.z_interp_2D, self.emulator, kbt)
+      bt = np.array([tmp_bt[i] for i in range(nz)])  
 
-      for i in range(self.len_z_interp_2D):    
-        interp = interp1d(logkbt, 
-            np.log(tmp_bt[i]), 
-            kind = 'linear', 
-            fill_value = 'extrapolate', 
-            assume_sorted = True
-          )
+      lnbt = interp1d(np.log10(kbt), 
+                      np.log(bt), 
+                      axis=1,
+                      kind='linear', 
+                      fill_value='extrapolate', 
+                      assume_sorted=True)(log10k_interp_2D)
+      lnbt[:,10**log10k_interp_2D < 8.73e-3] = 0.0
 
-        lnbt = interp(log10k_interp_2D)
-        lnbt[np.power(10,log10k_interp_2D) < 8.73e-3] = 0.0
-    
-        lnPNL[i::self.len_z_interp_2D]  = lnPL[i::self.len_z_interp_2D] + lnbt
-      
+      lnPNL=(lnPL.reshape(nz,nk,order='F')+lnbt).ravel(order='F')
+
     elif self.non_linear_emul == 2:
-
-      for i in range(self.len_z_interp_2D):
-        lnPNL[i::self.len_z_interp_2D]  = t1[i*self.len_k_interp_2D:(i+1)*self.len_k_interp_2D]  
-      lnPNL += np.log((h**3))      
-
+    
+      lnPNL = PKNL.logP(self.z_interp_2D,self.k_interp_2D).flatten(order='F')+np.log(h**3)   
+    
     else:
+    
       raise LoggedError(self.log, "non_linear_emul = %d is an invalid option", non_linear_emul)
 
-    G_growth = np.sqrt(PKL.P(self.z_interp_2D,0.0005)/PKL.P(0,0.0005))
-    G_growth = G_growth*(1 + self.z_interp_2D)    # do not merge these lines PI
-    G_growth = G_growth/G_growth[len(G_growth)-1] # do not merge these lines PII
+    G_growth = np.sqrt(PKL.P(self.z_interp_2D,0.0005)/PKL.P(0,0.0005))*(1+self.z_interp_2D)
+    G_growth /= G_growth[-1]
 
     ci.set_cosmology(
       omegam=self.provider.get_param("omegam"),
@@ -315,8 +282,8 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       # (3) call set_source_sample
       # source_nz_local = self.source_nz.copy()
 
-      ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      # insert mod function here <-
+      #source_nz_local = f(source_nz_local, nuisance parameters)
       # DHFS MOD START
       
       # ci.set_source_sample(nz_fid)
@@ -327,15 +294,16 @@ class _cosmolike_prototype_base(DataSetLikelihood):
 
       # ci.set_source_sample(source_nz_local)
 
+      #DHFS MOD START
       nz_fid = self.source_nz.copy()
       n_tomo = self.source_ntomo
       n_theta = self.ntheta
       epsilon = self.epsilon
 
-      path_jacob = f"./results_jacobian/roman_real/test_forward_difference/test_forward_difference_eps{epsilon}.txt" # DHFS MOD
-      # path_jacob = f"./results_jacobian/roman_real/test_central_difference/test_central_difference_eps{epsilon}.txt" # DHFS MOD
+      path_jacob = f"./cocoa_photoz/results_jacobian/roman_real/test_forward_difference/test_forward_difference_eps{epsilon}.txt" # DHFS MOD
+      # path_jacob = f"./cocoa_photoz/results_jacobian/roman_real/test_central_difference/test_central_difference_eps{epsilon}.txt" # DHFS MOD
       test_fisher = fisher.Fisher(ci,nz_fid,n_tomo,n_theta,epsilon)
-      
+
       print('------------------------------------------------')
       print('------------------------------------------------')
       print(f"epsilon: {epsilon}")
@@ -353,9 +321,10 @@ class _cosmolike_prototype_base(DataSetLikelihood):
             # derivs = test_fisher.fisher_matrix(job)
             print("z, ntomo: ",job)
             np.savetxt(f,derivs)
+      
+      ci.set_source_sample(nz_fid)
       # DHFS MOD END 
-      ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      
 
       # user may choose to still add photo-z bias or not (here we ad)
       ci.set_nuisance_shear_photoz(
@@ -455,3 +424,58 @@ class _cosmolike_prototype_base(DataSetLikelihood):
   # ------------------------------------------------------------------------
   # ------------------------------------------------------------------------
   # ------------------------------------------------------------------------
+
+  #DHFS MOD START - FROM lsst y1 prototype
+
+  # def logp(self, **params_values):
+  #   datavector = self.internal_get_datavector(**params_values)
+  #   return self.compute_logp(datavector)
+
+  # # ------------------------------------------------------------------------
+  # # ------------------------------------------------------------------------
+  # # ------------------------------------------------------------------------
+
+  # def get_datavector(self, **params_values):        
+  #   datavector = self.internal_get_datavector(**params_values)
+  #   return np.array(datavector)
+
+  # # ------------------------------------------------------------------------
+  # # ------------------------------------------------------------------------
+  # # ------------------------------------------------------------------------
+
+  # def internal_get_datavector(self, **params_values):
+  #   self.set_cosmo_related()
+
+  #   if self.probe != "xi":
+  #       self.set_lens_related(**params_values)
+
+  #   self.set_source_related(**params_values)
+    
+  #   if self.create_baryon_pca:
+  #     pcs = ci.compute_baryon_pcas(scenarios = self.baryon_pca_sims)
+  #     np.savetxt(self.filename_baryon_pca, pcs)
+    
+  #   if self.use_baryon_pca:      
+  #     datavector = np.array(
+  #       ci.compute_data_vector_masked_with_baryon_pcs(
+  #         Q = [
+  #               params_values.get(p, None) for p in [
+  #                 survey+"_BARYON_Q"+str(i+1) for i in range(self.npcs)
+  #               ]
+  #             ]
+  #       )
+  #     )
+  #   else:  
+  #     datavector = np.array(ci.compute_data_vector_masked())
+    
+  #   if self.print_datavector:
+  #     size = len(datavector)
+  #     out = np.zeros(shape=(size, 2))
+  #     out[:,0] = np.arange(0, size)
+  #     out[:,1] = datavector
+  #     fmt = '%d', '%1.8e'
+  #     np.savetxt(self.print_datavector_file, out, fmt = fmt)
+
+  #   return datavector
+  
+  #DHFS MOD END - FROM lsst y1 prototype
