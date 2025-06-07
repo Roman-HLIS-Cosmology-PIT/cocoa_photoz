@@ -6,7 +6,7 @@ stop_at_error: True
 force: True
 
 likelihood:
-  lsst_y1.lsst_y1_cosmic_shear:
+  lsst_y1.cosmic_shear:
     # path: ./external_modules/data/lsst_y1
     path: ./projects/lsst_y1/data
     data_file: lsst_y1_M1_GGL0.05.dataset   # 705 non-masked elements  (EE2 delta chi^2 ~ 11.8)
