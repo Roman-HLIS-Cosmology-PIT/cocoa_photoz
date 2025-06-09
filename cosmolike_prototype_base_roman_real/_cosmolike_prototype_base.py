@@ -46,6 +46,8 @@ class _cosmolike_prototype_base(DataSetLikelihood):
     self.ntheta = ini.int("n_theta")
 
     self.theta_min_arcmin = ini.float("theta_min_arcmin")
+    
+    # self.ggl_exclude = [[6,0],[7,0],[7,1]] #DHFS MOD - TODO read from .dataset
 
     self.theta_max_arcmin = ini.float("theta_max_arcmin")
     

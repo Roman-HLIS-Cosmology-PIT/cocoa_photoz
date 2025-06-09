@@ -14,13 +14,8 @@ import functools
 print(sys.version)
 print(os.getcwd())
 
-# IMPORT CAMB
-sys.path.insert(0, os.environ['ROOTDIR']+'/external_modules/code/CAMB/build/lib.linux-x86_64-'+os.environ['PYTHON_VERSION'])
-import camb
-from camb import model
-print('Using CAMB %s installed at %s'%(camb.__version__,os.path.dirname(camb.__file__)))
-
 surveys = ['lsst_y1','roman_real']
+# surveys = ['lsst_y1']
 
 for survey in surveys:
 
@@ -33,13 +28,13 @@ for survey in surveys:
     print(f'cosmolike interface is {ci}')
     print('---------------------------\n')
 
-    CAMBAccuracyBoost = 1.1
-    non_linear_emul = 2
     CLprobe="xi"
     if survey == 'lsst_y1':
         path= "../external_modules/data/lsst_y1"
         data_file="lsst_y1_M1_GGL0.05.dataset"
     elif survey == 'roman_real':
+        # path= "../external_modules/data/lsst_y1"
+        # data_file="lsst_y1_M1_GGL0.05.dataset"
         path= "../external_modules/data/roman_real"
         data_file="example1.dataset"
 
@@ -62,11 +57,16 @@ for survey in surveys:
 
     ci.init_probes(possible_probes = CLprobe)
 
-    ci.init_binning(int(ini.int("n_theta")), 
+    x = ci.init_binning(int(ini.int("n_theta")), 
                     ini.float("theta_min_arcmin"), 
                     ini.float("theta_max_arcmin"))
 
+    # print(np.array([[6,0],[7,0],[7,1]]).flatten())
+    # ci.init_ggl_exclude(np.array([[6,0],[7,0],[7,1]]).flatten())
 
     ci.init_data_real(ini.relativeFileName('cov_file'), 
                     ini.relativeFileName('mask_file'), 
                     ini.relativeFileName('data_file'))
+
+    x = np.array(ci.get_dv_masked())
+    np.savetxt("./get_dv_masked.txt",x)
