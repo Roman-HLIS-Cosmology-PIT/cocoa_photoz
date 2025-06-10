@@ -1,1 +1,0 @@
-Outputs from running the YAML file with CoCoA.
