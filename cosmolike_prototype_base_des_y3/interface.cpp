@@ -425,6 +425,20 @@ PYBIND11_MODULE(cosmolike_des_y3_interface, m)
       py::arg("PMV").none(false)
     );
 
+  // DHFS MOD START
+  m.def("set_lens_sample",
+      &cosmolike_interface::set_lens_sample,
+      "Set the lens n(z) from a numpy n(z) histogram",
+      py::arg("nofz").none(false)
+    );
+
+  m.def("set_source_sample",
+      &cosmolike_interface::set_source_sample,
+      "Set the source n(z) from a numpy n(z) histogram",
+      py::arg("nofz").none(false)
+    );  
+  // DHFS MOD END
+  
   // --------------------------------------------------------------------
   // --------------------------------------------------------------------
   // reset FUNCTIONS
