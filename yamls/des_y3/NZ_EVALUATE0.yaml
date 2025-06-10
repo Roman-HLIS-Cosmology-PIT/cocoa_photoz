@@ -7,7 +7,6 @@ force: True
 
 likelihood:
   des_y3.des_cosmic_shear:
-    # path: ./projects/des_y3/data
     path: ./external_modules/data/des_y3
     data_file: des_y3_real.dataset
     accuracyboost: 1.0

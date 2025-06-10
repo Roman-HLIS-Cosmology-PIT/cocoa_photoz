@@ -1,4 +1,4 @@
-output: ./projects/lsst_y1/chains/EXAMPLE_EVALUATE24
+output: ./cocoa_photoz/chains/lsst_y1/EXAMPLE_EVALUATE24
 
 timing: True
 debug: False
@@ -7,8 +7,7 @@ force: True
 
 likelihood:
   lsst_y1.cosmic_shear:
-    # path: ./external_modules/data/lsst_y1
-    path: ./projects/lsst_y1/data
+    path: ./external_modules/data/lsst_y1
     data_file: lsst_y1_M1_GGL0.05.dataset   # 705 non-masked elements  (EE2 delta chi^2 ~ 11.8)
     #data_file: lsst_y1_M2_GGL0.05.dataset  # 600 non-masked elements  (EE2 delta chi^2 ~ 6.7)
     #data_file: lsst_y1_M3_GGL0.05.dataset  # 495 non-masked elements  (EE2 delta chi^2 ~ 3.2)

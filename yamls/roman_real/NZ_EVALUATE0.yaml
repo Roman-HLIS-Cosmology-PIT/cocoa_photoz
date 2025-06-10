@@ -7,8 +7,6 @@ force: True
 
 likelihood:
   roman_real.roman_real_cosmic_shear:
-    # path: ./external_modules/data/roman_real/data_challenge1_real
-    # data_file: dc1.dataset
     path: ./external_modules/data/roman_real
     data_file: example1.dataset
     accuracyboost: 1.0
