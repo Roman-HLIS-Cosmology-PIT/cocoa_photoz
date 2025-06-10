@@ -236,3 +236,4 @@ elif SURVEY=="ROMAN":
     U = np.reshape(U.T, (np.shape(U.T)[0], 9, -1))
 print('U:',U)
 print('U shape 2:',U.shape)
+np.savez('./U_source.npz', U=U, perbin=0)
