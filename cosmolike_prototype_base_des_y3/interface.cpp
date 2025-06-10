@@ -332,6 +332,35 @@ PYBIND11_MODULE(cosmolike_des_y3_interface, m)
       py::arg("sigma_e").none(false)
     );
 
+  //DHFS MOD START - from lsst y1 interface
+  m.def("read_redshift_distributions",
+    &cosmolike_interface::read_redshift_distributions_from_files,
+    "Read n(z) lens and source from files (same way as old cosmolike)",
+    py::arg("lens_multihisto_file").none(false),
+    py::arg("lens_ntomo").none(false).noconvert(),
+    py::arg("source_multihisto_file").none(false),
+    py::arg("source_ntomo").none(false).noconvert(),
+    py::return_value_policy::move
+  );
+
+  m.def("init_lens_sample_size",
+      &cosmolike_interface::set_lens_sample_size,
+      "Set the lens number of tomo bins",
+      py::arg("Ntomo").none(false).noconvert()
+    );
+
+  m.def("init_source_sample_size",
+      &cosmolike_interface::set_source_sample_size,
+      "Set the source number of tomo bins",
+      py::arg("Ntomo").none(false).noconvert()
+    );
+
+  m.def("init_ntomo_powerspectra",
+    &cosmolike_interface::init_ntomo_powerspectra,
+    "Set the number of power spectra"
+  );
+  //DHFS MOD END - from lsst y1 interface
+
   // --------------------------------------------------------------------
   // SET FUNCTIONS
   // --------------------------------------------------------------------
@@ -580,7 +609,56 @@ PYBIND11_MODULE(cosmolike_des_y3_interface, m)
 
   // --------------------------------------------------------------------
   // --------------------------------------------------------------------
+
+
+  // DHFS MOD START - from lsst y1 interface
+  // --------------------------------------------------------------------
+  // Miscellaneous
+  // --------------------------------------------------------------------
+  m.def("get_mask",
+      // Why return an STL vector?
+      // The conversion between STL vector and python np array is cleaner
+      // arma:Col is cast to 2D np array with 1 column (not as nice!)
+      []()->std::vector<int>{
+        using namespace cosmolike_interface;
+        arma::Col<int> res = IP::get_instance().get_mask();
+        return arma::conv_to<std::vector<int>>::from(res);
+      },
+      "Get Mask Vector",
+      py::return_value_policy::move
+    );
+
+  m.def("get_dv_masked",
+      // Why return an STL vector?
+      // The conversion between STL vector and python np array is cleaner
+      // arma:Col is cast to 2D np array with 1 column (not as nice!)
+      []()->std::vector<double> {
+        using namespace cosmolike_interface;
+        arma::Col<double> res = IP::get_instance().get_dv_masked();
+        return arma::conv_to<std::vector<double>>::from(res);
+      },
+      "Get Mask Data Vector",
+      py::return_value_policy::move
+    );
+
+  m.def("get_cov_masked",
+      []()->arma::Mat<double> {
+        return cosmolike_interface::IP::get_instance().get_cov_masked();
+      },
+      "Get Mask Covariance Matrix",
+      py::return_value_policy::move
+    );
+
+  m.def("get_inv_cov_masked",
+      []()->arma::Mat<double> {
+        return cosmolike_interface::IP::get_instance().get_inv_cov_masked();
+      },
+      "Get Mask Covariance Matrix",
+      py::return_value_policy::move
+    );
 }
+// DHFS MOD END - from lsst y1 interface
+
 
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------

@@ -14,8 +14,8 @@ import functools
 print(sys.version)
 print(os.getcwd())
 
-# surveys = ['lsst_y1','roman_real']
-surveys = ['roman_real']
+# surveys = ['lsst_y1','roman_real','des_y3']
+surveys = ['des_y3']
 
 for survey in surveys:
 
@@ -23,6 +23,8 @@ for survey in surveys:
         import cosmolike_lsst_y1_interface as ci
     elif survey == 'roman_real':    
         import cosmolike_roman_real_interface as ci
+    elif survey == 'des_y3':    
+        import cosmolike_des_y3_interface as ci
 
     print('\n---------------------------')
     print(f'cosmolike interface is {ci}')
@@ -32,6 +34,9 @@ for survey in surveys:
     if survey == 'lsst_y1':
         path= "../external_modules/data/lsst_y1"
         data_file="lsst_y1_M1_GGL0.05.dataset"
+    elif survey == 'des_y3':
+        path= "../external_modules/data/des_y3"
+        data_file="des_y3_real.dataset"
     elif survey == 'roman_real':
         # path= "../external_modules/data/lsst_y1"
         # data_file="lsst_y1_M1_GGL0.05.dataset"
@@ -47,7 +52,7 @@ for survey in surveys:
     ci.initial_setup()
     ci.init_accuracy_boost(1.0, 1.0, int(1))
     ci.init_cosmo_runmode(is_linear = False)
-    ci.init_ggl_exclude(ggl_exclude)
+    # ci.init_ggl_exclude(ggl_exclude)
     ci.init_redshift_distributions_from_files(
         lens_multihisto_file=ini.relativeFileName('nz_lens_file'),
         lens_ntomo=int(ini.int("lens_ntomo")), 
@@ -63,12 +68,9 @@ for survey in surveys:
                     ini.float("theta_min_arcmin"), 
                     ini.float("theta_max_arcmin"))
 
-    # print(np.array([[6,0],[7,0],[7,1]]).flatten())
-    # ci.init_ggl_exclude(np.array([[6,0],[7,0],[7,1]]).flatten())
-
     ci.init_data_real(ini.relativeFileName('cov_file'), 
                     ini.relativeFileName('mask_file'), 
                     ini.relativeFileName('data_file'))
 
     x = np.array(ci.get_dv_masked())
-    np.savetxt("./get_dv_masked.txt",x)
+    # np.savetxt("./get_dv_masked.txt",x)

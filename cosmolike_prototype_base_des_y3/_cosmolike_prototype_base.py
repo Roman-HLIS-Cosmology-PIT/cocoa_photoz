@@ -6,6 +6,7 @@ import scipy
 from scipy.interpolate import interp1d
 import sys
 import time
+from . import fisher # DHFS MOD
 
 # Local
 from cobaya.likelihoods.base_classes import DataSetLikelihood
@@ -86,11 +87,24 @@ class _cosmolike_prototype_base(DataSetLikelihood):
 
     ci.init_cosmo_runmode(is_linear=False)
 
-    ci.init_redshift_distributions_from_files(
-      lens_multihisto_file=self.lens_file, 
-      lens_ntomo=int(self.lens_ntomo), 
-      source_multihisto_file=self.source_file, 
-      source_ntomo=int(self.source_ntomo))  
+    ##DHFS MOD START
+    if self.external_nz_modeling: 
+      (self.lens_nz, self.source_nz) = ci.read_redshift_distributions(
+          lens_multihisto_file=self.lens_file,
+          lens_ntomo=int(self.lens_ntomo), 
+          source_multihisto_file=self.source_file,
+          source_ntomo=int(self.source_ntomo)
+        ) 
+      ci.init_lens_sample_size(int(self.lens_ntomo))
+      ci.init_source_sample_size(int(self.source_ntomo))
+      ci.init_ntomo_powerspectra() # must be called after set_source/lens_size  
+    else:
+      ci.init_redshift_distributions_from_files(
+        lens_multihisto_file=self.lens_file,
+        lens_ntomo=int(self.lens_ntomo), 
+        source_multihisto_file=self.source_file,
+        source_ntomo=int(self.source_ntomo))
+    ##DHFS MOD END
 
     ci.init_data_real(self.cov_file, self.mask_file, self.data_vector_file)
 
@@ -247,13 +261,76 @@ class _cosmolike_prototype_base(DataSetLikelihood):
         ]
       ]
     )
-    ci.set_nuisance_shear_photoz(
-      bias = [
-        params_values.get(p, None) for p in [
-          survey+"_DZ_S"+str(i+1) for i in range(self.source_ntomo)
+    if self.external_nz_modeling: 
+      # here we send n(z) at every point in the chain as the user may
+      # modify it using an external function (example: adding outliers)
+     
+      # to modify it
+      # (1) deep copy the numpy array (so we keep track of the fiducial
+      # (2) modify the copy
+      # (3) call set_source_sample
+      # source_nz_local = self.source_nz.copy()
+
+      # insert mod function here <-
+      #source_nz_local = f(source_nz_local, nuisance parameters)
+      # DHFS MOD START
+      
+      # ci.set_source_sample(nz_fid)
+      # xip_fid = ci.xi_pm_tomo()[0].copy()
+
+      # insert mod function here <-
+      #source_nz_local = f(source_nz_local, nuisance parameters)
+
+      # ci.set_source_sample(source_nz_local)
+
+      #DHFS MOD START
+      nz_fid = self.source_nz.copy()
+      n_tomo = self.source_ntomo
+      n_theta = self.ntheta
+      epsilon = self.epsilon
+
+      path_jacob = f"./cocoa_photoz/results_jacobian/des_y3/test_forward_difference/test_forward_difference_eps{epsilon}.txt" # DHFS MOD
+      # path_jacob = f"./cocoa_photoz/results_jacobian/des_y3/test_central_difference/test_central_difference_eps{epsilon}.txt" # DHFS MOD
+      test_fisher = fisher.Fisher(ci,nz_fid,n_tomo,n_theta,epsilon)
+
+      print('------------------------------------------------')
+      print('------------------------------------------------')
+      print(f"epsilon: {epsilon}")
+      print("cosmolike interface", ci)
+      print("fisher.Fisher", test_fisher)
+      print('------------------------------------------------')
+      print('------------------------------------------------')
+
+      jobs = [(zi, tb) for tb in range(n_tomo) for zi in range(len(nz_fid[:,0]))]
+
+      with open(path_jacob,"a") as f:
+        for job in jobs:
+            derivs = test_fisher.forward_difference(job)
+            # derivs = test_fisher.central_difference(job)
+            # derivs = test_fisher.fisher_matrix(job)
+            print("z, ntomo: ",job)
+            np.savetxt(f,derivs)
+      
+      ci.set_source_sample(nz_fid)
+
+      # user may choose to still add photo-z bias or not (here we ad)
+      ci.set_nuisance_shear_photoz(
+        bias = [
+          params_values.get(p, None) for p in [
+            survey+"_DZ_S"+str(i+1) for i in range(self.source_ntomo)
+          ]
         ]
-      ]
-    )
+      )
+    else:
+      ci.set_nuisance_shear_photoz(
+        bias = [
+          params_values.get(p, None) for p in [
+            survey+"_DZ_S"+str(i+1) for i in range(self.source_ntomo)
+          ]
+        ]
+      )
+    # DHFS MOD END 
+
     ci.set_nuisance_ia(
       A1 = [
         params_values.get(p, None) for p in [
@@ -294,13 +371,39 @@ class _cosmolike_prototype_base(DataSetLikelihood):
         ]
       ]
     )
-    ci.set_nuisance_clustering_photoz(
-      bias = [
-        params_values.get(p, None) for p in [
-          survey+"_DZ_L"+str(i+1) for i in range(self.lens_ntomo)
+    ## DHFS MOD START
+    if self.external_nz_modeling: 
+      # here we send n(z) at every point in the chain as the user may
+      # modify it using an external function (example: adding outliers)
+     
+      # to modify it
+      # (1) deep copy the numpy array (so we keep track of the fiducial
+      # (2) modify the copy
+      # (3) call set_source_sample
+      lens_nz_local = self.lens_nz.copy()
+
+      # insert mod function here <-
+      #lens_nz_local = f(lens_nz_local, nuisance parameters)
+
+      ci.set_lens_sample(lens_nz_local)
+
+      # user may choose to still add photo-z bias or not (here we ad)
+      ci.set_nuisance_clustering_photoz(
+        bias = [
+          params_values.get(p, None) for p in [
+            survey+"_DZ_L"+str(i+1) for i in range(self.lens_ntomo)
+          ]
         ]
-      ]
-    )
+      )
+    else:
+      ci.set_nuisance_clustering_photoz(
+        bias = [
+          params_values.get(p, None) for p in [
+            survey+"_DZ_L"+str(i+1) for i in range(self.lens_ntomo)
+          ]
+        ]
+      )
+    ## DHFS MOD END  
     ci.set_point_mass(
       PMV = [
         params_values.get(p, None) for p in [
