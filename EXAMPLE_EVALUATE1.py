@@ -52,7 +52,7 @@ for survey in surveys:
     ci.initial_setup()
     ci.init_accuracy_boost(1.0, 1.0, int(1))
     ci.init_cosmo_runmode(is_linear = False)
-    # ci.init_ggl_exclude(ggl_exclude)
+    ci.init_ggl_exclude(ggl_exclude)
     ci.init_redshift_distributions_from_files(
         lens_multihisto_file=ini.relativeFileName('nz_lens_file'),
         lens_ntomo=int(ini.int("lens_ntomo")), 

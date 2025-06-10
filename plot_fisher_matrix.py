@@ -158,7 +158,7 @@ def get_important_dimensions(twopt):
     twopts = {"xip":ξp_dim,"xim":ξm_dim,"gammat":gammat_dim,"w":w_dim}
     return twopts[twopt]
 
-def get_fisher_matrix(dtwoptdn_relative_path,twopt="xip"):
+def get_fisher_matrix(dtwoptdn_relative_path,twopt="xip",savetxt=False):
     twopt_dim = get_important_dimensions(twopt)
     print()
     print()
@@ -169,11 +169,13 @@ def get_fisher_matrix(dtwoptdn_relative_path,twopt="xip"):
     dxipdn = np.genfromtxt(path_cocoa+dtwoptdn_relative_path)
     inv_cov_xip = inv_cov_masked[0:twopt_dim,0:twopt_dim]
     fisher_mat = dxipdn @ inv_cov_xip @ dxipdn.T
-    return fisher_mat
+    if savetxt:
+        np.savetxt(f'results_fisher/{survey}/fisher.txt',fisher_mat)
+        return None
+    else:
+        return fisher_mat
 
 dtwoptdn_relative_path = f"cocoa_photoz/results_jacobian/{survey}/test_central_difference/test_central_difference_eps0.0001.txt"
-# x = get_fisher_matrix(dtwoptdn_relative_path,twopt="xip")
-# print(x.shape)
 
 def plot_fisher_matrix(dtwoptdn_relative_path,twopt="xip"):
 
@@ -185,4 +187,10 @@ def plot_fisher_matrix(dtwoptdn_relative_path,twopt="xip"):
     plt.savefig(f'./plot_fisher_matrix__plot_fisher_matrix_{twopt}__{survey}.pdf')
     return 0
 
-plot_fisher_matrix(dtwoptdn_relative_path,twopt="xip")
+
+#################
+#### EXECUTE ####
+#################
+
+# plot_fisher_matrix(dtwoptdn_relative_path,twopt="xip")
+# get_fisher_matrix(dtwoptdn_relative_path,twopt="xip",savetxt=True)
