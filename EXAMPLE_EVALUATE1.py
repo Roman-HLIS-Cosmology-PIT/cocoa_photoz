@@ -14,8 +14,8 @@ import functools
 print(sys.version)
 print(os.getcwd())
 
-surveys = ['lsst_y1','roman_real']
-# surveys = ['lsst_y1']
+# surveys = ['lsst_y1','roman_real']
+surveys = ['roman_real']
 
 for survey in surveys:
 
@@ -37,6 +37,8 @@ for survey in surveys:
         # data_file="lsst_y1_M1_GGL0.05.dataset"
         path= "../external_modules/data/roman_real"
         data_file="example1.dataset"
+        ggl_exclude = [[6,0],[7,0],[7,1]]
+        ggl_exclude = np.array(ggl_exclude).flatten()
 
     IA_model = 0
     IA_redshift_evolution = 3
@@ -45,7 +47,7 @@ for survey in surveys:
     ci.initial_setup()
     ci.init_accuracy_boost(1.0, 1.0, int(1))
     ci.init_cosmo_runmode(is_linear = False)
-
+    ci.init_ggl_exclude(ggl_exclude)
     ci.init_redshift_distributions_from_files(
         lens_multihisto_file=ini.relativeFileName('nz_lens_file'),
         lens_ntomo=int(ini.int("lens_ntomo")), 
