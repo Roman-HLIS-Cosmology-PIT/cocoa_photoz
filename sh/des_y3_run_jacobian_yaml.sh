@@ -19,9 +19,9 @@ echo Slurm submit DIR is $SLURM_SUBMIT_DIR
 cd $SLURM_SUBMIT_DIR
 module purge > /dev/null 2>&1
 
-source /home/souzadio/miniconda3/etc/profile.d/conda.sh
-conda activate cocoapy310_env
-source start_cocoa.sh
+# source /home/souzadio/miniconda3/etc/profile.d/conda.sh
+# conda activate cocoapy310_env
+# source start_cocoa.sh
 
 module load slurm
 

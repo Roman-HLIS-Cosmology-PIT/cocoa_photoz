@@ -1,5 +1,6 @@
 # survey  = 'lsst_y1'
-survey  = 'roman_real'
+# survey  = 'roman_real'
+survey  = 'des_y3'
 
 import sys, platform, os
 os.environ['OMP_NUM_THREADS'] = '8'
@@ -14,6 +15,8 @@ if survey == 'lsst_y1':
     import cosmolike_lsst_y1_interface as ci
 elif survey == 'roman_real':
     import cosmolike_roman_real_interface as ci
+elif survey == 'des_y3':
+    import cosmolike_des_y3_interface as ci
 
 print('------------------------------')
 print('cosmolike interface used', ci)
@@ -54,23 +57,25 @@ CLprobe="xi"
 path_cocoa="/gpfs/scratch/pit-roman-hlis/Diogo/cocoapy310/Cocoa/"
 titles = {'lsst_y1': 'LSST Y1 Source', 'roman_real': 'Roman Real Y1 Source', 'des_y3': 'DES Y3 Source'}
 
+IA_model = 0
+IA_redshift_evolution = 3
+
 def survey_params(survey):
     if survey == 'lsst_y1':
         path= path_cocoa+f"external_modules/data/{survey}"
         data_file="lsst_y1_M1_GGL0.05.dataset"
-
-        IA_model = 0
-        IA_redshift_evolution = 3
-
         return path, data_file, IA_model, IA_redshift_evolution
+    
     elif survey == 'roman_real':
-        path= path_cocoa+f"external_modules/data/{survey}/data_challenge1_real"
-        data_file="dc1.dataset"
-
-        IA_model = 0
-        IA_redshift_evolution = 3
-
+        path= path_cocoa+f"external_modules/data/{survey}"
+        data_file="example1.dataset"
         return path, data_file, IA_model, IA_redshift_evolution
+
+    elif survey == 'des_y3':
+        path= path_cocoa+f"external_modules/data/{survey}"
+        data_file="des_y3_real.dataset"
+        return path, data_file, IA_model, IA_redshift_evolution
+    
     else:
         print("\n-----CRITICAL-----")
         print(f'\nSurvey "{survey}" not found\n')
@@ -92,7 +97,11 @@ print()
 ci.initial_setup()
 ci.init_accuracy_boost(1.0, 1.0, int(1))
 ci.init_cosmo_runmode(is_linear = False)
-
+if survey=='roman_real':
+    ggl_exclude = [[6,0],[7,0],[7,1]]
+    ggl_exclude = np.array(ggl_exclude).flatten()
+    ci.init_ggl_exclude(ggl_exclude)
+else: None    
 ci.init_redshift_distributions_from_files(
       lens_multihisto_file=ini.relativeFileName('nz_lens_file'),
       lens_ntomo=int(ini.int("lens_ntomo")), 
@@ -109,12 +118,6 @@ ci.init_probes(possible_probes = CLprobe)
 ci.init_binning(int(ini.int("n_theta")), 
                 ini.float("theta_min_arcmin"), 
                 ini.float("theta_max_arcmin"))
-
-if survey == 'roman_real':
-    ggl_exclude = [[4,0],[5,0],[5,1],[6,0],[6,1],[6,2],[7,0],[7,1],[7,2],[7,3]] 
-    ci.init_ggl_exclude(np.array(ggl_exclude).flatten())
-elif survey == 'lsst_y1':
-    pass
 
 ci.init_data_real(ini.relativeFileName('cov_file'), 
                   ini.relativeFileName('mask_file'), 
@@ -168,7 +171,7 @@ def get_fisher_matrix(dtwoptdn_relative_path,twopt="xip"):
     fisher_mat = dxipdn @ inv_cov_xip @ dxipdn.T
     return fisher_mat
 
-dtwoptdn_relative_path = f"results_jacobian/{survey}/test_central_difference/test_central_difference_eps0.0001.txt"
+dtwoptdn_relative_path = f"cocoa_photoz/results_jacobian/{survey}/test_central_difference/test_central_difference_eps0.0001.txt"
 # x = get_fisher_matrix(dtwoptdn_relative_path,twopt="xip")
 # print(x.shape)
 
