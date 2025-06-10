@@ -1,3 +1,6 @@
+# results
+results/*
+!figures
 # chains
 chains/*
 !chains/README.md
@@ -6,6 +9,9 @@ outs_jacobian/*
 !outs_jacobian/README.md
 results_jacobian/*
 !results_jacobian/README.md
-# cosmolike interface and prototype
+#
+roman_nz_realizations
+results_fisher
+# extra folders
 projects/
 __pycache__/

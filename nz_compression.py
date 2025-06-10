@@ -100,8 +100,6 @@ def get_nzs(survey):
 ##### TEST 
 ########################################################
 
-
-
 def nearestPD(A):
     """Find the nearest positive-definite matrix to input
     A Python/Numpy port of John D'Errico's `nearestSPD` MATLAB code [1], which
@@ -226,7 +224,6 @@ print('D shape:',D.shape)
 X,U,dchisq,resids = getModes(D, Cn, chisq_threshold=chisq_threshold)
 print('Chisq kept:',dchisq,'discarded:',resids)
 print(U)
-
 
 ## Save eigenvectors/basis/modes to file
 print('U shape 1:',U.shape)
