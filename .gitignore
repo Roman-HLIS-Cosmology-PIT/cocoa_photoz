@@ -1,10 +1,11 @@
+# chains
+chains/*
+!chains/README.md
+# outs
 outs_jacobian/*
 !outs_jacobian/README.md
 results_jacobian/*
 !results_jacobian/README.md
-cosmolike_prototype_base_des_y3/*
-!cosmolike_prototype_base_des_y3/_cosmolike_prototype_base.py
-!cosmolike_prototype_base_des_y3/interface.cpp
-!cosmolike_prototype_base_des_y3/des_cosmic_shear.yaml
+# cosmolike interface and prototype
 projects/
 __pycache__/

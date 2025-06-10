@@ -1,4 +1,4 @@
-output: ./projects/lsst_y1/chains/EXAMPLE_EVALUATE0
+output: ./cocoa_photoz/chains/lsst_y1/EXAMPLE_EVALUATE0
 
 timing: True
 debug: False
