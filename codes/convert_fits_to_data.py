@@ -30,6 +30,18 @@ dataset_file = 'pile3.dataset'
 hdul = fits.open(fits_file)
 print(hdul.info())
 
+# source = np.array(hdul['nz_source'].data)
+# lens = np.array(hdul['nz_source'].data)
+# xip = np.array(hdul['xip'].data)
+# gammat = np.array(hdul['gammat'].data)
+# wtheta = np.array(hdul['wtheta'].data)
+
+# print(source.dtype.names,source.shape)
+# print(lens.dtype.names,lens.shape)
+# print(xip.dtype.names,xip.shape)
+# print(gammat.dtype.names,gammat.shape)
+# print(wtheta.dtype.names,wtheta.shape)
+# print(wtheta,wtheta.shape)
 
 def modelvector():
     xip = np.array(hdul['xip'].data) # cosmic shear   
