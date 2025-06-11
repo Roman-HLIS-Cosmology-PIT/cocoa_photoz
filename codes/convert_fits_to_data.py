@@ -54,8 +54,26 @@ def modelvector():
     gammat_list = [gammat[i][3] for i in range(len(gammat))]
     wtheta_list = [wtheta[i][3] for i in range(len(wtheta))]
 
-    modelvector_list = enumerate(xip_list + xim_list + gammat_list + wtheta_list)
+    ## START ONLY XIP
+    s_ntomo=4
+    l_ntomo=4
+    n_θ=26
+    ξp_dim  = int(( s_ntomo*(s_ntomo+1) / 2 ) * n_θ)
+    ξm_dim  = int((s_ntomo*(s_ntomo+1) / 2 ) * n_θ)
+    gammat_dim = int((s_ntomo * l_ntomo ) * n_θ)
+    w_dim = int(s_ntomo * n_θ)
+
+    no_ξm = list(np.zeros(ξm_dim))
+    no_gammat = list(np.zeros(gammat_dim))
+    no_wtheta = list(np.zeros(w_dim))
+
+    modelvector_list = enumerate(xip_list + no_ξm + no_gammat + no_wtheta)
     np.savetxt(data_file,list(modelvector_list), fmt='%d %.18e')
+    ## END ONLY XIP
+
+    # modelvector_list = enumerate(xip_list + xim_list + gammat_list + wtheta_list)
+    # np.savetxt(data_file,list(modelvector_list), fmt='%d %.18e')
+
     return None
 # modelvector()
 
@@ -69,20 +87,54 @@ def nz_source_lens():
 
 
 def covariance():
-    covmat = np.array(hdul['COVMAT'].data)
-    dim = covmat.shape[0]
-    covmat = covmat.reshape(int(covmat.shape[0]**2),-1)
-    bin_comb = [[i,j] for i in range(dim) for j in range(dim)]
-    covmat = [bin_comb[i]+list(covmat[i]) for i in range(dim**2)]
-    np.savetxt(cov_file,covmat,fmt='%d %d %.18e')
+    # covmat = np.array(hdul['COVMAT'].data)
+    # dim = covmat.shape[0]
+    # covmat = covmat.reshape(int(covmat.shape[0]**2),-1)
+    # bin_comb = [[i,j] for i in range(dim) for j in range(dim)]
+    # covmat = [bin_comb[i]+list(covmat[i]) for i in range(dim**2)]
+    # np.savetxt(cov_file,covmat,fmt='%d %d %.18e')
+    
+    ## START ONLY XIP
+    covmat=np.array(hdul['COVMAT'].data)
+    s_ntomo=4
+    l_ntomo=4
+    n_θ=26
+    ξp_dim  = int(( s_ntomo*(s_ntomo+1) / 2 ) * n_θ)
+    ξm_dim  = int((s_ntomo*(s_ntomo+1) / 2 ) * n_θ)
+    gammat_dim = int((s_ntomo * l_ntomo ) * n_θ)
+    w_dim = int(s_ntomo * n_θ)
+    ndata_ = ξp_dim+ξm_dim+gammat_dim+w_dim ## dimension that cosmolike wants: [critical] this->ndata_ = 1040
+    #### TODO START ####
+    # new_covmat = np.zeros((ndata_, ndata_)) ## RuntimeError: inv(): matrix is singular
+    # new_covmat = np.ones((ndata_, ndata_))*1e-20 ## [critical] IP::set_inv_cov: masked cov not positive definite
+    #### TODO END ####
+    new_covmat[:ξp_dim, :ξp_dim] = covmat[:ξp_dim, :ξp_dim]
+    new_covmat = new_covmat.reshape(int(new_covmat.shape[0]**2),-1)
+    bin_comb = [[i,j] for i in range(ndata_) for j in range(ndata_)]
+    new_covmat = [bin_comb[i]+list(new_covmat[i]) for i in range(ndata_**2)]
+    np.savetxt(cov_file,new_covmat,fmt='%d %d %.18e')
+    ## END ONLY XIP
     return None
-# covariance()
+covariance()
 
 
 def no_mask():
-    dv_size = np.array(hdul['COVMAT'].data).shape[0]
-    ones = [(i,1.0) for i in range(dv_size)]
+    # dv_size = np.array(hdul['COVMAT'].data).shape[0]
+    # ones = [(i,1.0) for i in range(dv_size)]
+    # np.savetxt(mask_file,ones,fmt='%d %.1f')
+
+    ## START ONLY XIP
+    s_ntomo=4
+    l_ntomo=4
+    n_θ=26
+    ξp_dim  = int(( s_ntomo*(s_ntomo+1) / 2 ) * n_θ)
+    ξm_dim  = int((s_ntomo*(s_ntomo+1) / 2 ) * n_θ)
+    gammat_dim = int((s_ntomo * l_ntomo ) * n_θ)
+    w_dim = int(s_ntomo * n_θ)
+    ndata_ = ξp_dim+ξm_dim+gammat_dim+w_dim ## cosmolike wants this dimension: [critical] this->ndata_ = 1040
+    ones = [(i,1.0) for i in range(ndata_)]
     np.savetxt(mask_file,ones,fmt='%d %.1f')
+    ## END ONLY XIP    
     return None
 # no_mask()
 
