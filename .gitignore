@@ -1,6 +1,7 @@
 # results
 results/*
 !figures
+!zdistris
 # chains
 chains/*
 !chains/README.md
