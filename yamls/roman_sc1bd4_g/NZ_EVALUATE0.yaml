@@ -1,4 +1,4 @@
-output: ./cocoa_photoz/results/chains/roman_sc1b_d4/EXAMPLE_EVALUATE0
+output: ./cocoa_photoz/results/chains/roman_sc1bd4_g/EXAMPLE_EVALUATE0
 
 timing: True
 debug: False
@@ -7,8 +7,8 @@ force: True
 
 likelihood:
   roman_real.roman_real_cosmic_shear:
-    path: ./external_modules/data/roman_real/sc1b_d4
-    data_file: example1.dataset
+    path: ./external_modules/data/roman_real/sc1bd4_g
+    data_file: roman_sc1bd4_g.dataset
     accuracyboost: 1.0
     integration_accuracy: 0
     kmax_boltzmann: 5.0
