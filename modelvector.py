@@ -8,45 +8,66 @@ import importlib
 import camb
 from camb import model
 import scipy
+import yaml
+from types import SimpleNamespace
 
-
-surveys = ['lsst_y1','des_y3','roman_real']
+    
+surveys    = ['lsst_y1','des_y3','roman_real']
 data_files = {'lsst_y1':'lsst_y1_M1_GGL0.05.dataset',
               'des_y3':'des_y3_real.dataset',
               'roman_real':'example1.dataset'}
-survey  = surveys[0]
-path    = '../external_modules/data/' + survey
-data_file = data_files[survey]
+survey     = surveys[0]
+path       = '../external_modules/data/' + survey
+data_file  = data_files[survey]
 
-#############################
-# CLprobe = "xi"
-# CLprobe = "3x2pt"
-# CLprobe = "gammat"
-CAMBAccuracyBoost = 1.1
-non_linear_emul = 2
-IA_model = 0
+############ GENERAL PARAMETERS ############
+non_linear_emul       = 2
+IA_model              = 0
 IA_redshift_evolution = 3
-ntheta = 26 
-theta_min_arcmin = 2.5 
-theta_max_arcmin = 900
-As_1e9 = 2.1
-ns = 0.96605
-H0 = 67.32
-omegab = 0.04
-omegam = 0.3
-mnu = 0.06
-w0pwa = -0.9
-w = -0.9
-AccuracyBoost=1.0
-k_per_logint = 20
-CLAccuracyBoost = 1.0
+CAMBAccuracyBoost     = 1.1
+AccuracyBoost         = 1.0
+k_per_logint          = 20
+CLAccuracyBoost       = 1.0
 CLIntegrationAccuracy = 1
-kmax = 10
+kmax                  = 10
+
+############ LOAD SPEC PARAMETERS ############
+with open('./cosmo_survey_parameters.yaml','r') as f: 
+    config = yaml.safe_load(f)
+cp = config['cosmo'] # cosmological parameters
+sp = config[survey]  # survey parameters
+
+############ COSMOLOGICAL PARMAETERS ############
+As_1e9 = cp['As_1e9']
+ns     = cp['ns']
+H0     = cp['H0']
+omegab = cp['omegab']
+omegam = cp['omegam']
+w0pwa  = cp['w0pwa']
+w      = cp['w']
+mnu    = cp['mnu']
+
+############ SURVEY PARMAETERS ############
+M                 = sp['M']
+A1                = sp['A1']
+A2                = sp['A2']
+BTA               = sp['BTA']
+shear_photoz_bias = sp['shear_photoz_bias']
+lens_photoz_bias  = sp['lens_photoz_bias']
+galaxy_bias_b1    = sp['galaxy_bias_b1']
+galaxy_bias_b2    = sp['galaxy_bias_b2']
+galaxy_bias_bmag  = sp['galaxy_bias_bmag']
+bias_model        = sp['bias_model']
+ntheta            = sp['ntheta'] 
+theta_min_arcmin  = sp['theta_min_arcmin']
+theta_max_arcmin  = sp['theta_max_arcmin']
+
+############ DERIVED PARAMETERS ############
 CLAccuracyBoost = CLAccuracyBoost * AccuracyBoost
 CLSamplingBoost = CLAccuracyBoost * AccuracyBoost
 CLIntegrationAccuracy = max(0, CLIntegrationAccuracy + 5*(AccuracyBoost-1.0))
-#############################
 
+############ INIT COSMOLIKE ############
 module_name = f'cosmolike_{survey}_interface'
 ci = importlib.import_module(module_name)
 
@@ -57,7 +78,7 @@ print('---------------------------\n')
 ini = IniFile(os.path.normpath(os.path.join(path, data_file)))
 
 ci.initial_setup()
-ci.init_accuracy_boost(1.0, 1.0, int(1))
+ci.init_accuracy_boost(1.0, CLAccuracyBoost, int(CLIntegrationAccuracy))
 ci.init_cosmo_runmode(is_linear = False)
 
 if survey == 'roman_real':
@@ -78,7 +99,7 @@ ci.init_redshift_distributions_from_files(
 # nz=np.genfromtxt('../external_modules/data/lsst_y1/lsst_y1_source.nz')
 # ci.set_source_sample(nz)
 
-################################################
+############ DEF CAMB FUNCTION ############
 def get_camb_cosmology(omegam = omegam, omegab = omegab, H0 = H0, ns = ns, 
                        As_1e9 = As_1e9, w = w, w0pwa = w0pwa, AccuracyBoost = 1.0, 
                        kmax = 10, k_per_logint = 20, CAMBAccuracyBoost=1.1):
@@ -104,7 +125,7 @@ def get_camb_cosmology(omegam = omegam, omegab = omegab, H0 = H0, ns = ns,
     z_interp_2D = np.concatenate((np.linspace(0, 2.0, 95), np.linspace(2.25, 10, 5)),  axis=0)
 
     log10k_interp_2D = np.linspace(-4.2, 2.0, 1200)
-
+    
     pars = camb.set_params(H0=H0, 
                            ombh2=omegabh2(omegab, H0), 
                            omch2=omegach2(omegam, omegab, mnu, H0), 
@@ -178,14 +199,13 @@ def get_camb_cosmology(omegam = omegam, omegab = omegab, H0 = H0, ns = ns,
 
     return (log10k_interp_2D, z_interp_2D, lnPL, lnPNL, G_growth, z_interp_1D, chi)
 
+############ CALL CAMB FUNCTION ############
 (log10k_interp_2D, z_interp_2D, lnPL, lnPNL, G_growth, z_interp_1D, chi) = get_camb_cosmology(omegam=omegam, 
     omegab=omegab, H0=H0, ns=ns, As_1e9=As_1e9, w=w, w0pwa=w0pwa, AccuracyBoost=AccuracyBoost, kmax=kmax,
     k_per_logint=k_per_logint, CAMBAccuracyBoost=CAMBAccuracyBoost)
 
-ci.init_accuracy_boost(1.0, CLAccuracyBoost, int(CLIntegrationAccuracy))
-
+############ FEED COSMOLIKE ############
 ci.init_binning(int(ntheta), theta_min_arcmin, theta_max_arcmin)
-
 ci.set_cosmology(omegam = omegam, 
                     H0 = H0, 
                     log10k_2D = log10k_interp_2D, 
@@ -195,50 +215,14 @@ ci.set_cosmology(omegam = omegam,
                     G = G_growth,
                     z_1D = z_interp_1D,
                     chi = chi)
-################################################
-
-LSST_DZ_S1 = 0.0414632
-LSST_DZ_S2 = 0.00147332
-LSST_DZ_S3 = 0.0237035
-LSST_DZ_S4 = -0.0773436
-LSST_DZ_S5 = -8.67127e-05
-LSST_M1 = 0.0191832
-LSST_M2 = -0.0431752
-LSST_M3 = -0.034961
-LSST_M4 = -0.0158096
-LSST_M5 = -0.0158096
-LSST_A1_1 = 0.606102
-LSST_A1_2 = -1.51541
-LSST_DZ_L1 = 0.00457604
-LSST_DZ_L2 = 0.000309875
-LSST_DZ_L3 = 0.00855907
-LSST_DZ_L4 = -0.00316269
-LSST_DZ_L5 = -0.0146753 
-LSST_B1_1 = 1.72716
-LSST_B1_2 = 1.65168
-LSST_B1_3 = 1.61423
-LSST_B1_4 = 1.92886
-LSST_B1_5 = 2.11633
-
-M = [LSST_M1, LSST_M2, LSST_M3, LSST_M4, LSST_M5]
-shear_photoz_bias = [LSST_DZ_S1, LSST_DZ_S2, LSST_DZ_S3, LSST_DZ_S4, LSST_DZ_S5]
-lens_photoz_bias = [LSST_DZ_L1, LSST_DZ_L2, LSST_DZ_L3, LSST_DZ_L4, LSST_DZ_L5]
-galaxy_bias_b1 = [LSST_B1_1, LSST_B1_2, LSST_B1_3, LSST_B1_4, LSST_B1_5]
-galaxy_bias_b2 = [0,0,0,0,0]
-galaxy_bias_bmag = [0,0,0,0,0]
-A1  = [LSST_A1_1, LSST_A1_2, 0, 0, 0]
-A2  = [0, 0, 0, 0, 0]
-BTA = [0, 0, 0, 0, 0]
-
-ci.init_bias(bias_model=[0,0,0,1,0])
+ci.init_bias(bias_model=bias_model)
 ci.set_nuisance_shear_photoz(bias = shear_photoz_bias)
 ci.set_nuisance_clustering_photoz(bias = lens_photoz_bias)
 ci.set_nuisance_bias(B1 = galaxy_bias_b1,
                     B2 = galaxy_bias_b2,
                     B_MAG = galaxy_bias_bmag)
 
-################################################
-
+############ ACCESS 2PCF ############
 xi_pm = np.array(ci.xi_pm_tomo())
 gamma_t = np.array(ci.w_gammat_tomo())
 w_theta = np.array(ci.w_gg_tomo())
