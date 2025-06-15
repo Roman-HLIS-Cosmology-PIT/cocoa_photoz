@@ -9,7 +9,6 @@ cosmo:
   w: -0.9
   mnu: 0.06
 
-
 lsst_y1:
   M: [0.0191832, -0.0431752, -0.034961, -0.0158096, -0.0158096]
   shear_photoz_bias: [0.0414632, 0.00147332, 0.0237035, -0.0773436, -8.67127e-05]
@@ -24,3 +23,18 @@ lsst_y1:
   ntheta: 26 
   theta_min_arcmin: 2.5 
   theta_max_arcmin: 900
+
+roman_real:
+  M: [0,0,0,0,0,0,0,0,0]
+  shear_photoz_bias: [0,0,0,0,0,0,0,0,0]
+  lens_photoz_bias: [0,0,0,0,0,0,0,0,0]
+  galaxy_bias_b1: [0,0,0,0,0,0,0,0,0]
+  galaxy_bias_b2: [0,0,0,0,0,0,0,0,0]
+  galaxy_bias_bmag: [0,0,0,0,0,0,0,0,0]
+  A1: [0,0,0,0,0,0,0,0,0]
+  A2: [0,0,0,0,0,0,0,0,0]
+  BTA: [0,0,0,0,0,0,0,0,0]
+  bias_model: [0,0,0,0,0,0,0,0,0]
+  ntheta: 15 
+  theta_min_arcmin: 2.5 
+  theta_max_arcmin: 250.0

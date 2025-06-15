@@ -13,11 +13,14 @@ from types import SimpleNamespace
 
     
 surveys    = ['lsst_y1','des_y3','roman_real']
+survey     = surveys[2]
+path       = f'../external_modules/data/{survey}/sc1bd4_g/'
+# path       = f'../external_modules/data/{survey}/'
 data_files = {'lsst_y1':'lsst_y1_M1_GGL0.05.dataset',
               'des_y3':'des_y3_real.dataset',
-              'roman_real':'example1.dataset'}
-survey     = surveys[0]
-path       = '../external_modules/data/' + survey
+              #'roman_real':'example1.dataset',
+              'roman_real':'roman_sc1bd4_g.dataset',
+              }
 data_file  = data_files[survey]
 
 ############ GENERAL PARAMETERS ############
@@ -82,7 +85,8 @@ ci.init_accuracy_boost(1.0, CLAccuracyBoost, int(CLIntegrationAccuracy))
 ci.init_cosmo_runmode(is_linear = False)
 
 if survey == 'roman_real':
-    ggl_exclude = [[6,0],[7,0],[7,1]]
+    # ggl_exclude = [[6,0],[7,0],[7,1]]
+    ggl_exclude = []
     ggl_exclude = np.array(ggl_exclude).flatten()
     ci.init_ggl_exclude(ggl_exclude)
 else: pass
@@ -223,12 +227,33 @@ ci.set_nuisance_bias(B1 = galaxy_bias_b1,
                     B_MAG = galaxy_bias_bmag)
 
 ############ ACCESS 2PCF ############
-xi_pm = np.array(ci.xi_pm_tomo())
+
+n_tomo = int(ini.int("source_ntomo"))
+
+xi_pm   = np.array(ci.xi_pm_tomo())
+xi_p    = xi_pm[0]
+xi_m    = xi_pm[1]
 gamma_t = np.array(ci.w_gammat_tomo())
 w_theta = np.array(ci.w_gg_tomo())
 
-# print(xi_pm.shape)
-# print(w_gammat.shape)
-# print(w_gg.shape)
 
-print(gamma_t[0][0])
+cs_tomo = [(i,j) for i in range(n_tomo) for j in range(n_tomo) if j>=i] # tomo bins combination for cosmic-shear => xi^{ij}(theta)
+xi_p = np.hstack([xi_p[:,t[0],t[1]] for t in cs_tomo])
+xi_m = np.hstack([xi_m[:,t[0],t[1]] for t in cs_tomo])
+print('dim[xi+], dim[xi-] =',xi_p.shape,xi_m.shape)
+
+ggl_tomo = [(i,j) for i in range(n_tomo) for j in range(n_tomo)] # tomo bins combination for galaxy-galaxy lensing => gammat^{ij}(theta)
+gamma_t = np.hstack([gamma_t[:,t[0],t[1]] for t in ggl_tomo])
+print('dim[gamma_t] =',gamma_t.shape)
+
+gg_tomo = [(i,j) for i in range(n_tomo) for j in range(n_tomo) if j==i] # tomo bins combination for galaxy-galaxy => w^i(theta)
+w_theta = np.hstack([w_theta[:,t[0],t[1]] for t in gg_tomo])
+print('dim[w]',w_theta.shape)
+
+print('total dim =',xi_p.shape[0] + xi_m.shape[0] + gamma_t.shape[0] + w_theta.shape[0])
+
+mv = np.hstack((xi_p,xi_m,gamma_t,w_theta)) # model vector combined - CosmoLike order [xi+,xi-,gammat,w]
+print('dim[mv] =',mv.shape)
+
+mv = list(enumerate(mv))
+np.savetxt('lcdm.modelvector',mv,fmt='%d %e')
