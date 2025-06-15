@@ -300,8 +300,8 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       n_theta = self.ntheta
       epsilon = self.epsilon
 
-      path_jacob = f"./cocoa_photoz/results_jacobian/roman_real/test_forward_difference/test_forward_difference_eps{epsilon}.txt" # DHFS MOD
-      # path_jacob = f"./cocoa_photoz/results_jacobian/roman_real/test_central_difference/test_central_difference_eps{epsilon}.txt" # DHFS MOD
+      # path_jacob = f"./cocoa_photoz/results/jacobian_matrix/roman_real/test_forward_difference/test_forward_difference_eps{epsilon}.txt" # DHFS MOD
+      path_jacob = f"./cocoa_photoz/results/jacobian_matrix/roman_sc1bd4/test_central_difference/test_central_difference_eps{epsilon}.txt" # DHFS MOD
       test_fisher = fisher.Fisher(ci,nz_fid,n_tomo,n_theta,epsilon)
 
       print('------------------------------------------------')
@@ -316,8 +316,8 @@ class _cosmolike_prototype_base(DataSetLikelihood):
 
       with open(path_jacob,"a") as f:
         for job in jobs:
-            derivs = test_fisher.forward_difference(job)
-            # derivs = test_fisher.central_difference(job)
+            # derivs = test_fisher.forward_difference(job)
+            derivs = test_fisher.central_difference(job)
             # derivs = test_fisher.fisher_matrix(job)
             print("z, ntomo: ",job)
             np.savetxt(f,derivs)

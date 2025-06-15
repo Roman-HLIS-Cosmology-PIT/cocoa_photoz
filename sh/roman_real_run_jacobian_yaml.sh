@@ -1,13 +1,14 @@
 #!/bin/bash -l
-#SBATCH --job-name=JACOBIAN-ROMAN
-#SBATCH --output=./cocoa_photoz/outs_jacobian/%x_%A_%a.out
-#SBATCH --error=./cocoa_photoz/outs_jacobian/%x_%A_%a.err
+#SBATCH --job-name=JACOBIAN_ROMAN_SC1BD4_G
+#SBATCH --output=./cocoa_photoz/results/outs_jacobian/%x_%A_%a.out
+#SBATCH --error=./cocoa_photoz/results/outs_jacobian/%x_%A_%a.err
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=28
 #SBATCH --time=7-00:00:00
 
-yaml_file=./cocoa_photoz/yamls/roman_real/NZ_EVALUATE${SLURM_ARRAY_TASK_ID}.yaml
+# yaml_file=./cocoa_photoz/yamls/roman_real/NZ_EVALUATE${SLURM_ARRAY_TASK_ID}.yaml
+yaml_file=./cocoa_photoz/yamls/roman_sc1bd4_g/NZ_EVALUATE${SLURM_ARRAY_TASK_ID}.yaml
 
 echo Running on host `hostname`
 echo Time is `date`
