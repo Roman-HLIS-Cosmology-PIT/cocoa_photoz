@@ -22,8 +22,8 @@ import h5py
 # import twopoint
 import os
 
-# SURVEY = 'ROMAN' # or DES
-SURVEY = 'DES' # or ROMAN
+SURVEY = 'ROMAN' # or DES
+# SURVEY = 'DES' # or ROMAN
 
 ################################
 ###### Fisher matrix ######
@@ -35,7 +35,8 @@ def fisher(survey):
         fisher = 'fisher2_all_with_scale_cuts.txt'
 
     elif survey == 'ROMAN':
-        fisher = 'results/fisher_matrix/roman_real/fisher.txt'
+        # fisher = 'results/fisher_matrix/roman_real/fisher.txt'
+        fisher = 'results/fisher_matrix/roman_sc1bd4/fisher.txt'
 
     D = np.genfromtxt(fisher)
     return D    
@@ -200,8 +201,9 @@ def getModes(D, Cn, chisq_threshold=0.1):
     return X, U, s*s, resid
 
 # Load nzs and calculate mean, deviation from mean, and covariance
-chisq_threshold=0.15
+# chisq_threshold=0.15
 # chisq_threshold=1e-25
+chisq_threshold=1e-5
 
 n=get_nzs( SURVEY )
 nbar = np.mean(n, axis=0)

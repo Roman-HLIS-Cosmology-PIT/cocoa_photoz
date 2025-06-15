@@ -1,6 +1,6 @@
 # survey  = 'lsst_y1'
-# survey  = 'roman_real'
-survey  = 'des_y3'
+survey  = 'roman_real'
+# survey  = 'des_y3'
 
 import sys, platform, os
 os.environ['OMP_NUM_THREADS'] = '8'
@@ -67,8 +67,10 @@ def survey_params(survey):
         return path, data_file, IA_model, IA_redshift_evolution
     
     elif survey == 'roman_real':
-        path= path_cocoa+f"external_modules/data/{survey}"
-        data_file="example1.dataset"
+        # path= path_cocoa+f"external_modules/data/{survey}"
+        # data_file="example1.dataset"
+        path= path_cocoa+f"external_modules/data/{survey}/sc1bd4_g"
+        data_file="roman_sc1bd4_g.dataset"
         return path, data_file, IA_model, IA_redshift_evolution
 
     elif survey == 'des_y3':
@@ -98,7 +100,8 @@ ci.initial_setup()
 ci.init_accuracy_boost(1.0, 1.0, int(1))
 ci.init_cosmo_runmode(is_linear = False)
 if survey=='roman_real':
-    ggl_exclude = [[6,0],[7,0],[7,1]]
+    # ggl_exclude = [[6,0],[7,0],[7,1]]
+    ggl_exclude = []
     ggl_exclude = np.array(ggl_exclude).flatten()
     ci.init_ggl_exclude(ggl_exclude)
 else: None    
@@ -170,12 +173,14 @@ def get_fisher_matrix(dtwoptdn_relative_path,twopt="xip",savetxt=False):
     inv_cov_xip = inv_cov_masked[0:twopt_dim,0:twopt_dim]
     fisher_mat = dxipdn @ inv_cov_xip @ dxipdn.T
     if savetxt:
-        np.savetxt(f'results_fisher/{survey}/fisher.txt',fisher_mat)
+        # np.savetxt(f'results_fisher/{survey}/fisher.txt',fisher_mat)
+        np.savetxt(f'results/fisher_matrix/roman_sc1bd4/fisher.txt',fisher_mat)
         return None
     else:
         return fisher_mat
 
-dtwoptdn_relative_path = f"cocoa_photoz/results_jacobian/{survey}/test_central_difference/test_central_difference_eps0.0001.txt"
+# dtwoptdn_relative_path = f"cocoa_photoz/results/jacobian_matrix/{survey}/test_central_difference/test_central_difference_eps0.0001.txt"
+dtwoptdn_relative_path = f"cocoa_photoz/results/jacobian_matrix/roman_sc1bd4/test_central_difference/test_central_difference_eps0.001.txt"
 
 def plot_fisher_matrix(dtwoptdn_relative_path,twopt="xip"):
 
@@ -183,14 +188,16 @@ def plot_fisher_matrix(dtwoptdn_relative_path,twopt="xip"):
 
     im = plt.imshow(fisher_mat,cmap='seismic',vmin=-1,vmax=+1)
     plt.colorbar(im)
-    plt.title(f'Fisher matrix: {titles[survey]}')
-    plt.savefig(f'./plot_fisher_matrix__plot_fisher_matrix_{twopt}__{survey}.pdf')
-    return 0
+    # plt.title(f'Fisher matrix: {titles[survey]}')
+    # plt.savefig(f'./plot_fisher_matrix__plot_fisher_matrix_{twopt}__{survey}.pdf')
+    plt.title(f'Fisher matrix: Roman scb1_d4_g')
+    plt.savefig(f'./plot_fisher_matrix__plot_fisher_matrix_{twopt}__roman_sc1bd4.pdf')
+    return None
 
 
 #################
 #### EXECUTE ####
 #################
 
-# plot_fisher_matrix(dtwoptdn_relative_path,twopt="xip")
+plot_fisher_matrix(dtwoptdn_relative_path,twopt="xip")
 # get_fisher_matrix(dtwoptdn_relative_path,twopt="xip",savetxt=True)

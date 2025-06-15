@@ -17,10 +17,11 @@ print(U['U'][0].shape)
 
 ### DES CASE ###
 N = (3-0)/0.01
-z = np.linspace(0,3,int(N)-1)
-# z = np.linspace(0,3,int(N))
+# z = np.linspace(0,3,int(N)-1)
+print(int(N))
+z = np.linspace(0,3,int(46))
 
-print(len(z))
+# x = np.linspace(0,3,)
 
 
 
@@ -31,12 +32,15 @@ print(len(z))
 
 
 def plot_modes():
-    fig, axs = plt.subplots(nrows=2,ncols=4,sharey=False,sharex=False,figsize=(12,7))
+    fig, axs = plt.subplots(nrows=2,ncols=7,sharey=False,sharex=False,figsize=(20,7))
+    # fig, axs = plt.subplots(nrows=2,ncols=4,sharey=False,sharex=False)
     Us = [np.load('./U_source.npz')]
     for k in np.arange(1):
         U = Us[k]
-        for j in np.arange(4):
-            for i in np.arange(5):
+        # for j in np.arange(4):
+            # for i in np.arange(5):
+        for j in np.arange(6):
+            for i in np.arange(6):
                 if k == 0:
                     axs[k,j].plot(z,U['U'][i][j],label=rf'$\mathrm{{PC}}_{i}$' if j==0 else None)
                 elif k == 1:    
@@ -45,14 +49,14 @@ def plot_modes():
                 if k == 0:
                     axs[k,j].set_title(f'Tomo. Bin: {j}' if j==0 else f'{j}')
             axs[k,j].set_xlim(0,3)
-            axs[k,j].set_ylim(-0.2,0.2)
+            axs[k,j].set_ylim(-0.002,0.002)
 
         if k == 0:
             axs[k,0].legend(loc='upper right')
-            axs[k,0].set_ylabel('CosmoSIS\nDV pile3 w/ 3x2 pt',fontsize=15)
+            # axs[k,0].set_ylabel('CosmoSIS\nDV pile3 w/ 3x2 pt',fontsize=15)
         elif k == 1:    
             axs[k,0].legend(loc='upper right')
-            axs[k,0].set_ylabel('CosmoSIS\nDV pile3 w/ '+r'$\xi_+$',fontsize=15)
+            # axs[k,0].set_ylabel('CosmoSIS\nDV pile3 w/ '+r'$\xi_+$',fontsize=15)
 
     plt.tight_layout()
     plt.savefig('./test.pdf')
