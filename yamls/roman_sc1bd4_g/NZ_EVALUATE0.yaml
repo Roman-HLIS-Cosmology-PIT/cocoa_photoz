@@ -246,6 +246,17 @@ params:
       scale: 0.003
     proposal: 0.003
     latex: \Delta z_\mathrm{s,roman}^8
+  roman_DZ_S9:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 0.003
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 0.003
+    proposal: 0.003
+    latex: \Delta z_\mathrm{s,roman}^9
 
 
   roman_M1:
@@ -336,6 +347,17 @@ params:
       scale: 0.005
     proposal: 0.005
     latex: m_\mathrm{roman}^8
+  roman_M9:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 0.005
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 0.005
+    proposal: 0.005
+    latex: m_\mathrm{roman}^9
 
   # Intrinsic alignment
   roman_A1_1:
