@@ -2,6 +2,7 @@
 results/*
 !figures
 !zdistris
+!modes_and_chi2
 # chains
 chains/*
 !chains/README.md
