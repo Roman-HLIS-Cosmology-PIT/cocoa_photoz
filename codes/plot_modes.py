@@ -4,12 +4,13 @@ import h5py
 
 
 surname = 'fisher2_xip_no_scale_cut' ## fisher matrix
+path='/gpfs/scratch/pit-roman-hlis/Diogo/cocoapy310/Cocoa/cocoa_photoz/'
 
 #### TO DO #####
 ### DHFS - REMOVE ALLLLLLL MAGIC NUMBERS! PUT NAMES!!!
 #### TO DO #####
 
-U = np.load('./U_source.npz')
+U = np.load(f'{path}/U_source.npz')
 
 print(U['U'].shape)
 print(U['U'][0])
@@ -34,13 +35,13 @@ z = np.linspace(0,3,int(46))
 def plot_modes():
     fig, axs = plt.subplots(nrows=2,ncols=7,sharey=False,sharex=False,figsize=(20,7))
     # fig, axs = plt.subplots(nrows=2,ncols=4,sharey=False,sharex=False)
-    Us = [np.load('./U_source.npz')]
+    Us = [np.load(f'{path}/U_source.npz')]
     for k in np.arange(1):
         U = Us[k]
         # for j in np.arange(4):
             # for i in np.arange(5):
-        for j in np.arange(6):
-            for i in np.arange(6):
+        for j in np.arange(3):
+            for i in np.arange(3):
                 if k == 0:
                     axs[k,j].plot(z,U['U'][i][j],label=rf'$\mathrm{{PC}}_{i}$' if j==0 else None)
                 elif k == 1:    
@@ -48,8 +49,8 @@ def plot_modes():
                 axs[k,j].set_xlabel('z',fontsize=15)
                 if k == 0:
                     axs[k,j].set_title(f'Tomo. Bin: {j}' if j==0 else f'{j}')
-            axs[k,j].set_xlim(0,3)
-            axs[k,j].set_ylim(-0.002,0.002)
+            # axs[k,j].set_xlim(0,3)
+            # axs[k,j].set_ylim(-0.002,0.002)
 
         if k == 0:
             axs[k,0].legend(loc='upper right')
@@ -59,13 +60,13 @@ def plot_modes():
             # axs[k,0].set_ylabel('CosmoSIS\nDV pile3 w/ '+r'$\xi_+$',fontsize=15)
 
     plt.tight_layout()
-    plt.savefig('./test.pdf')
+    plt.savefig(f'{path}/test.pdf')
 
 
 plot_modes()
 
 plt.figure()
-x = np.genfromtxt('chisq_kept.txt')
+x = np.genfromtxt(f'{path}/chisq_kept.txt')
 plt.plot(list(range(len(x))),x,'o')
 plt.yscale('log')
-plt.savefig('test_chisq_kept.pdf')
+plt.savefig(f'{path}/test_chisq_kept.pdf')

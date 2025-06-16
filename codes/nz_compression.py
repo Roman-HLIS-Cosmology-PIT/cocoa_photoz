@@ -94,7 +94,6 @@ def isPD(B):
     except la.LinAlgError:
         return False
 
-
 def getModes(D, Cn, chisq_threshold=0.1):
     '''Calculate the compression matrix from n to u and the
     modes U that multiply each U.  
@@ -170,14 +169,14 @@ elif SURVEY == 'DES':
     n     = get_nzs( SURVEY )
     nbar  = np.mean(n, axis=0)
     ndiff = n - nbar
-    Cn = np.einsum('ij,ik->jk',ndiff,ndiff) / n.shape[0]
+    Cn = np.einsum('ij,ik->jk',ndiff,ndiff) / n.shape[0] # a[i,j]a[i,k] = c[j,k]
 
 print('Cn shape:',Cn.shape)
 
 D = fisher( SURVEY )
 
 # Load the D matrix (fisher matrix of n(z_i) variations) - its eigenvalues drop rapidly too
-#D = np.genfromtxt('chain_nzsample_source_unsmooth_coarse_max3.txt')
+# D = np.genfromtxt('chain_nzsample_source_unsmooth_coarse_max3.txt')
 # This has never turned out to be positive definite, needs to be 'corrected' first
 
 if not isPD(D):
