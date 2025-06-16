@@ -23,19 +23,33 @@ def compute_n_nbar_ndiff():
             row.append(normalized)
         rows.append(np.hstack(row))
 
-    print('Saving n')
     n = np.vstack(rows)
-    np.savetxt('n_roman_sc1bd4.txt',n)
+    print('Saving n')
+    print('n.shape: ',n.shape)
+    # np.savetxt('n_roman_sc1bd4.txt',n)
+    np.save('n_roman_sc1bd4.npy',n)
 
-    print('Saving nbar')
     nbar = np.mean(n,axis=0)
-    np.savetxt('nbar_roman_sc1bd4.txt',nbar)
+    print('Saving nbar')
+    print('nbar.shape: ',nbar.shape)
+    # np.savetxt('nbar_roman_sc1bd4.txt',nbar)
+    np.save('nbar_roman_sc1bd4.npy',nbar)
 
-    print('Saving ndiff')
     ndiff = n - nbar
-    np.savetxt('ndiff_roman_sc1bd4.txt',ndiff)
+    print('Saving ndiff')
+    print('ndiff.shape: ',ndiff.shape)
+    # np.savetxt('ndiff_roman_sc1bd4.txt',ndiff)
+    np.save('ndiff_roman_sc1bd4.npy',ndiff)
     return None
 
+compute_n_nbar_ndiff()
+
+# n     = np.genfromtxt(f'{path}/n_roman_sc1bd4.txt')     ## shape = ()
+# print('n.shape: ',n.shape)
+# nbar  = np.genfromtxt(f'{path}/nbar_roman_sc1bd4.txt')  ## shape = ()
+# print('nbar.shape: ',nbar.shape)
+# ndiff = np.genfromtxt(f'{path}/ndiff_roman_sc1bd4.txt') ## shape = ()
+# print('ndiff.shape: ',ndiff.shape)
 
 # z and nzs
 # nzd = f'{path}/roman_nz_realizations/Fisher_matrix/Tz_realizations_WZ_bq_pile3_0d01.npy'
