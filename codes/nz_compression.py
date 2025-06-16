@@ -56,10 +56,11 @@ def get_nzs(survey):
         return nzd
 
     elif survey == 'ROMAN':
-        n     = np.genfromtxt(f'{path}/input_files_cosmocov_cocoa/n_roman_sc1bd4.txt')     ## shape = ()
-        nbar  = np.genfromtxt(f'{path}/input_files_cosmocov_cocoa/nbar_roman_sc1bd4.txt')  ## shape = ()
-        ndiff = np.genfromtxt(f'{path}/input_files_cosmocov_cocoa/ndiff_roman_sc1bd4.txt') ## shape = ()
-        return n, nbar, ndiff
+        #n = np.load(f'{path}/n_roman_sc1bd4.npy')        ## shape = (1M , 414)
+        #nbar = np.load(f'{path}/nbar_roman_sc1bd4.npy')  ## shape = (414, )
+        ndiff = np.load(f'{path}/ndiff_roman_sc1bd4.npy') ## shape = (1M , 414)
+        Cn = np.load(f'{path}/Cn_roman_sc1bd4.npy')       ## shape = (414 , 414)
+        return ndiff, Cn
 
 def nearestPD(A):
     """Find the nearest positive-definite matrix to input
@@ -161,16 +162,16 @@ def getModes(D, Cn, chisq_threshold=0.1):
 # Load nzs and calculate mean, deviation from mean, and covariance
 # chisq_threshold=0.15
 # chisq_threshold=1e-25
-chisq_threshold=1e-5
+chisq_threshold=0.01
 
 if SURVEY == 'ROMAN':
-    n,nbar,ndiff = get_nzs( SURVEY )
+    ndiff, Cn = get_nzs( SURVEY )
 elif SURVEY == 'DES':
     n     = get_nzs( SURVEY )
     nbar  = np.mean(n, axis=0)
     ndiff = n - nbar
+    Cn = np.einsum('ij,ik->jk',ndiff,ndiff) / n.shape[0]
 
-Cn = np.einsum('ij,ik->jk',ndiff,ndiff) / n.shape[0]
 print('Cn shape:',Cn.shape)
 
 D = fisher( SURVEY )
@@ -198,7 +199,7 @@ elif SURVEY=="ROMAN":
     U = np.reshape(U.T, (np.shape(U.T)[0], 9, -1))
 # print('U:',U)
 print('U shape 2:',U.shape)
-# np.savez('./U_source.npz', U=U, perbin=0)
+np.savez(f'{path}/U_source.npz', U=U, perbin=0)
 
 # Encode
 u = ndiff @ X.T   # u is (Nz,M)
@@ -206,6 +207,6 @@ nEig = np.shape(u)[1]
 print('nEig: ', nEig)
 
 chisq_kept = np.array([dchisq])
-# np.savetxt('chisq_kept.txt', chisq_kept)
+np.savetxt(f'{path}/chisq_kept.txt', chisq_kept)
 chisq_discard = np.array([resids])
-# np.savetxt('chisq_discard.txt', chisq_discard)
+np.savetxt(f'{path}/chisq_discard.txt', chisq_discard)

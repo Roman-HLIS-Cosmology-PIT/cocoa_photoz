@@ -41,14 +41,20 @@ def compute_n_nbar_ndiff():
     # np.savetxt('ndiff_roman_sc1bd4.txt',ndiff)
     np.save('ndiff_roman_sc1bd4.npy',ndiff)
     return None
+# compute_n_nbar_ndiff()
 
-compute_n_nbar_ndiff()
+def compute_Cn():
+    print('Computing Cn - Covariance matrix of ndiff = n - nbar')
+    ndiff = np.load(f'{path}/ndiff_roman_sc1bd4.npy')
+    Cn = np.einsum('ij,ik->jk',ndiff,ndiff) / ndiff.shape[0]
+    np.save('Cn_roman_sc1bd4.npy',Cn)
+    np.savetxt('Cn_roman_sc1bd4.txt',Cn)
+    return None
+# compute_Cn()
 
-# n     = np.genfromtxt(f'{path}/n_roman_sc1bd4.txt')     ## shape = ()
-# print('n.shape: ',n.shape)
-# nbar  = np.genfromtxt(f'{path}/nbar_roman_sc1bd4.txt')  ## shape = ()
+# nbar  = np.genfromtxt(f'{path}/nbar_roman_sc1bd4.txt')
 # print('nbar.shape: ',nbar.shape)
-# ndiff = np.genfromtxt(f'{path}/ndiff_roman_sc1bd4.txt') ## shape = ()
+# ndiff = np.genfromtxt(f'{path}/ndiff_roman_sc1bd4.txt')
 # print('ndiff.shape: ',ndiff.shape)
 
 # z and nzs
