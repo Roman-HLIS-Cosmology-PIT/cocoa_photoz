@@ -28,6 +28,7 @@ SURVEY = 'ROMAN' # or DES
 ################################
 ###### Fisher matrix ######
 ################################
+path='/gpfs/scratch/pit-roman-hlis/Diogo/cocoapy310/Cocoa/cocoa_photoz/'
 
 def fisher(survey):
     if survey == 'DES': 
@@ -36,7 +37,7 @@ def fisher(survey):
 
     elif survey == 'ROMAN':
         # fisher = 'results/fisher_matrix/roman_real/fisher.txt'
-        fisher = 'results/fisher_matrix/roman_sc1bd4/fisher.txt'
+        fisher = f'{path}/results/fisher_matrix/roman_sc1bd4/fisher.txt'
 
     D = np.genfromtxt(fisher)
     return D    
@@ -44,63 +45,21 @@ def fisher(survey):
 def get_nzs(survey):
     if survey == 'DES':
         ## nz simulations shared by Boyan
-        nz_file_DES = 'roman_nz_realizations/Fisher_matrix/Tz_realizations_WZ_bq_pile3_0d01.npy'
+        nzd = f'{path}/roman_nz_realizations/Fisher_matrix/Tz_realizations_WZ_bq_pile3_0d01.npy'
             
-        nzs = np.load(nz_file_DES) ## shape = (10095, 4, 300) = (Ns, Nt, Nz)
-        nzs = nzs[:,:,1:]          ## shape = (10095, 4, 299) DHFS: For all 10095 simulations (first :) and for all 4 tomo bins (second :) eliminate eliminate the first element (third ,1:) because the first element of all nzs is 0.0.
-        Ns = np.shape(nzs)[0]      ## Number of simulations: 10095
-        Nt = np.shape(nzs)[1]      ## Number of tomographic bins: 4
-        Nz = np.shape(nzs)[2]      ## Number of redshifts: 299
-        nzs_DES = nzs.reshape(Ns, Nt * Nz)
-        return nzs_DES
+        nzd = np.load(nzd)             ## shape = (10095, 4, 300) = (Ns, Nt, Nz) = (# of simulations, # of tomo bins, # of redshift)
+        nzd = nzd[:,:,1:]              ## shape = (10095, 4, 299) | (first :) => all 10095 simulations, (second :) => all 4 tomo bins, (third ,1:) => all redshift bins except the first where nz is 0.0.
+        Ns = np.shape(nzd)[0]          ## Number of simulations: 10095
+        Nt = np.shape(nzd)[1]          ## Number of tomographic bins: 4
+        Nz = np.shape(nzd)[2]          ## Number of redshifts: 299
+        nzd = nzd.reshape(Ns, Nt * Nz) ## shape = (10095, 1196) = (Ns, Nt*Nz)
+        return nzd
 
     elif survey == 'ROMAN':
-        # open simulation: this file contains z and nzs
-        nz_file_ROMAN = 'roman_nz_realizations/sc1b_d4/SVSN/nz_samples__LHC0_pointZ_1e6_Roman_sc1b_d4.h5'
-        nzs_ROMAN_ = h5py.File(nz_file_ROMAN,'r') ## nzs in dict format
-        sim_j = lambda j: [nzs_ROMAN_[f'bin{i}'][j,:] for i in np.arange(9)] ## The jth simulation for all 9 tomographic bins.
-        # Ns_Roman = 10095 ## DHFS - Taken Ns for Roman to be equal to Ns for DES - disclaimer: should use all 9M simulations for Roman
-        Ns_Roman = 50000 ## DHFS - Taken Ns for Roman to be equal to Ns for DES - disclaimer: should use all 9M simulations for Roman
-        nzs_ROMAN = np.stack(([sim_j(j) for j in np.arange(Ns_Roman)])) ## nzs in array format
-        nzs_ROMAN = nzs_ROMAN.reshape(Ns_Roman, 9 * 46)
-        return nzs_ROMAN
-
-########################################################
-##### TEST 
-########################################################
-# nz_file_DES = '/gpfs/projects/MirandaGroup/Diogo/ROMAN-NZ-PROJECT/photoz_uz/Tz_realizations_WZ_bq_pile3_0d01.npy'  ## DHFS: Shared by Boyan, Troxel - this file is for DES
-# nz_file_ROMAN = '/gpfs/projects/MirandaGroup/Diogo/ROMAN-NZ-PROJECT/sc1b_d4/SVSN/nz_samples__LHC0_pointZ_1e6_Roman_sc1b_d4.h5' # open simulation: this file contains z and nzs
-
-# nzs_DES   = np.load(nz_file_DES)
-# nzs_ROMAN_ = h5py.File(nz_file_ROMAN,'r') ## nzs in dict format
-
-# sim_j = lambda j: [nzs_ROMAN_[f'bin{i}'][j,:] for i in np.arange(9)] ## The jth simulation for all 9 tomographic bins.
-# Ns_Roman = 2 ## DHFS - Taken Ns for Roman to be equal to Ns for DES - disclaimer: should use all 9M simulations for Roman
-# nzs_ROMAN = np.stack(([sim_j(j) for j in np.arange(Ns_Roman)])) ## nzs in array format
-
-# for j in np.arange(Ns_Roman):
-#     for i in np.arange(9):
-#         plt.plot(nzs_ROMAN_['zbinsc'][:],nzs_ROMAN[j,i,:])
-# plt.savefig('./test.pdf')
-
-
-# N = (3-0)/0.01
-# z = np.linspace(0,3,int(N)-1)
-
-# for j in np.arange(5):
-#     for i in np.arange(4):
-#         plt.plot(z,nzs[j,i,:])
-# plt.savefig('./test.pdf')
-# print(x1==x2)
-# print(x1)
-# print(x2)
-# print(nzs.shape)
-# nzs = nzs.reshape(np.shape(nzs)[0], 4*299)
-# print(nzs.shape)
-
-########################################################
-##### TEST 
-########################################################
+        n     = np.genfromtxt(f'{path}/input_files_cosmocov_cocoa/n_roman_sc1bd4.txt')     ## shape = ()
+        nbar  = np.genfromtxt(f'{path}/input_files_cosmocov_cocoa/nbar_roman_sc1bd4.txt')  ## shape = ()
+        ndiff = np.genfromtxt(f'{path}/input_files_cosmocov_cocoa/ndiff_roman_sc1bd4.txt') ## shape = ()
+        return n, nbar, ndiff
 
 def nearestPD(A):
     """Find the nearest positive-definite matrix to input
@@ -125,7 +84,6 @@ def nearestPD(A):
         A3 += I * (-mineig * k**2 + spacing)
         k += 1
     return A3
-
 
 def isPD(B):
     """Returns true when input is positive-definite, via Cholesky"""
@@ -205,9 +163,13 @@ def getModes(D, Cn, chisq_threshold=0.1):
 # chisq_threshold=1e-25
 chisq_threshold=1e-5
 
-n=get_nzs( SURVEY )
-nbar = np.mean(n, axis=0)
-ndiff = n - nbar
+if SURVEY == 'ROMAN':
+    n,nbar,ndiff = get_nzs( SURVEY )
+elif SURVEY == 'DES':
+    n     = get_nzs( SURVEY )
+    nbar  = np.mean(n, axis=0)
+    ndiff = n - nbar
+
 Cn = np.einsum('ij,ik->jk',ndiff,ndiff) / n.shape[0]
 print('Cn shape:',Cn.shape)
 
@@ -236,7 +198,7 @@ elif SURVEY=="ROMAN":
     U = np.reshape(U.T, (np.shape(U.T)[0], 9, -1))
 # print('U:',U)
 print('U shape 2:',U.shape)
-np.savez('./U_source.npz', U=U, perbin=0)
+# np.savez('./U_source.npz', U=U, perbin=0)
 
 # Encode
 u = ndiff @ X.T   # u is (Nz,M)
@@ -244,6 +206,6 @@ nEig = np.shape(u)[1]
 print('nEig: ', nEig)
 
 chisq_kept = np.array([dchisq])
-np.savetxt('chisq_kept.txt', chisq_kept)
+# np.savetxt('chisq_kept.txt', chisq_kept)
 chisq_discard = np.array([resids])
-np.savetxt('chisq_discard.txt', chisq_discard)
+# np.savetxt('chisq_discard.txt', chisq_discard)
