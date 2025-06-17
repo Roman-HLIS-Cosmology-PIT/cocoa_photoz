@@ -2,71 +2,40 @@ import numpy as np
 import matplotlib.pyplot as plt
 import h5py
 
-
-surname = 'fisher2_xip_no_scale_cut' ## fisher matrix
 path='/gpfs/scratch/pit-roman-hlis/Diogo/cocoapy310/Cocoa/cocoa_photoz/'
-
-#### TO DO #####
-### DHFS - REMOVE ALLLLLLL MAGIC NUMBERS! PUT NAMES!!!
-#### TO DO #####
-
-U = np.load(f'{path}/U_source.npz')
-
-print(U['U'].shape)
-print(U['U'][0])
-print(U['U'][0].shape)
-
-### DES CASE ###
-N = (3-0)/0.01
-# z = np.linspace(0,3,int(N)-1)
-print(int(N))
-z = np.linspace(0,3,int(46))
-
-# x = np.linspace(0,3,)
-
-
-
-# U_fisher_pile3_3x2 = np.load('/gpfs/projects/MirandaGroup/Diogo/ROMAN-NZ-PROJECT/PCA/photoz_uz/NZ_COMPRESSION_OUTS/U_source_with_fisher_DES.npz')
-# U_fisher_pile3_xip = np.load('/gpfs/projects/MirandaGroup/Diogo/ROMAN-NZ-PROJECT/PCA/photoz_uz/NZ_COMPRESSION_OUTS/U_source__%s.npz' % surname)
-
-# Us = [U_fisher_pile3_3x2, U_fisher_pile3_xip]
-
+nz = f'{path}/roman_nz_realizations/sc1b_d4/SVSN/nz_samples__LHC0_pointZ_1e6_Roman_sc1b_d4.h5'
+nz = h5py.File(nz,'r') 
+z = np.array(nz['zbinsc'])
 
 def plot_modes():
-    fig, axs = plt.subplots(nrows=2,ncols=7,sharey=False,sharex=False,figsize=(20,7))
-    # fig, axs = plt.subplots(nrows=2,ncols=4,sharey=False,sharex=False)
-    Us = [np.load(f'{path}/U_source.npz')]
-    for k in np.arange(1):
-        U = Us[k]
-        # for j in np.arange(4):
-            # for i in np.arange(5):
-        for j in np.arange(3):
-            for i in np.arange(3):
-                if k == 0:
-                    axs[k,j].plot(z,U['U'][i][j],label=rf'$\mathrm{{PC}}_{i}$' if j==0 else None)
-                elif k == 1:    
-                    axs[k,j].plot(z,U['U'][i][j],label=rf'$\mathrm{{PC}}_{i}$' if j==0 else None)
-                axs[k,j].set_xlabel('z',fontsize=15)
-                if k == 0:
-                    axs[k,j].set_title(f'Tomo. Bin: {j}' if j==0 else f'{j}')
-            # axs[k,j].set_xlim(0,3)
-            # axs[k,j].set_ylim(-0.002,0.002)
+    U = np.load(f'{path}/U_source.npz')
+    nEig = U['U'].shape[0]  # number of eigenvectors
+    ntomo = U['U'].shape[1] # number of tomographic bins
+    zbins = U['U'].shape[2] # number of redhisft bins
 
-        if k == 0:
-            axs[k,0].legend(loc='upper right')
-            # axs[k,0].set_ylabel('CosmoSIS\nDV pile3 w/ 3x2 pt',fontsize=15)
-        elif k == 1:    
-            axs[k,0].legend(loc='upper right')
-            # axs[k,0].set_ylabel('CosmoSIS\nDV pile3 w/ '+r'$\xi_+$',fontsize=15)
+    c=['r','orange','darkgreen','darkblue']
 
-    plt.tight_layout()
-    plt.savefig(f'{path}/test.pdf')
+    fig,ax = plt.subplots(3,3,figsize=(10,10))
 
+    grid=[(i,j) for i in range(3) for j in range(3)]
+    grid = list(enumerate(grid))
 
-plot_modes()
+    for t, (row,col) in grid:
+        for eig in range(4):
+            mode = U['U'][eig,t,:]
+            config = {'c':c[eig],
+                    'label':[f'{eig}'],
+                    'ls':'--' if eig==len(range(4))-1 else None}
+            ax[row,col].plot(z,mode,**config)
+    ax[0,0].legend(loc='best')
+    plt.savefig('U_source.pdf')
+    return None
+# plot_modes()
 
-plt.figure()
-x = np.genfromtxt(f'{path}/chisq_kept.txt')
-plt.plot(list(range(len(x))),x,'o')
-plt.yscale('log')
-plt.savefig(f'{path}/test_chisq_kept.pdf')
+def plot_chisqkept():
+    chisq_kept = np.genfromtxt(f'{path}/chisq_kept.txt')
+    Ms = np.arange(len(chisq_kept))
+    plt.plot(Ms,chisq_kept,'o')
+    plt.savefig('chisq_kept.pdf')
+    return None
+plot_chisqkept()

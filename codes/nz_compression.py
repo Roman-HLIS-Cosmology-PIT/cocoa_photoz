@@ -125,24 +125,24 @@ def getModes(D, Cn, chisq_threshold=0.1):
     ## DHFS: Fisher matrix J^T C_c^{-1} J where J = dc/dn
     # Symmetrize and sqrt D
     D = 0.5*(D + D.T)
-    Dval, Dvec = np.linalg.eigh(D)
+    Dval, Dvec = np.linalg.eigh(D) # DHFS (characteristic equation): D @ Dvec[:,i] = Dval[i] * Dvec[,:i], where i=0,1,...,D.shape[0]-1
     # Any negatives are numerical problems
-    Dval = np.maximum(0., Dval)
+    Dval = np.maximum(0., Dval) # DHFS - set to zero any negative eingenvalue
 
     ## DHFS: Covariance matrix of n(z)
     # And Cn
-    Cnval, Cnvec = np.linalg.eigh(Cn)
+    Cnval, Cnvec = np.linalg.eigh(Cn)  # Λn, Vn
     Cnval = np.maximum(0., Cnval)
 
     # Build the keystone matrix and its SVD
-    M = np.einsum('i,ji,jk,k->ik',np.sqrt(Cnval), Cnvec, Dvec, np.sqrt(Dval))
+    M = np.einsum('i,ji,jk,k->ik',np.sqrt(Cnval), Cnvec, Dvec, np.sqrt(Dval)) 
     Um,s,Vmt = np.linalg.svd(M)
 
     # Sort SV's and throw away unwanted ones
     order = np.argsort(s*s)  # increasing order
     kill = np.count_nonzero(np.cumsum(s[order]**2) < chisq_threshold)
-                                           
-    resid = np.sum((s[order[:kill]]**2)) ## DHFS: Gary's Eq. 15 - have to confirm!
+
+    resid = np.sum((s[order[:kill]]**2))
 
     keep = np.flip(order[kill:])  # Decreasing influence order
     Um = Um[:,keep]
@@ -155,7 +155,7 @@ def getModes(D, Cn, chisq_threshold=0.1):
     # And the decoder
     tmp = np.where(Dval>thr*np.max(Dval), 1/np.sqrt(Dval), 0.)
     U = np.einsum('ji,i,ik,k->jk',Dvec, tmp, Vm,s)
-    
+
     return X, U, s*s, resid
 
 # Load nzs and calculate mean, deviation from mean, and covariance
