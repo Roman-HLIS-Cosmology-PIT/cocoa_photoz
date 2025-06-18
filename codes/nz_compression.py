@@ -140,6 +140,7 @@ def getModes(D, Cn, chisq_threshold=0.1):
 
     # Sort SV's and throw away unwanted ones
     order = np.argsort(s*s)  # increasing order
+    print("s[order] =",s[order]**2)
     kill = np.count_nonzero(np.cumsum(s[order]**2) < chisq_threshold)
 
     resid = np.sum((s[order[:kill]]**2))
@@ -161,7 +162,7 @@ def getModes(D, Cn, chisq_threshold=0.1):
 # Load nzs and calculate mean, deviation from mean, and covariance
 # chisq_threshold=0.15
 # chisq_threshold=1e-25
-chisq_threshold=0.01
+chisq_threshold=0.005
 
 if SURVEY == 'ROMAN':
     ndiff, Cn = get_nzs( SURVEY )
@@ -198,7 +199,7 @@ elif SURVEY=="ROMAN":
     U = np.reshape(U.T, (np.shape(U.T)[0], 9, -1))
 # print('U:',U)
 print('U shape 2:',U.shape)
-np.savez(f'{path}/U_source.npz', U=U, perbin=0)
+np.savez(f'{path}/U_source_{chisq_threshold}.npz', U=U, perbin=0)
 
 # Encode
 u = ndiff @ X.T   # u is (Nz,M)
@@ -206,6 +207,6 @@ nEig = np.shape(u)[1]
 print('nEig: ', nEig)
 
 chisq_kept = np.array([dchisq])
-np.savetxt(f'{path}/chisq_kept.txt', chisq_kept)
+np.savetxt(f'{path}/chisq_kept_{chisq_threshold}.txt', chisq_kept)
 chisq_discard = np.array([resids])
-np.savetxt(f'{path}/chisq_discard.txt', chisq_discard)
+np.savetxt(f'{path}/chisq_discard_{chisq_threshold}.txt', chisq_discard)
