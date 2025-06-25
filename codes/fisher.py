@@ -66,3 +66,22 @@ class Fisher:
         inv_cov_xip = self.inv_cov[0:390,0:390]
         fisher_mat = dxipdn @ inv_cov_xip @ dxipdn.T
         return fisher_mat
+    
+    def pca(self,params_values,survey,n):
+        path_temp = '/gpfs/scratch/pit-roman-hlis/Diogo/cocoapy310/Cocoa/cocoa_photoz/'
+        thr_temp = 0.005
+        U = np.load(f'{path_temp}/U_source_{thr_temp}.npz')['U'] #(eig, tomo, z)
+        maxnEig = U.shape[0] 
+        U = U.transpose(1,2,0).reshape(-1,maxnEig)[:,:n] #(z*tomo, eig)
+        
+        s = self.nz_fid[:,1:].shape
+        z = self.nz_fid[:,0]
+        
+        alphas = np.array([params_values.get(survey+"_DZ_S"+str(i+1)) for i in range(n)])
+
+        correction = (alphas * U).sum(axis=1)
+
+        nz_model = self.nz_fid[:,1:].T.flatten() + correction
+        nz_model = nz_model.reshape(s[::-1]).T
+        nz_model = np.column_stack((z,nz_model))
+        return nz_model

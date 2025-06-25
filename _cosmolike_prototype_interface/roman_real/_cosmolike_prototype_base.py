@@ -116,7 +116,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
         ) 
       ci.init_lens_sample_size(int(self.lens_ntomo))
       ci.init_source_sample_size(int(self.source_ntomo))
-      ci.init_ntomo_powerspectra() # must be called after set_source/lens_size  
+      ci.init_ntomo_powerspectra() # must be called after set_source/lens_size 
     else:
       ci.init_redshift_distributions_from_files(
         lens_multihisto_file=self.lens_file,
@@ -300,31 +300,33 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       n_theta = self.ntheta
       epsilon = self.epsilon
 
-      # path_jacob = f"./cocoa_photoz/results/jacobian_matrix/roman_real/test_forward_difference/test_forward_difference_eps{epsilon}.txt" # DHFS MOD
-      path_jacob = f"./cocoa_photoz/results/jacobian_matrix/roman_sc1bd4/test_central_difference/test_central_difference_eps{epsilon}.txt" # DHFS MOD
+      # TODO : fisher.Fisher(ci,nz_fid,n_tomo,n_theta,epsilon).get_derivs()
+      # def get_derivs():
+      #   # path_jacob = f"./cocoa_photoz/results/jacobian_matrix/roman_real/test_forward_difference/test_forward_difference_eps{epsilon}.txt" # DHFS MOD
+      #   path_jacob = f"./cocoa_photoz/results/jacobian_matrix/roman_sc1bd4/test_central_difference/test_central_difference_eps{epsilon}.txt" # DHFS MOD
+      #   test_fisher = fisher.Fisher(ci,nz_fid,n_tomo,n_theta,epsilon)
+      #   print('------------------------------------------------')
+      #   print('------------------------------------------------')
+      #   print(f"epsilon: {epsilon}")
+      #   print("cosmolike interface", ci)
+      #   print("fisher.Fisher", test_fisher)
+      #   print('------------------------------------------------')
+      #   print('------------------------------------------------')
+      #   jobs = [(zi, tb) for tb in range(n_tomo) for zi in range(len(nz_fid[:,0]))]
+      #   with open(path_jacob,"a") as f:
+      #     for job in jobs:
+      #         # derivs = test_fisher.forward_difference(job)
+      #         derivs = test_fisher.central_difference(job)
+      #         # derivs = test_fisher.fisher_matrix(job)
+      #         print("z, ntomo: ",job)
+      #         np.savetxt(f,derivs)
+      #   ci.set_source_sample(nz_fid)
+      #   return None
+      
       test_fisher = fisher.Fisher(ci,nz_fid,n_tomo,n_theta,epsilon)
-
-      print('------------------------------------------------')
-      print('------------------------------------------------')
-      print(f"epsilon: {epsilon}")
-      print("cosmolike interface", ci)
-      print("fisher.Fisher", test_fisher)
-      print('------------------------------------------------')
-      print('------------------------------------------------')
-
-      jobs = [(zi, tb) for tb in range(n_tomo) for zi in range(len(nz_fid[:,0]))]
-
-      with open(path_jacob,"a") as f:
-        for job in jobs:
-            # derivs = test_fisher.forward_difference(job)
-            derivs = test_fisher.central_difference(job)
-            # derivs = test_fisher.fisher_matrix(job)
-            print("z, ntomo: ",job)
-            np.savetxt(f,derivs)
-      
-      ci.set_source_sample(nz_fid)
+      nz_model = test_fisher.pca(params_values,survey,n=3)
+      ci.set_source_sample(nz_model)
       # DHFS MOD END 
-      
 
       # user may choose to still add photo-z bias or not (here we ad)
       ci.set_nuisance_shear_photoz(

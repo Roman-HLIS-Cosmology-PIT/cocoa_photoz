@@ -137,10 +137,13 @@ def getModes(D, Cn, chisq_threshold=0.1):
     # Build the keystone matrix and its SVD
     M = np.einsum('i,ji,jk,k->ik',np.sqrt(Cnval), Cnvec, Dvec, np.sqrt(Dval)) 
     Um,s,Vmt = np.linalg.svd(M)
+    print("Um.shape:",Um.shape)
+    print("s.shape:",s.shape)
+    print("Vmt.shape:",Vmt.shape)
 
     # Sort SV's and throw away unwanted ones
     order = np.argsort(s*s)  # increasing order
-    print("s[order] =",s[order]**2)
+    # print("s[order] =",s[order]**2)
     kill = np.count_nonzero(np.cumsum(s[order]**2) < chisq_threshold)
 
     resid = np.sum((s[order[:kill]]**2))
@@ -153,9 +156,11 @@ def getModes(D, Cn, chisq_threshold=0.1):
     # Build the encoder
     tmp = np.where(Cnval>thr*np.max(Cnval), 1/np.sqrt(Cnval), 0.)
     X = np.einsum('ij,i,ki->jk',Um, tmp, Cnvec)  # X is (M,N)
+    print('E dim:', X.shape)
     # And the decoder
     tmp = np.where(Dval>thr*np.max(Dval), 1/np.sqrt(Dval), 0.)
-    U = np.einsum('ji,i,ik,k->jk',Dvec, tmp, Vm,s)
+    U = np.einsum('ji,i,ik,k->jk',Dvec, tmp, Vm,s) # U is (N,M)
+    print('D dim:', U.shape)
 
     return X, U, s*s, resid
 
@@ -166,6 +171,7 @@ chisq_threshold=0.005
 
 if SURVEY == 'ROMAN':
     ndiff, Cn = get_nzs( SURVEY )
+    print("Cn.shape:",Cn.shape)
 elif SURVEY == 'DES':
     n     = get_nzs( SURVEY )
     nbar  = np.mean(n, axis=0)
@@ -201,12 +207,30 @@ elif SURVEY=="ROMAN":
 print('U shape 2:',U.shape)
 np.savez(f'{path}/U_source_{chisq_threshold}.npz', U=U, perbin=0)
 
-# Encode
-u = ndiff @ X.T   # u is (Nz,M)
-nEig = np.shape(u)[1]
-print('nEig: ', nEig)
-
 chisq_kept = np.array([dchisq])
 np.savetxt(f'{path}/chisq_kept_{chisq_threshold}.txt', chisq_kept)
 chisq_discard = np.array([resids])
 np.savetxt(f'{path}/chisq_discard_{chisq_threshold}.txt', chisq_discard)
+
+# Encode
+u = ndiff @ X.T   # u is (Nz,M)
+nEig = np.shape(u)[1]
+print('nEig: ', nEig)
+# Save corresponding amplitudes to file
+np.savetxt(f'{path}/u_{chisq_threshold}.txt', u)
+
+############################
+from getdist import MCSamples, plots
+
+names = ["u%s" %i for i in range(nEig)]
+chains = MCSamples(samples=u,names=names)
+
+g = plots.get_subplot_plotter()
+g.triangle_plot(chains,["u%s" %i for i in range(3)],filled=True)
+g.export('test.pdf')
+############################
+
+print()
+print("ndiff shape:",ndiff.shape)
+print("X shape:",X.shape)
+print("Weights shape:",u.shape)
