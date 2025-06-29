@@ -9,8 +9,10 @@ path='/gpfs/scratch/pit-roman-hlis/Diogo/cocoapy310/Cocoa/cocoa_photoz/'
 nz = f'{path}/roman_nz_realizations/sc1b_d4/SVSN/nz_samples__LHC0_pointZ_1e6_Roman_sc1b_d4.h5'
 nz = h5py.File(nz,'r') 
 z = np.array(nz['zbinsc'])
+Nz = 46 #len(z)
+Nt = 9
+Nd = 414
 
-n=414
 def pcs():
     d_cov = np.load(f'{path}/Cn_roman_sc1bd4.npy')
     eigvals, eigvecs = eig(d_cov)
@@ -19,11 +21,10 @@ def pcs():
     idx = np.argsort(eigvals)[::-1]
     eigvals = eigvals[idx]
     eigvecs = eigvecs[:, idx]
-    eigvecs = eigvecs[:, : n]
-    eigvals = eigvals[: n]
+    eigvecs = eigvecs[:, : Nd]
+    eigvals = eigvals[: Nd]
     return eigvecs, eigvals
 
-Nz = 46
 def weights():
     alphas = []
     U, _ = pcs() # (414=9*46, 414=#pcs)

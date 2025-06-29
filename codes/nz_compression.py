@@ -167,7 +167,7 @@ def getModes(D, Cn, chisq_threshold=0.1):
 # Load nzs and calculate mean, deviation from mean, and covariance
 # chisq_threshold=0.15
 # chisq_threshold=1e-25
-chisq_threshold=0.005
+chisq_threshold=0.01
 
 if SURVEY == 'ROMAN':
     ndiff, Cn = get_nzs( SURVEY )

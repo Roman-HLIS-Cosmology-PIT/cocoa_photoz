@@ -30,13 +30,13 @@ def plot_modes(thr):
                     'ls':'--' if eig==len(range(nEig))-1 else None}
             ax[row,col].plot(z,mode,**config)
     ax[0,0].legend(loc='upper right')
-    ax[2,0].set_xlabel('z',fontsize=12)
-    ax[2,1].set_xlabel('z',fontsize=12)
-    ax[2,2].set_xlabel('z',fontsize=12)
-    ax[0,0].set_ylabel('Modes',fontsize=12)
-    ax[1,0].set_ylabel('Modes',fontsize=12)
-    ax[2,0].set_ylabel('Modes',fontsize=12)
-    ax[0,1].set_title(r'$\langle\chi^2_{th}\rangle=$'+f'{thr}', fontsize=16)
+    ax[2,0].set_xlabel('z',fontsize=20)
+    ax[2,1].set_xlabel('z',fontsize=20)
+    ax[2,2].set_xlabel('z',fontsize=20)
+    ax[0,0].set_ylabel('PCs',fontsize=20)
+    ax[1,0].set_ylabel('PCs',fontsize=20)
+    ax[2,0].set_ylabel('PCs',fontsize=20)
+    # ax[0,1].set_title(r'$\langle\chi^2_{th}\rangle=$'+f'{thr}', fontsize=16)
     plt.savefig(f'U_source_{thr}.pdf')
     return None
 
@@ -53,14 +53,15 @@ def plot_chisqkept():
     Ms0 = np.arange(len(chisq_kept0))
     Ms1 = np.arange(len(chisq_kept1))
     Ms2 = np.arange(len(chisq_kept2))
-    c = ['purple','C0','orange']
+    c = ['C0','purple','orange']
     plt.plot(Ms0,chisq_kept0,'o',c=c[0])
-    plt.plot(Ms1-0.2,chisq_kept1,'s',c=c[1])
-    plt.plot(Ms2+0.2,chisq_kept2,'^',c=c[2])
+    # plt.plot(Ms1-0.2,chisq_kept1,'s',c=c[1])
+    # plt.plot(Ms2+0.2,chisq_kept2,'^',c=c[2])
     minv = min(min(Ms0),min(Ms1),min(Ms2))
     maxv = max(max(Ms0),max(Ms1),max(Ms2))
     info = lambda i: {'xmin':minv-.3,'xmax':maxv,
-            'color':f'{c[i]}',
+            # 'color':f'{c[i]}',
+            'color':'gray',
             'ls':':',
             'label':r'$\langle\chi^2_{th}\rangle=$'+f'{thr[i]}'}
     plt.hlines(thr[0],**info(0))
@@ -69,7 +70,7 @@ def plot_chisqkept():
     plt.xticks(range(minv,maxv + 1, 1))
     plt.xlim(minv-.3,maxv)
     plt.xlabel('M',fontsize=13)
-    plt.ylabel(r'$\langle\chi^2_{th}\rangle$',fontsize=13)
+    plt.ylabel(r'$\langle\chi^2\rangle$',fontsize=13)
     plt.legend(loc='best')
     plt.savefig(f'chisq_kept.pdf')
     return None

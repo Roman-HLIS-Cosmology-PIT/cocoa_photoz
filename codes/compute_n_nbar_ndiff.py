@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 path='/gpfs/scratch/pit-roman-hlis/Diogo/cocoapy310/Cocoa/cocoa_photoz/'
 
 def compute_n_nbar_ndiff():
-    nzr = f'{path}/roman_nz_realizations/sc1b_d4/SVSN/nz_samples__LHC0_pointZ_1e6_Roman_sc1b_d4.h5'
+    nzr = f'{path}/roman_nz_realizations/sc1b_d4/nz_samples_LHC0_pointZ_1e6_Roman_sc1b_d4.h5'
     nzr = h5py.File(nzr,'r') 
     zr = np.array(nzr['zbinsc'])
 
