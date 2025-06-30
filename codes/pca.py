@@ -70,7 +70,7 @@ svd_vals = svd_vals**2
 skl_vecs, skl_vals,\
 explained_variance, explained_variance_ratio = pcs('sklearn')
 
-def plot_eigvalues_and_derived_params(plot_type):
+def plot_eigvalues_and_related_quantities(plot_type):
     plt.figure()
     if plot_type=='eig_vals':
         plt.plot(list(range(Nd)),eig_vals,'C0')
@@ -106,14 +106,35 @@ def plot_eigvalues_and_derived_params(plot_type):
         plt.tight_layout()
     plt.savefig('test.pdf')
 
-plot_eigvalues_and_derived_params('explained_variance_ratio')
+# plot_eigvalues_and_related_quantities('explained_variance_ratio')
 
-# k=0
-# plt.plot(z,eig_vecs[Nz*k:Nz*(k+1):,0],'C0')
-# plt.plot(z,eigh_vecs[Nz*k:Nz*(k+1):,0],'k--')
-# plt.plot(z,-svd_vecs[Nz*k:Nz*(k+1):,0],'r:')
-# plt.plot(z,skl_vecs[Nz*k:Nz*(k+1):,0],c='darkgreen',ls='-.')
-# plt.savefig('test.pdf')
+def plot_eigenvectors_singular_vectors(plot_type):
+    k=4
+    plt.figure()
+    if plot_type=='test':
+        plt.plot(z,eig_vecs[Nz*k:Nz*(k+1):,0],c=colors[0],ls='-',label='linalg.eig',lw=5)
+        plt.plot(z,eigh_vecs[Nz*k:Nz*(k+1):,0],c=colors[1],ls='--',label='linalg.eigh',lw=5)
+        plt.plot(z,svd_vecs[Nz*k:Nz*(k+1):,0],c=colors[2],ls='-.',label='linalg.svd',lw=5)
+        plt.plot(z,skl_vecs.T[Nz*k:Nz*(k+1):,0],c=colors[3],ls=':',label='sklearn',lw=5)
+        plt.legend(loc='best',fontsize=15)
+        plt.xlabel(r'$z$',fontsize=15)
+        plt.ylabel(r'$\mathrm{PC}_1^{\text{tomo}=1}$',fontsize=15)
+        plt.xlim(np.min(z),np.max(z))
+        plt.tight_layout()
+    if plot_type == 'paper':
+        plt.plot(z,eigh_vecs[Nz*k:Nz*(k+1):,0],c=colors[0],ls='-',lw=5,label=r'$\text{PC}_1$')
+        plt.plot(z,eigh_vecs[Nz*k:Nz*(k+1):,1],c=colors[1],ls='--',lw=5,label=r'$\text{PC}_2$')
+        plt.plot(z,eigh_vecs[Nz*k:Nz*(k+1):,2],c=colors[2],ls=':',lw=5,label=r'$\text{PC}_3$')
+        # plt.plot(z,eigh_vecs[Nz*k:Nz*(k+1):,3],c=colors[3],ls='-.',lw=5)
+        plt.xlabel(r'$z$',fontsize=15)
+        plt.ylabel(r'$\mathrm{PC}s^{\text{tomo}=4}$',fontsize=15)
+        plt.xlim(np.min(z),np.max(z))
+        plt.legend(loc='best',fontsize=15)
+        plt.tight_layout()
+    plt.savefig('test.pdf')
+    return None
+
+plot_eigenvectors_singular_vectors('paper')
 
 #############################################
 #############################################
