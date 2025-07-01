@@ -9,6 +9,8 @@ likelihood:
   roman_real.roman_real_cosmic_shear:
     path: ./external_modules/data/roman_real/sc1bd4_g
     data_file: roman_sc1bd4_g.dataset
+    # path: ./external_modules/data/roman_real
+    # data_file: example1.dataset
     accuracyboost: 1.0
     integration_accuracy: 0
     kmax_boltzmann: 5.0
@@ -16,11 +18,14 @@ likelihood:
     non_linear_emul: 2
     IA_model: 0 #NLA
     IA_redshift_evolution: 3
-    print_datavector: False
+    print_datavector: True
+    print_datavector_file: 'print_datavector_file'
     # ggl_exclude: [[6,0],[7,0],[7,1]]
     ggl_exclude: []
     external_nz_modeling: 1
     epsilon: 1e-3
+    photoz_pc_file: '/gpfs/scratch/pit-roman-hlis/Diogo/cocoapy310/Cocoa/projects/roman_real/data/sc1bd4_g/U.txt'
+    photoz_npc: 1
     
 params:
   As_1e9:

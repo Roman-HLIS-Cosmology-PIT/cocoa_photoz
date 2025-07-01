@@ -69,6 +69,12 @@ svd_vals = svd_vals**2
 skl_vecs, skl_vals,\
 explained_variance, explained_variance_ratio = pcs('sklearn')
 
+def save_eigvectors():
+    np.savetxt('U.txt',eigh_vecs)
+    return None
+save_eigvectors()
+
+
 def plot_eigvalues_and_related_quantities(plot_type):
     plt.figure()
     if plot_type=='eig_vals':

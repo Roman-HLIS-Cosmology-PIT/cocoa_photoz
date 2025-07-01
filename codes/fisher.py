@@ -66,22 +66,49 @@ class Fisher:
         inv_cov_xip = self.inv_cov[0:390,0:390]
         fisher_mat = dxipdn @ inv_cov_xip @ dxipdn.T
         return fisher_mat
-    
-    def pca(self,params_values,survey,n):
-        path_temp = '/gpfs/scratch/pit-roman-hlis/Diogo/cocoapy310/Cocoa/cocoa_photoz/'
-        thr_temp = 0.005
-        U = np.load(f'{path_temp}/U_source_{thr_temp}.npz')['U'] #(eig, tomo, z)
-        maxnEig = U.shape[0] 
-        U = U.transpose(1,2,0).reshape(-1,maxnEig)[:,:n] #(z*tomo, eig)
-        
-        s = self.nz_fid[:,1:].shape
-        z = self.nz_fid[:,0]
-        
-        alphas = np.array([params_values.get(survey+"_DZ_S"+str(i+1)) for i in range(n)])
 
-        correction = (alphas * U).sum(axis=1)
+      # TODO : fisher.Fisher(ci,nz_fid,n_tomo,n_theta,epsilon).get_derivs()
+      # def get_derivs():
+      #   # path_jacob = f"./cocoa_photoz/results/jacobian_matrix/roman_real/test_forward_difference/test_forward_difference_eps{epsilon}.txt" # DHFS MOD
+      #   path_jacob = f"./cocoa_photoz/results/jacobian_matrix/roman_sc1bd4/test_central_difference/test_central_difference_eps{epsilon}.txt" # DHFS MOD
+      #   test_fisher = fisher.Fisher(ci,nz_fid,n_tomo,n_theta,epsilon)
+      #   print('------------------------------------------------')
+      #   print('------------------------------------------------')
+      #   print(f"epsilon: {epsilon}")
+      #   print("cosmolike interface", ci)
+      #   print("fisher.Fisher", test_fisher)
+      #   print('------------------------------------------------')
+      #   print('------------------------------------------------')
+      #   jobs = [(zi, tb) for tb in range(n_tomo) for zi in range(len(nz_fid[:,0]))]
+      #   with open(path_jacob,"a") as f:
+      #     for job in jobs:
+      #         # derivs = test_fisher.forward_difference(job)
+      #         derivs = test_fisher.central_difference(job)
+      #         # derivs = test_fisher.fisher_matrix(job)
+      #         print("z, ntomo: ",job)
+      #         np.savetxt(f,derivs)
+      #   ci.set_source_sample(nz_fid)
+      #   return None
 
-        nz_model = self.nz_fid[:,1:].T.flatten() + correction
-        nz_model = nz_model.reshape(s[::-1]).T
-        nz_model = np.column_stack((z,nz_model))
-        return nz_model
+    def pca(self,params_values,survey,photoz_pc_file,photoz_npc):
+        
+        if photoz_npc == 0:     
+            return self.nz_fid
+
+        elif photoz_npc > 0:
+            print("[photoz_pc_file]",photoz_pc_file)
+            print("[photoz_npc]",photoz_npc)
+
+            U = np.genfromtxt(photoz_pc_file)[:,:photoz_npc]
+            alphas = np.array([params_values.get(survey+"_DZ_S"+str(i+1)) for i in range(photoz_npc)])
+            
+            correction = (alphas * U).sum(axis=1)
+
+            s = self.nz_fid[:,1:].shape
+            z = self.nz_fid[:,0]
+
+            nz_model = self.nz_fid[:,1:].T.flatten() + correction
+            nz_model = nz_model.reshape(s[::-1]).T
+            nz_model = np.column_stack((z,nz_model))
+
+            return nz_model

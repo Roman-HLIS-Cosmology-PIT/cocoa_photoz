@@ -48,7 +48,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
     self.theta_min_arcmin = ini.float("theta_min_arcmin")
 
     self.theta_max_arcmin = ini.float("theta_max_arcmin")
-    
+
     # ------------------------------------------------------------------------
     self.nz_interp_1d=int(500 + 250*self.accuracyboost)
     self.nz_interp_2d=int(min(60 + 15*self.accuracyboost,150))
@@ -324,7 +324,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       #   return None
       
       test_fisher = fisher.Fisher(ci,nz_fid,n_tomo,n_theta,epsilon)
-      nz_model = test_fisher.pca(params_values,survey,n=3)
+      nz_model = test_fisher.pca(params_values,survey,self.photoz_pc_file,self.photoz_npc)
       ci.set_source_sample(nz_model)
       # DHFS MOD END 
 
