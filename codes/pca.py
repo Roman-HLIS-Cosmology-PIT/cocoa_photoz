@@ -1,9 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import h5py
-from getdist import MCSamples, plots
 from sklearn.decomposition import PCA
-
+from getdist import MCSamples, plots
 
 # Colors
 colors = [
@@ -134,66 +133,38 @@ def plot_eigenvectors_singular_vectors(plot_type):
     plt.savefig('test.pdf')
     return None
 
-plot_eigenvectors_singular_vectors('paper')
+# plot_eigenvectors_singular_vectors('paper')
 
-#############################################
-#############################################
+def weights():
+    alphas = [] # little us in the paper
+    U, _ = pcs('eig') # (414=9*46, 414=#pcs)
+    ndiff = np.load(f'{path}/ndiff_roman_sc1bd4.npy') # (1M,414=9*46)
+    for t in range(9):
+        n_sample = ndiff[0,Nz*t:Nz*(t+1)]
+        PC = U[Nz*t:Nz*(t+1),0]
+        alpha = np.dot(n_sample,PC.T) # projection <n,PC>
+        alphas.append(alpha)
+    return alphas
 
-# def weights():
-#     alphas = []
-#     U, _ = pcs() # (414=9*46, 414=#pcs)
-#     ndiff = np.load(f'{path}/ndiff_roman_sc1bd4.npy') # (1M,414=9*46)
-#     for t in range(9):
-#         n_sample = ndiff[0,Nz*t:Nz*(t+1)]
-#         PC = U[Nz*t:Nz*(t+1),0]
-#         alpha = np.dot(n_sample,PC.T)
-#         alphas.append(alpha)
-#     return alphas
 
-# alphas_1 = []
-# alphas_2 = []
-# # alphas_i = []
-# tomo = 0
+def plot_alpha_samples():
+    M = 414
+    Nsample = 1000
 
-# M = 414
-# Nsample = 1000
-# # alphas_test = np.zeros((M, Nsample))  # rows: PCA modes, columns: Nsample
+    U,_ = pcs('eig') # (414=9*46, 414=#pcs)
+    ndiff = np.load(f'{path}/ndiff_roman_sc1bd4.npy') # shape (1M, 414=9*46)
+    alphas = ndiff[:Nsample,:] @ U # Projection onto PCs: <n,PC>
 
-# def alpha_sample():
-#     U,_ = pcs() # (414=9*46, 414=#pcs)
-#     ndiff = np.load(f'{path}/ndiff_roman_sc1bd4.npy') # shape (1M, 414=9*46)
-#     alphas = ndiff[:Nsample,:] @ U
-#     return alphas
+    print(alphas.shape)
 
-# alphas =  alpha_sample()
+    names = ["alpha%s" %i for i in range(M)]
+    labels = [fr"\alpha_{{{i+1}}}" for i in range(M)]
 
-# print(alphas.shape)
-# names = ["alpha%s" %i for i in range(M)]
-# labels = [fr"\alpha_{{{i+1}}}" for i in range(M)]
+    chains = MCSamples(samples=alphas,names=names,labels=labels)
 
-# chains = MCSamples(samples=alphas,names=names,labels=labels)
+    g = plots.get_subplot_plotter()
+    g.plots_1d(chains,["alpha%s" %i for i in range(5)],share_y=True)
+    g.export('test.pdf')
+    return None
 
-# g = plots.get_subplot_plotter()
-# g.plots_1d(chains,["alpha%s" %i for i in range(5)],share_y=True)
-# g.export('test.pdf')
-
-#############################################
-#############################################
-
-# for i in range(9):
-#     plt.figure()
-#     plt.plot(z,U[46*i:46*(i+1),0],c='C0')
-#     plt.plot(z,U[46*i:46*(i+1),1],c='k')
-#     plt.plot(z,U[46*i:46*(i+1),2],c='r')
-#     plt.savefig(f'test{i}.pdf')
-
-# x = range(len(s))
-# thr = [0.001,0.005,0.01]
-# chisq_kept2 = np.genfromtxt(f'{path}/chisq_kept_{thr[1]}.txt')
-# print(chisq_kept2)
-# print(s[:6])
-# for i in range(len(chisq_kept2)):
-#     print(s[:6][i]/chisq_kept2[i])
-# plt.plot(x[:6],s[:6],'o',c='r')
-# plt.plot(x[:6],chisq_kept2,'o')
-# plt.savefig('test.pdf')
+# plot_alpha_samples()

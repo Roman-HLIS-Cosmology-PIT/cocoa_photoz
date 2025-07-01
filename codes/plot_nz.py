@@ -157,11 +157,30 @@ def plot_ndiff():
         [axes[1].plot(zr,ndiff[idx,Nz*k:Nz*(k+1)],**info) for k in range(9)]
     axes[0].set_xlim(np.min(zr),np.max(zr)) 
     axes[0].set_ylim(np.min(nbar),np.max(nbar)) 
-    axes[0].set_ylabel(r'$\hat{\mathbf{n}}_\text{ref}$',fontsize=18)
+    axes[0].set_ylabel(r'$\bar{\mathbf{n}}_\text{ref}$',fontsize=18)
     axes[1].set_xlabel(r'$\mathrm{z}$',fontsize=18)
-    axes[1].set_ylabel(r'$\mathbf{n}_\text{ref}-\hat{\mathbf{n}}_\text{ref}$',fontsize=18)
+    axes[1].set_ylabel(r'$\mathbf{n}_\text{ref}-\bar{\mathbf{n}}_\text{ref}$',fontsize=18)
     plt.tight_layout()   
     plt.savefig('test.pdf')    
     return None
 
-plot_ndiff()
+# plot_ndiff()
+
+def distribution_violinplot():
+    plt.figure()
+    
+    nzs = f'{path}roman_nz_realizations/sc1b_d4/nz_samples_LHC0_pointZ_1e6_Roman_sc1b_d4.h5'
+    nzs = h5py.File(nzs,'r') 
+    zbins = np.array(nzs['zbinsc'])
+    nzs = np.stack([nzs[f'bin0'][:100,:]], axis=1)
+
+    plt.violinplot(nzs[:,0],positions=zbins,
+                   widths=0.1, showmeans=True,
+                   showmedians=True, showextrema=True)
+    plt.xlabel(r'$\mathrm{z}$',fontsize=18)
+    plt.ylabel(r'$\text{Distribution of } n^{tomo=1}(z)$',fontsize=18)
+    plt.tight_layout()   
+    plt.savefig('test.pdf')
+    return None
+
+distribution_violinplot()
