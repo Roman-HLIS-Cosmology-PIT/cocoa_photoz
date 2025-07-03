@@ -14,7 +14,8 @@ from types import SimpleNamespace
     
 surveys    = ['lsst_y1','des_y3','roman_real']
 survey     = surveys[2]
-path       = f'../external_modules/data/{survey}/sc1bd4_g/'
+path_c     = '/gpfs/scratch/pit-roman-hlis/Diogo/cocoapy310/Cocoa/'
+path       = f'{path_c}/external_modules/data/{survey}/sc1bd4_g/'
 # path       = f'../external_modules/data/{survey}/'
 data_files = {'lsst_y1':'lsst_y1_M1_GGL0.05.dataset',
               'des_y3':'des_y3_real.dataset',
@@ -256,4 +257,24 @@ mv = np.hstack((xi_p,xi_m,gamma_t,w_theta)) # model vector combined - CosmoLike 
 print('dim[mv] =',mv.shape)
 
 mv = list(enumerate(mv))
-np.savetxt('lcdm.modelvector',mv,fmt='%d %e')
+# np.savetxt('lcdm.modelvector',mv,fmt='%d %e')
+
+def plot_xipm():
+    """plot xi_+ and xi_- for different Roman scenarios - see the paper"""
+    fig,ax = plt.subplots(1,2,figsize=(7,3))
+    xi_p0 = xi_pm[0][:,0,0]
+    xi_m0 = xi_pm[1][:,0,0]
+    thetas = np.arange(25., 250., 15.)
+    ax[0].plot(thetas,thetas*xi_p0,color='#1b5f6f',lw=3,ls='-',marker='o',label='REF-D1')
+    ax[1].plot(thetas,thetas*xi_m0,color='#1b5f6f',lw=3,ls='-',marker='o')
+    ax[0].set_xscale('log')
+    ax[1].set_xscale('log')
+    ax[0].set_xlabel(r'$\theta$',fontsize=13)
+    ax[1].set_xlabel(r'$\theta$',fontsize=13)
+    ax[0].set_ylabel(r'$\theta\times\xi_+^{00}$',fontsize=13)
+    ax[1].set_ylabel(r'$\theta\times\xi_-^{00}$',fontsize=13)
+    ax[0].legend(loc='best')
+    plt.tight_layout()
+    plt.savefig('test.pdf')
+    return None
+# plot_xipm()
