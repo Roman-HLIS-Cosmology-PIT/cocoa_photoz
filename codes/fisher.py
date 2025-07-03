@@ -97,7 +97,7 @@ class Fisher:
 
         elif photoz_npc > 0:
             U = np.genfromtxt(photoz_pc_file)[:,:photoz_npc]
-            alphas = np.array([params_values.get(survey+"_DZ_S"+str(i+1)) for i in range(photoz_npc)])
+            alphas = np.array([params_values.get(survey+"_alpha_"+str(i+1)) for i in range(photoz_npc)])
             
             correction = (alphas * U).sum(axis=1)
 

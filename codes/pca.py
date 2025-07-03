@@ -29,7 +29,7 @@ Nt = 9
 Nd = 414
 
 def pcs(method='eig'):
-    Cn = np.load(f'{path}/Cn_roman_sc1bd4.npy')
+    Cn = np.load(f'{path}/Cn_roman_sc1bd4.npy') #TODO: path changed
     Cn = 0.5*(Cn + Cn.T)
     if method == 'eig':
         eigvals, eigvecs = np.linalg.eig(Cn)
@@ -151,7 +151,6 @@ def weights():
         alpha = np.dot(n_sample,PC.T) # projection <n,PC>
         alphas.append(alpha)
     return alphas
-
 
 def plot_alpha_samples():
     M = 414

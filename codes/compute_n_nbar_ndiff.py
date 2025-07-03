@@ -12,7 +12,11 @@ scenarios = [
 'sc2b_d4','sc2b_d5','sc2b_d6','sc2b_d7',
 'sc3b_d4','sc3b_d5','sc3b_d7']
 
-def compute_n_nbar_ndiff(sc='sc1b_d4'):
+def compute_n_nbar_ndiff(sc=''):
+    print('--------------------------------')
+    print(f'PROCESSING ROMAN SCENARIO {sc}')
+    print('--------------------------------')
+
     file = f'{path}/roman_nz_realizations/{sc}/nz_samples_LHC0_pointZ_1e6_Roman_{sc}.h5'
     nz = h5py.File(file,'r') 
     z = np.array(nz['zbinsc'])
@@ -39,6 +43,9 @@ def compute_n_nbar_ndiff(sc='sc1b_d4'):
     print('Saving mean n(z)')
     print('nbar.shape: ',nbar.shape)
     np.save(f'{p}nbar_{sc}.npy',nbar)
+    reshaped_nbar = nbar.flatten().reshape((9, 46)).T
+    final_nbar = np.column_stack((z, reshaped_nbar))
+    np.savetxt(f'{p}nbar_{sc}.nz', final_nbar, fmt=['%.3f'] + ['%.8e'] * 9)  # Change fmt if needed for different precision
 
     ndiff = n - nbar
     print('Saving difference matrix')
@@ -49,7 +56,7 @@ def compute_n_nbar_ndiff(sc='sc1b_d4'):
 
 def compute_Cn(sc='sc1bd4'):
     print('Computing Cn - Covariance matrix of the difference matrix: ndiff = n - nbar')
-    ndiff = np.load(f'{path}/ndiff_{sc}.npy')
+    ndiff = np.load(f'{p}ndiff_{sc}.npy')
     Cn = np.einsum('ij,ik->jk',ndiff,ndiff) / (ndiff.shape[0]-1)
     np.save(f'{p}cov_ndiff_{sc}.npy',Cn)
     np.savetxt(f'{p}cov_ndiff_{sc}.txt',Cn)
