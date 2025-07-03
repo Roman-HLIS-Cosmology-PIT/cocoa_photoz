@@ -4,21 +4,8 @@ Get the mean of redshift distribution for 9 millions of Roman scenarios
 """
 
 ## LIBS ##
-# import fitsio as fio
 import numpy as np
-from numpy import linalg as la
-from numpy.lib.recfunctions import stack_arrays
-import matplotlib
-matplotlib.use ('agg')
-import matplotlib.pyplot as plt
-import matplotlib.cm as cm
-from matplotlib.colors import LogNorm
-import matplotlib.gridspec as gridspec
-from matplotlib.ticker import MultipleLocator, FormatStrFormatter
-import pylab
-from scipy.special import softmax
 import h5py
-import os
 
 ###################################
 ###### REDSHIFT DISTRIBUTION ######

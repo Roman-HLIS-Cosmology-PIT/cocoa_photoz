@@ -96,9 +96,6 @@ class Fisher:
             return self.nz_fid
 
         elif photoz_npc > 0:
-            print("[photoz_pc_file]",photoz_pc_file)
-            print("[photoz_npc]",photoz_npc)
-
             U = np.genfromtxt(photoz_pc_file)[:,:photoz_npc]
             alphas = np.array([params_values.get(survey+"_DZ_S"+str(i+1)) for i in range(photoz_npc)])
             
