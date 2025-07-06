@@ -1,14 +1,19 @@
 #!/bin/bash -l
-#SBATCH --job-name=JACOBIAN_ROMAN_SC1BD4_G
-#SBATCH --output=./cocoa_photoz/results/outs_jacobian/%x_%A_%a.out
-#SBATCH --error=./cocoa_photoz/results/outs_jacobian/%x_%A_%a.err
+#SBATCH --job-name=RREAL
+#SBATCH --output=cocoa_photoz/results/outs_jacobian/%x_%A_%a.out
+#SBATCH --error=cocoa_photoz/results/outs_jacobian/%x_%A_%a.err
+###############SBATCH --ntasks-per-node=4
+###############SBATCH --cpus-per-task=7
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=28
 #SBATCH --time=7-00:00:00
 
-# yaml_file=./cocoa_photoz/yamls/roman_real/NZ_EVALUATE${SLURM_ARRAY_TASK_ID}.yaml
-yaml_file=./cocoa_photoz/yamls/roman_sc1bd4_g/NZ_EVALUATE${SLURM_ARRAY_TASK_ID}.yaml
+# yaml_file=cocoa_photoz/yamls/roman_sc1bd4_g/SHIFT_MODEL_MCMC${SLURM_ARRAY_TASK_ID}.yaml
+# yaml_file=cocoa_photoz/yamls/roman_sc1bd4_test_dv/PCA_MODEL_printdv_3x2_MCMC${SLURM_ARRAY_TASK_ID}.yaml
+# yaml_file=cocoa_photoz/yamls/roman_sc1bd4_g/ROMAN_REAL_MCMC0_print_datavector_file_example1_3x2pt.modelvector.yaml
+# yaml_file=cocoa_photoz/yamls/roman_sc1bd4_g_18decimal_diff_params_than_cosmocov/PCA_MODEL_MCMC${SLURM_ARRAY_TASK_ID}.yaml
+yaml_file=cocoa_photoz/yamls/roman_real/ROMAN_REAL_MCMC${SLURM_ARRAY_TASK_ID}.yaml
 
 echo Running on host `hostname`
 echo Time is `date`
@@ -34,3 +39,4 @@ else
 fi
 
 $CONDA_PREFIX/bin/mpirun -n ${SLURM_NTASKS} --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run $yaml_file -f
+# $CONDA_PREFIX/bin/mpirun -n ${SLURM_NTASKS} --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} python $yaml_file -f
