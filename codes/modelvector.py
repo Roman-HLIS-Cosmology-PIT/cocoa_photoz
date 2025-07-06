@@ -12,19 +12,18 @@ import yaml
 from types import SimpleNamespace
 
 
-surveys    = ['lsst_y1','des_y3','roman_real','roman_scenarios']
-survey     = surveys[2]
-path_c     = '/gpfs/scratch/pit-roman-hlis/Diogo/cocoapy310/Cocoa/'
-# path       = f'{path_c}/external_modules/data/{survey}/sc1bd4_g/'
-path       = f'{path_c}/external_modules/data/{survey}/roman_scenarios/'
+surveys = {'lsst_y1': {'base':{'path':'../../projects/lsst_y1/data/',
+                               'data_file':'lsst_y1_M1_GGL0.05.dataset'}},
+           'roman_real':{'base':{'path':'../../projects/roman_real/data/',
+                                 'data_file':'example1.dataset'},
+                         'sc1bd4':{'path':'../../projects/roman_real/data/roman_scenarios/',
+                               'data_file':'roman_sc1bd4_modelvector.py.dataset'}},
+           }
 
-data_files = {'lsst_y1':'lsst_y1_M1_GGL0.05.dataset',
-              'des_y3':'des_y3_real.dataset',
-              #'roman_real': 'example1.dataset',
-              #'roman_real':'roman_sc1bd4_g.dataset',
-              'roman_real':'roman_sc1bd4.dataset'}
-
-data_file = data_files[survey]
+survey = 'lsst_y1'
+type_ = 'base'
+path = surveys[survey][type_]['path']
+data_file = surveys[survey][type_]['data_file']
 
 ############ GENERAL PARAMETERS ############
 non_linear_emul       = 2
@@ -261,7 +260,24 @@ mv = np.hstack((xi_p,xi_m,gamma_t,w_theta)) # model vector combined - CosmoLike 
 print('dim[mv] =',mv.shape)
 
 mv = list(enumerate(mv))
-np.savetxt('lcdm_sc1bd4.modelvector',mv,fmt='%d %e')
+# np.savetxt('lcdm_sc1bd4.modelvector',mv,fmt='%d %e')
+
+
+##### TESTS: CHI2 VERSUS PCS #####
+# Init Cosmolike
+CLprobe='xi'
+ci.init_probes(possible_probes = CLprobe)
+ci.init_data_real(ini.relativeFileName('cov_file'), 
+                  ini.relativeFileName('mask_file'), 
+                  ini.relativeFileName('data_file'))
+
+dv = ci.compute_data_vector_masked()
+chi2 = ci.compute_chi2(dv)
+print(chi2)
+param = np.arange(0.27, 0.33, 0.005)
+##### TESTS: CHI2 VERSUS PCS #####
+
+
 
 def plot_xipm():
     """plot xi_+ and xi_- for different Roman scenarios - see the paper"""
