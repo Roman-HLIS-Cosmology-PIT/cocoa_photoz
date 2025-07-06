@@ -1,0 +1,10 @@
+data_file = lcdm_sc1bd4_modelvector.py.modelvector
+cov_file = cov_roman_sc1bd4_ng40
+mask_file = roman_sc1bd4_calculate_mask.py.mask
+nz_lens_file = nbar_sc1bd4.nz
+nz_source_file = nbar_sc1bd4.nz
+lens_ntomo = 9
+source_ntomo = 9
+n_theta = 15
+theta_min_arcmin = 2.5
+theta_max_arcmin = 250.

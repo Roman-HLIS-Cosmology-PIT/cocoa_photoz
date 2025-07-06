@@ -1,0 +1,10 @@
+data_file = example1_test.modelvector
+cov_file = example1_cov
+mask_file = example1.mask
+nz_lens_file = example1.nz
+nz_source_file = example1.nz
+lens_ntomo = 8
+source_ntomo = 8
+n_theta = 15
+theta_min_arcmin = 2.5
+theta_max_arcmin = 250.
