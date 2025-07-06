@@ -1,14 +1,13 @@
-output: ./cocoa_photoz/results/chains/roman_sc1bd4_g/EXAMPLE_EVALUATE0
+output: ./cocoa_photoz/results/chains/same_params_than_cosmocov/PCA_EXAMPLE_EVALUATE0
 
 timing: True
 debug: False
 stop_at_error: True
-force: True
 
 likelihood:
   roman_real.roman_real_cosmic_shear:
     path: ./external_modules/data/roman_real/sc1bd4_g
-    data_file: roman_sc1bd4_g.dataset
+    data_file: same_params_than_cosmocov.dataset
     # path: ./external_modules/data/roman_real
     # data_file: example1.dataset
     accuracyboost: 1.0
@@ -18,10 +17,11 @@ likelihood:
     non_linear_emul: 2
     IA_model: 0 #NLA
     IA_redshift_evolution: 3
-    print_datavector: False
+    print_datavector: True
+    print_datavector_file: 'same_params_from_cosmocov.modelvector'
     # ggl_exclude: [[6,0],[7,0],[7,1]]
     ggl_exclude: []
-    external_nz_modeling: 1
+    external_nz_modeling: 0
     epsilon: 1e-3
     photoz_pc_file: '/gpfs/scratch/pit-roman-hlis/Diogo/cocoapy310/Cocoa/projects/roman_real/data/sc1bd4_g/U.txt'
     photoz_npc: 0
@@ -114,6 +114,9 @@ params:
   tau:
     value: 0.0697186
     latex: \tau_\mathrm{reio}
+  # mnu:
+  #   value: 0.06
+  #   latex: m_\nu
   # ---------------------------------------------------------------------------------------
   # ------------------------------------- DERIVED PARAMETERS ------------------------------
   # ---------------------------------------------------------------------------------------
@@ -162,106 +165,21 @@ params:
     latex: \Omega_\mathrm{\\nu}
   ### NUISSANCE PARAMETERS
   # WL photo-z errors (lens=source -> same errors for both)
-  roman_DZ_S1:
+  roman_alpha_1:
     prior:
-      dist: norm
-      loc: 0.0
-      scale: 0.003
-    ref:
-      dist: norm
-      loc: 0.0
-      scale: 0.003
-    proposal: 0.003
-    latex: \Delta z_\mathrm{s,roman}^1
-  roman_DZ_S2:
+      min: -3.0
+      max: 3.0
+    latex: \alpha_1
+  roman_alpha_2:
     prior:
-      dist: norm
-      loc: 0.0
-      scale: 0.003
-    ref:
-      dist: norm
-      loc: 0.0
-      scale: 0.003
-    proposal: 0.003
-    latex: \Delta z_\mathrm{s,roman}^2
-  roman_DZ_S3:
+      min: -3.0
+      max: 3.0
+    latex: \alpha_2
+  roman_alpha_3:
     prior:
-      dist: norm
-      loc: 0.0
-      scale: 0.003
-    ref:
-      dist: norm
-      loc: 0.0
-      scale: 0.003
-    proposal: 0.003
-    latex: \Delta z_\mathrm{s,roman}^3
-  roman_DZ_S4:
-    prior:
-      dist: norm
-      loc: 0.0
-      scale: 0.003
-    ref:
-      dist: norm
-      loc: 0.0
-      scale: 0.003
-    proposal: 0.003
-    latex: \Delta z_\mathrm{s,roman}^4
-  roman_DZ_S5:
-    prior:
-      dist: norm
-      loc: 0.0
-      scale: 0.003
-    ref:
-      dist: norm
-      loc: 0.0
-      scale: 0.003
-    proposal: 0.003
-    latex: \Delta z_\mathrm{s,roman}^5
-  roman_DZ_S6:
-    prior:
-      dist: norm
-      loc: 0.0
-      scale: 0.003
-    ref:
-      dist: norm
-      loc: 0.0
-      scale: 0.003
-    proposal: 0.003
-    latex: \Delta z_\mathrm{s,roman}^6
-  roman_DZ_S7:
-    prior:
-      dist: norm
-      loc: 0.0
-      scale: 0.003
-    ref:
-      dist: norm
-      loc: 0.0
-      scale: 0.003
-    proposal: 0.003
-    latex: \Delta z_\mathrm{s,roman}^7
-  roman_DZ_S8:
-    prior:
-      dist: norm
-      loc: 0.0
-      scale: 0.003
-    ref:
-      dist: norm
-      loc: 0.0
-      scale: 0.003
-    proposal: 0.003
-    latex: \Delta z_\mathrm{s,roman}^8
-  # roman_DZ_S9:
-  #   prior:
-  #     dist: norm
-  #     loc: 0.0
-  #     scale: 0.003
-  #   ref:
-  #     dist: norm
-  #     loc: 0.0
-  #     scale: 0.003
-  #   proposal: 0.003
-  #   latex: \Delta z_\mathrm{s,roman}^9
-
+      min: -3.0
+      max: 3.0
+    latex: \alpha_3
 
   roman_M1:
     prior:
@@ -351,17 +269,17 @@ params:
       scale: 0.005
     proposal: 0.005
     latex: m_\mathrm{roman}^8
-  # roman_M9:
-  #   prior:
-  #     dist: norm
-  #     loc: 0.0
-  #     scale: 0.005
-  #   ref:
-  #     dist: norm
-  #     loc: 0.0
-  #     scale: 0.005
-  #   proposal: 0.005
-  #   latex: m_\mathrm{roman}^9
+  roman_M9:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 0.005
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 0.005
+    proposal: 0.005
+    latex: m_\mathrm{roman}^9
 
   # Intrinsic alignment
   roman_A1_1:
@@ -405,11 +323,13 @@ sampler:
     N: 1
     override:
       As_1e9: 2.1
-      ns: 0.96605
-      H0: 67.32
-      omegab: 0.04
+      ns: 0.97
+      H0: 69.0
+      omegab: 0.048
       omegam: 0.3
       mnu: 0.06
+      w0pwa: -1.0
+      w: -1.0
       roman_DZ_S1: 0.0
       roman_DZ_S2: 0.0
       roman_DZ_S3: 0.0
@@ -418,7 +338,7 @@ sampler:
       roman_DZ_S6: 0.0
       roman_DZ_S7: 0.0
       roman_DZ_S8: 0.0
-      # roman_DZ_S9: 0.0
+      roman_DZ_S9: 0.0
       roman_M1: 0.0
       roman_M2: 0.0
       roman_M3: 0.0
@@ -427,8 +347,6 @@ sampler:
       roman_M6: 0.0
       roman_M7: 0.0
       roman_M8: 0.0
-      # roman_M9: 0.0
+      roman_M9: 0.0
       roman_A1_1: 0.6
       roman_A1_2: -1.5
-      w0pwa: -0.9
-      w: -0.9

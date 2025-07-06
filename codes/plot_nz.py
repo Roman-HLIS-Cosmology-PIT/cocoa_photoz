@@ -14,15 +14,23 @@ from matplotlib.ticker import FuncFormatter
 
 path='/gpfs/scratch/pit-roman-hlis/Diogo/cocoapy310/Cocoa/cocoa_photoz/'
 
+
+# from Readme: https://docs.google.com/document/d/1iLUo9ok0hWj75-D6QhRrpidgJe4xqB0W-1sKcQu2eJU/edit?tab=t.0 
+# Wide field specification (area)
+# Scenario 1: (DRM-like plan) 5x140 s, dark sky, Y106+J129+H158+F184 H<24.96
+# Scenario 2: (proposed wide layer) 5x91 s, bright sky, H band only, H<23.93
+# Scenario 3: (proposed medium layer, if placed in an Equatorial field), 5x91 s, bright sky, Y106+J129+H158, H<24.31
+
+
 # Secenarios
 scenarios = [
 'sc1b_d4','sc1b_d5','sc1b_d6','sc1b_d7',
 'sc2b_d4','sc2b_d5','sc2b_d6','sc2b_d7',
 'sc3b_d4','sc3b_d5','sc3b_d7']
 scenarios_label = [
-'REF-D1','REF-D2','REF-D2','REF-D4',
-'W1-D1','W1-D2','W1-D3','W1-D4',
-'W2-D1','W2-D2',        'W2-D4']
+'DRM-D1','DRM-D2','DRM-D3','DRM-D4',
+'W-D1','W-D2','W-D3','W-D4',
+'M-D1','M-D2',        'M-D4']
 
 # A thousand random integers between 1 and 1M
 np.random.seed(42)
@@ -135,7 +143,7 @@ def plot_scenarios(sc='sc1b_d4'):
     # # np.savetxt('ndiff_roman_sc1bd4.txt',ndiff)
     # np.save('ndiff_roman_sc1bd4.npy',ndiff)
     return None
-# plot_scenarios()
+plot_scenarios()
 
 def plot_ndiff():
     nzr = f'{path}roman_nz_realizations/sc1b_d4/nz_samples_LHC0_pointZ_1e6_Roman_sc1b_d4.h5'
@@ -183,4 +191,4 @@ def distribution_violinplot():
     plt.savefig('test.pdf')
     return None
 
-distribution_violinplot()
+# distribution_violinplot()

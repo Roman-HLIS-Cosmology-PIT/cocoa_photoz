@@ -12,6 +12,8 @@ scenarios = [
 'sc2b_d4','sc2b_d5','sc2b_d6','sc2b_d7',
 'sc3b_d4','sc3b_d5','sc3b_d7']
 
+sc = 'sc1b_d6'
+
 def compute_n_nbar_ndiff(sc=''):
     print('--------------------------------')
     print(f'PROCESSING ROMAN SCENARIO {sc}')
@@ -45,14 +47,14 @@ def compute_n_nbar_ndiff(sc=''):
     np.save(f'{p}nbar_{sc}.npy',nbar)
     reshaped_nbar = nbar.flatten().reshape((9, 46)).T
     final_nbar = np.column_stack((z, reshaped_nbar))
-    np.savetxt(f'{p}nbar_{sc}.nz', final_nbar, fmt=['%.3f'] + ['%.8e'] * 9)  # Change fmt if needed for different precision
+    np.savetxt(f'{p}nbar_{sc}.nz', final_nbar, fmt='%.18e')  # Change fmt if needed for different precision
 
     ndiff = n - nbar
     print('Saving difference matrix')
     print('ndiff.shape: ',ndiff.shape)
     np.save(f'{p}ndiff_{sc}.npy',ndiff)
     return None
-# compute_n_nbar_ndiff()
+compute_n_nbar_ndiff(sc)
 
 def compute_Cn(sc='sc1bd4'):
     print('Computing Cn - Covariance matrix of the difference matrix: ndiff = n - nbar')
@@ -61,12 +63,12 @@ def compute_Cn(sc='sc1bd4'):
     np.save(f'{p}cov_ndiff_{sc}.npy',Cn)
     np.savetxt(f'{p}cov_ndiff_{sc}.txt',Cn)
     return None
-# compute_Cn()
+compute_Cn(sc)
 
-if __name__ == "__main__":
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--sc", type=str, required=True)
-    args = parser.parse_args()
-    compute_n_nbar_ndiff(sc=args.sc)
-    compute_Cn(sc=args.sc)
+# if __name__ == "__main__":
+#     import argparse
+#     parser = argparse.ArgumentParser()
+#     parser.add_argument("--sc", type=str, required=True)
+#     args = parser.parse_args()
+#     compute_n_nbar_ndiff(sc=args.sc)
+#     compute_Cn(sc=args.sc)
