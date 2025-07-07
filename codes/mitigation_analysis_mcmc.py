@@ -23,28 +23,34 @@ mcmc_control = {'c_1':{'path':f'{cp}/roman_sc1bd4_g/',
                 'c_6':{'path':f'{cp}/roman_real/',
                        'prefix':'ROMAN_REAL',
                        'info':'example1.modelvector: 3x2 (original)'},
-                'c_7':{'path':f'{cp}/roman_real/',
+                'c_7':{'path':f'{cp}/diff_params_than_cosmocov_gauss_alphas_prior/',
                        'prefix':'PCA_MODEL',
-                       'info':'Same as c_5, but with Gaussian prior on alphas.'}}
+                       'info':'Same as c_5, but with Gaussian prior on alphas.'},
+                       }
 
-control = 'c_5'
+control = 'c_7'
 path = mcmc_control[control]['path']
 px = mcmc_control[control]['prefix']
 info = mcmc_control[control]['info']
 print(info)
 
 def roman_pca_mcmc():
-    no_pc = loadMCSamples(path+f"{px}_MCMC0", settings=settings)
+#     no_pc = loadMCSamples(path+f"{px}_MCMC0", settings=settings)
     one_pc = loadMCSamples(path+f"{px}_MCMC1", settings=settings)
     two_pc = loadMCSamples(path+f"{px}_MCMC2", settings=settings)
     three_pc = loadMCSamples(path+f"{px}_MCMC3", settings=settings)
 
     g = plots.get_subplot_plotter()
-    g.plots_1d([no_pc,one_pc,two_pc,three_pc],["omegam","sigma8","w","wa"],
+#     g.plots_1d([no_pc,one_pc,two_pc,three_pc],["omegam","sigma8","w","wa"],
+#             markers={"omegam":0.3,"sigma8":0.8120,"w":-1,"wa":0}, # planck best-fit 1807.06209
+#             nx=4,legend_ncol=5,legend_labels=['No PC', '1 PC', '2 PC', '3 PC'],
+#             colors=['#1b5f6f',"#E69F00","#D55E00","#56B4E9"],
+#             ls=['-','--','-.',':'],lws=[3,3,3,3])
+    g.plots_1d([one_pc,two_pc,three_pc],["omegam","sigma8","w","wa"],
             markers={"omegam":0.3,"sigma8":0.8120,"w":-1,"wa":0}, # planck best-fit 1807.06209
-            nx=4,legend_ncol=5,legend_labels=['No PC', '1 PC', '2 PC', '3 PC'],
-            colors=['#1b5f6f',"#E69F00","#D55E00","#56B4E9"],
-            ls=['-','--','-.',':'],lws=[3,3,3,3])
+            nx=4,legend_ncol=5,legend_labels=['1 PC', '2 PC', '3 PC'],
+            colors=["#E69F00","#D55E00","#56B4E9"],
+            ls=['--','-.',':'],lws=[3,3,3])
     g.export("1d_marg.pdf")
 
     g = plots.get_subplot_plotter()
@@ -101,9 +107,13 @@ def plot_RMinus1():
     progress_2 = f'{px}_MCMC2.progress'
     progress_3 = f'{px}_MCMC3.progress'
 
-    progress = [progress_0,progress_1,progress_2,progress_3]
-    colors = ['#1b5f6f',"#E69F00","#D55E00","#56B4E9"]
-    legend_labels=['No PC', '1 PC', '2 PC', '3 PC']
+#     progress = [progress_0,progress_1,progress_2,progress_3]
+#     colors = ['#1b5f6f',"#E69F00","#D55E00","#56B4E9"]
+#     legend_labels=['No PC', '1 PC', '2 PC', '3 PC']
+    
+    progress = [progress_1,progress_2,progress_3]
+    colors = ["#E69F00","#D55E00","#56B4E9"]
+    legend_labels=['1 PC', '2 PC', '3 PC']
 
     # progress = [progress_0,progress_1,progress_2]
     # colors = ['#1b5f6f',"#E69F00","#D55E00"]
