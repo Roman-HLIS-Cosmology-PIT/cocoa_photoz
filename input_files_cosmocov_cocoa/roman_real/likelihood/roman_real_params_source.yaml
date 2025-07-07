@@ -1,23 +1,50 @@
-  # DHFS MOD START
+#### DHFS MOD START ####
   roman_alpha_1:
     prior:
-      min: -3.0
-      max: 3.0
-    ref: 0  
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 0.002  
+    # prior:
+    #   min: -3.0
+    #   max: 3.0
+    # ref: 0  
     latex: \alpha_1
   roman_alpha_2:
     prior:
-      min: -3.0
-      max: 3.0
-    ref: 0  
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 0.002
+    # prior:
+    #   min: -3.0
+    #   max: 3.0
+    # ref: 0  
     latex: \alpha_2
   roman_alpha_3:
     prior:
-      min: -3.0
-      max: 3.0
-    ref: 0  
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 0.002
+    # prior:
+    #   min: -3.0
+    #   max: 3.0
+    # ref: 0  
     latex: \alpha_3
-  # DHFS MOD END
+#### DHFS MOD END ####
   roman_DZ_S1:
     prior:
       dist: norm
