@@ -28,24 +28,25 @@ mcmc_control = {'c_1':{'path':f'{cp}/roman_sc1bd4_g/',
                        'info':'Same as c_5, but with Gaussian prior on alphas.'},
                        }
 
-control = 'c_7'
+control = 'c_6'
 path = mcmc_control[control]['path']
 px = mcmc_control[control]['prefix']
 info = mcmc_control[control]['info']
 print(info)
 
 def roman_pca_mcmc():
-#     no_pc = loadMCSamples(path+f"{px}_MCMC0", settings=settings)
+    #no_pc = loadMCSamples(path+f"{px}_MCMC0", settings=settings)
     one_pc = loadMCSamples(path+f"{px}_MCMC1", settings=settings)
     two_pc = loadMCSamples(path+f"{px}_MCMC2", settings=settings)
     three_pc = loadMCSamples(path+f"{px}_MCMC3", settings=settings)
 
     g = plots.get_subplot_plotter()
-#     g.plots_1d([no_pc,one_pc,two_pc,three_pc],["omegam","sigma8","w","wa"],
-#             markers={"omegam":0.3,"sigma8":0.8120,"w":-1,"wa":0}, # planck best-fit 1807.06209
-#             nx=4,legend_ncol=5,legend_labels=['No PC', '1 PC', '2 PC', '3 PC'],
-#             colors=['#1b5f6f',"#E69F00","#D55E00","#56B4E9"],
-#             ls=['-','--','-.',':'],lws=[3,3,3,3])
+
+    # g.plots_1d([no_pc,one_pc,two_pc,three_pc],["omegam","sigma8","w","wa"],
+    #         markers={"omegam":0.3,"sigma8":0.8120,"w":-1,"wa":0}, # planck best-fit 1807.06209
+    #         nx=4,legend_ncol=5,legend_labels=['No PC', '1 PC', '2 PC', '3 PC'],
+    #         colors=['#1b5f6f',"#E69F00","#D55E00","#56B4E9"],
+    #         ls=['-','--','-.',':'],lws=[3,3,3,3])
     g.plots_1d([one_pc,two_pc,three_pc],["omegam","sigma8","w","wa"],
             markers={"omegam":0.3,"sigma8":0.8120,"w":-1,"wa":0}, # planck best-fit 1807.06209
             nx=4,legend_ncol=5,legend_labels=['1 PC', '2 PC', '3 PC'],
@@ -74,7 +75,7 @@ def roman_pca_mcmc():
             ls=['-'],lws=[3])
     g.export("1d_marg_alpha_3pc.pdf")
     return None
-roman_pca_mcmc()
+# roman_pca_mcmc()
 
 def roman_real_mcmc():
     mcmc0 = loadMCSamples(path+f"{px}_MCMC0", settings=settings)
@@ -97,8 +98,10 @@ def roman_real_mcmc():
             ls=['-','--','-.'],lws=[3,3,3])
     g.export("1d_marg_alpha_3pc.pdf")
     return None
+roman_real_mcmc()
 
-def plot_RMinus1():
+
+def plot_RMinus1(type_):
     plt.figure()
     Rminus1_stop = 0.015
     max_val = 0
@@ -107,17 +110,19 @@ def plot_RMinus1():
     progress_2 = f'{px}_MCMC2.progress'
     progress_3 = f'{px}_MCMC3.progress'
 
-#     progress = [progress_0,progress_1,progress_2,progress_3]
-#     colors = ['#1b5f6f',"#E69F00","#D55E00","#56B4E9"]
-#     legend_labels=['No PC', '1 PC', '2 PC', '3 PC']
+    # progress = [progress_0,progress_1,progress_2,progress_3]
+    # colors = ['#1b5f6f',"#E69F00","#D55E00","#56B4E9"]
+    # legend_labels=['No PC', '1 PC', '2 PC', '3 PC']
     
-    progress = [progress_1,progress_2,progress_3]
-    colors = ["#E69F00","#D55E00","#56B4E9"]
-    legend_labels=['1 PC', '2 PC', '3 PC']
+    if type_ == 'roman_pca': 
+        progress = [progress_1,progress_2,progress_3]
+        colors = ["#E69F00","#D55E00","#56B4E9"]
+        legend_labels=['1 PC', '2 PC', '3 PC']
 
-    # progress = [progress_0,progress_1,progress_2]
-    # colors = ['#1b5f6f',"#E69F00","#D55E00"]
-    # legend_labels=['ROMAN_REAL_MCMC0', 'ROMAN_REAL_MCMC1', 'ROMAN_REAL_MCMC2']
+    elif type_ == 'roman_shift':
+        progress = [progress_0,progress_1,progress_2]
+        colors = ['#1b5f6f',"#E69F00","#D55E00"]
+        legend_labels=['ROMAN_REAL_MCMC0', 'ROMAN_REAL_MCMC1', 'ROMAN_REAL_MCMC2']
 
     for p,c,l in zip(progress,colors,legend_labels):
         Rminus1 = np.genfromtxt(path+p,usecols=(3))
@@ -135,4 +140,7 @@ def plot_RMinus1():
     plt.xlim(np.min(vals),max_val)
     plt.ylim(Rminus1_stop-0.1,np.max(Rminus1)+5)
     plt.savefig('Rminus1.pdf')
-plot_RMinus1()
+    return None
+# type_ = 'roman_pca'
+type_ = 'roman_shift'
+plot_RMinus1(type_)

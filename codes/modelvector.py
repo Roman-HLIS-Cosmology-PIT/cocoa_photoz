@@ -100,7 +100,6 @@ ci.init_redshift_distributions_from_files(
     source_ntomo=int(ini.int("source_ntomo")))
 
 # ci.init_probes(possible_probes = CLprobe)
-
 # ci.external_nz_modeling=int(1)
 # nz=np.genfromtxt('../external_modules/data/lsst_y1/lsst_y1_source.nz')
 # ci.set_source_sample(nz)
@@ -230,57 +229,48 @@ ci.set_nuisance_bias(B1 = galaxy_bias_b1,
                     B_MAG = galaxy_bias_bmag)
 ci.set_nuisance_ia(A1 = A1, A2 = A2, B_TA = BTA)
 
-############ ACCESS 2PCF ############
+##########################################################################################
+##################################### ACCESS 2PCF ########################################
+##########################################################################################
+def modelvector():
+    n_tomo = int(ini.int("source_ntomo"))
 
-n_tomo = int(ini.int("source_ntomo"))
-
-xi_pm   = np.array(ci.xi_pm_tomo())
-xi_p    = xi_pm[0]
-xi_m    = xi_pm[1]
-gamma_t = np.array(ci.w_gammat_tomo())
-w_theta = np.array(ci.w_gg_tomo())
-
-
-cs_tomo = [(i,j) for i in range(n_tomo) for j in range(n_tomo) if j>=i] # tomo bins combination for cosmic-shear => xi^{ij}(theta)
-xi_p = np.hstack([xi_p[:,t[0],t[1]] for t in cs_tomo])
-xi_m = np.hstack([xi_m[:,t[0],t[1]] for t in cs_tomo])
-print('dim[xi+], dim[xi-] =',xi_p.shape,xi_m.shape)
-
-ggl_tomo = [(i,j) for i in range(n_tomo) for j in range(n_tomo)] # tomo bins combination for galaxy-galaxy lensing => gammat^{ij}(theta)
-gamma_t = np.hstack([gamma_t[:,t[0],t[1]] for t in ggl_tomo])
-print('dim[gamma_t] =',gamma_t.shape)
-
-gg_tomo = [(i,j) for i in range(n_tomo) for j in range(n_tomo) if j==i] # tomo bins combination for galaxy-galaxy => w^i(theta)
-w_theta = np.hstack([w_theta[:,t[0],t[1]] for t in gg_tomo])
-print('dim[w]',w_theta.shape)
-
-print('total dim =',xi_p.shape[0] + xi_m.shape[0] + gamma_t.shape[0] + w_theta.shape[0])
-
-mv = np.hstack((xi_p,xi_m,gamma_t,w_theta)) # model vector combined - CosmoLike order [xi+,xi-,gammat,w]
-print('dim[mv] =',mv.shape)
-
-mv = list(enumerate(mv))
-# np.savetxt('lcdm_sc1bd4.modelvector',mv,fmt='%d %e')
+    xi_pm   = np.array(ci.xi_pm_tomo())
+    xi_p    = xi_pm[0]
+    xi_m    = xi_pm[1]
+    gamma_t = np.array(ci.w_gammat_tomo())
+    w_theta = np.array(ci.w_gg_tomo())
 
 
-##### TESTS: CHI2 VERSUS PCS #####
-# Init Cosmolike
-CLprobe='xi'
-ci.init_probes(possible_probes = CLprobe)
-ci.init_data_real(ini.relativeFileName('cov_file'), 
-                  ini.relativeFileName('mask_file'), 
-                  ini.relativeFileName('data_file'))
+    cs_tomo = [(i,j) for i in range(n_tomo) for j in range(n_tomo) if j>=i] # tomo bins combination for cosmic-shear => xi^{ij}(theta)
+    xi_p = np.hstack([xi_p[:,t[0],t[1]] for t in cs_tomo])
+    xi_m = np.hstack([xi_m[:,t[0],t[1]] for t in cs_tomo])
+    print('dim[xi+], dim[xi-] =',xi_p.shape,xi_m.shape)
 
-dv = ci.compute_data_vector_masked()
-chi2 = ci.compute_chi2(dv)
-print(chi2)
-param = np.arange(0.27, 0.33, 0.005)
-##### TESTS: CHI2 VERSUS PCS #####
+    ggl_tomo = [(i,j) for i in range(n_tomo) for j in range(n_tomo)] # tomo bins combination for galaxy-galaxy lensing => gammat^{ij}(theta)
+    gamma_t = np.hstack([gamma_t[:,t[0],t[1]] for t in ggl_tomo])
+    print('dim[gamma_t] =',gamma_t.shape)
 
+    gg_tomo = [(i,j) for i in range(n_tomo) for j in range(n_tomo) if j==i] # tomo bins combination for galaxy-galaxy => w^i(theta)
+    w_theta = np.hstack([w_theta[:,t[0],t[1]] for t in gg_tomo])
+    print('dim[w]',w_theta.shape)
 
+    print('total dim =',xi_p.shape[0] + xi_m.shape[0] + gamma_t.shape[0] + w_theta.shape[0])
 
+    mv = np.hstack((xi_p,xi_m,gamma_t,w_theta)) # model vector combined - CosmoLike order [xi+,xi-,gammat,w]
+    print('dim[mv] =',mv.shape)
+
+    mv = list(enumerate(mv))
+    np.savetxt('lcdm_sc1bd4.modelvector',mv,fmt='%d %e')
+    return xi_pm
+# modelvector()
+
+##########################################################################################
+################################# PLOT XI+ AND XI - ######################################
+##########################################################################################
 def plot_xipm():
     """plot xi_+ and xi_- for different Roman scenarios - see the paper"""
+    xi_pm = modelvector()
     fig,ax = plt.subplots(1,2,figsize=(7,3))
     xi_p0 = xi_pm[0][:,0,0]
     xi_m0 = xi_pm[1][:,0,0]
@@ -297,3 +287,77 @@ def plot_xipm():
     plt.tight_layout()
     # plt.savefig('test.pdf')
     return None
+
+##########################################################################################
+##################################### PLOT CHI2 ##########################################
+##########################################################################################
+def get_chi2(omegam = omegam, 
+             omegab = omegab, 
+             H0 = H0, 
+             ns = ns, 
+             As_1e9 = As_1e9, 
+             w = w, 
+             w0pwa = w0pwa,
+             A1  = A1, 
+             A2  = A2,
+             BTA = BTA,
+             shear_photoz_bias = shear_photoz_bias,
+             M = M,
+             baryon_sims = None,
+             AccuracyBoost = 1.0, 
+             kmax = 10, 
+             k_per_logint = 20, 
+             CAMBAccuracyBoost=1.1,
+             CLAccuracyBoost = 1.0, 
+             CLIntegrationAccuracy = 0):
+
+    CLAccuracyBoost = CLAccuracyBoost * AccuracyBoost
+    CLSamplingBoost = CLAccuracyBoost * AccuracyBoost
+    CLIntegrationAccuracy = max(0, CLIntegrationAccuracy + 3*(AccuracyBoost-1.0))
+
+    ci.init_accuracy_boost(CLAccuracyBoost, CLSamplingBoost, int(CLIntegrationAccuracy))
+
+    # Set Nuisance Parameters
+    (log10k_interp_2D, z_interp_2D, lnPL, lnPNL, G_growth, z_interp_1D, chi) = get_camb_cosmology()
+    
+    ci.set_cosmology(omegam = omegam, 
+                     H0 = H0, 
+                     log10k_2D = log10k_interp_2D, 
+                     z_2D = z_interp_2D, 
+                     lnP_linear = lnPL,
+                     lnP_nonlinear = lnPNL,
+                     G = G_growth,
+                     z_1D = z_interp_1D,
+                     chi = chi)
+    
+    ci.set_nuisance_shear_calib(M = M)
+    
+    ci.set_nuisance_shear_photoz(bias = shear_photoz_bias)
+    
+    ci.set_nuisance_ia(A1 = A1, A2 = A2, B_TA = BTA)
+    
+    datavector = np.array(ci.compute_data_vector_masked())
+    return ci.compute_chi2(datavector)
+
+
+# Init Cosmolike
+CLprobe="xi"
+ci.init_probes(possible_probes = CLprobe)
+
+ci.init_binning(int(ini.int("n_theta")), 
+                ini.float("theta_min_arcmin"), 
+                ini.float("theta_max_arcmin"))
+
+ci.init_data_real(ini.relativeFileName('cov_file'), 
+                  ini.relativeFileName('mask_file'), 
+                  ini.relativeFileName('data_file'))
+
+print(rf"$\chi^2$={get_chi2():3.3f}")
+
+param = np.arange(0.27, 0.33, 0.005)      
+chi2 = []
+for x in param:
+    chi2.append(get_chi2(omegam = x))
+
+plt.plot(param, chi2)
+plt.savefig('test.pdf')

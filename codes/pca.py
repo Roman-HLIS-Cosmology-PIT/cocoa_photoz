@@ -29,7 +29,7 @@ Nt = 9
 Nd = 414
 
 def pcs(method='eig'):
-    Cn = np.load(f'{path}/Cn_roman_sc1bd4.npy') #TODO: path changed
+    Cn = np.load(f'{path}/codes/Cn_roman_sc1bd4.npy') #TODO: path changed
     Cn = 0.5*(Cn + Cn.T)
     if method == 'eig':
         eigvals, eigvecs = np.linalg.eig(Cn)
@@ -61,6 +61,12 @@ def pcs(method='eig'):
 eig_vecs, eig_vals = pcs('eig')
 eigh_vecs, eigh_vals = pcs('eigh')
 svd_vecs, svd_vals = pcs('svd')
+
+size=10
+plt.figure()
+plt.plot(range(len(eigh_vals[:size])),eigh_vals[:size],marker='o')
+print(eigh_vals[:size])
+plt.savefig('test.pdf')
 
 eig_vals = eig_vals**2
 eigh_vals = eigh_vals**2
@@ -113,8 +119,8 @@ def plot_eigvalues_and_related_quantities(plot_type):
 
 # plot_eigvalues_and_related_quantities('explained_variance_ratio')
 
-def plot_eigenvectors_singular_vectors(plot_type):
-    k=4
+def plot_eigenvectors_singular_vectors(plot_type,k=4):
+    # k=4
     plt.figure()
     if plot_type=='test':
         plt.plot(z,eig_vecs[Nz*k:Nz*(k+1):,0],c=colors[0],ls='-',label='linalg.eig',lw=5)
@@ -136,10 +142,11 @@ def plot_eigenvectors_singular_vectors(plot_type):
         plt.xlim(np.min(z),np.max(z))
         plt.legend(loc='best',fontsize=15)
         plt.tight_layout()
-    plt.savefig('test.pdf')
+    plt.savefig(f'test{k}.pdf')
     return None
 
-# plot_eigenvectors_singular_vectors('paper')
+# for k in range(9):
+#     plot_eigenvectors_singular_vectors('paper',k=k)
 
 def weights():
     alphas = [] # little us in the paper

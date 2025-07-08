@@ -22,8 +22,20 @@ import h5py
 # import twopoint
 import os
 
-SURVEY = 'ROMAN' # or DES
 # SURVEY = 'DES' # or ROMAN
+SURVEY = 'ROMAN' # or DES
+def params(survey):
+    if survey == 'DES':
+        Nz = 299 #len(z)
+        Nt = 4
+        Nd = 1196
+    elif survey == 'ROMAN':   
+        Nz = 46 #len(z)
+        Nt = 9
+        Nd = 414
+    return Nz, Nt, Nd    
+
+Nz, Nt, Nd = params( SURVEY ) 
 
 ################################
 ###### Fisher matrix ######
@@ -33,7 +45,8 @@ path='/gpfs/scratch/pit-roman-hlis/Diogo/cocoapy310/Cocoa/cocoa_photoz/'
 def fisher(survey):
     if survey == 'DES': 
         # fisher = 'results/fisher_matrix/des_y3/fisher.txt'
-        fisher = 'fisher2_all_with_scale_cuts.txt'
+        # fisher = 'fisher2_all_with_scale_cuts.txt'
+        fisher = f'{path}/roman_nz_realizations/Fisher_matrix/chain_mean_realization_source_27-11-24_Tz_WZ_bq_0d01_pile3.txt'
 
     elif survey == 'ROMAN':
         # fisher = 'results/fisher_matrix/roman_real/fisher.txt'
@@ -53,14 +66,20 @@ def get_nzs(survey):
         Nt = np.shape(nzd)[1]          ## Number of tomographic bins: 4
         Nz = np.shape(nzd)[2]          ## Number of redshifts: 299
         nzd = nzd.reshape(Ns, Nt * Nz) ## shape = (10095, 1196) = (Ns, Nt*Nz)
-        return nzd
+        min_z   = 0.01
+        max_z   = 3
+        delta_z = (max_z - min_z) / 299 #0.05
+        zbins   = np.arange(min_z,max_z+delta_z,delta_z)
+        zbinsc  = zbins[:-1]+(zbins[1]-zbins[0])/2.
+        return nzd, zbinsc
 
     elif survey == 'ROMAN':
-        #n = np.load(f'{path}/n_roman_sc1bd4.npy')        ## shape = (1M , 414)
-        #nbar = np.load(f'{path}/nbar_roman_sc1bd4.npy')  ## shape = (414, )
-        ndiff = np.load(f'{path}/ndiff_roman_sc1bd4.npy') ## shape = (1M , 414)
-        Cn = np.load(f'{path}/Cn_roman_sc1bd4.npy')       ## shape = (414 , 414)
-        return ndiff, Cn
+        ndiff = np.load(f'ndiff_roman_sc1bd4.npy') ## shape = (1M , 414)
+        Cn = np.load(f'Cn_roman_sc1bd4.npy')       ## shape = (414 , 414)
+        p = f'{path}/roman_nz_realizations/sc1b_d4/nz_samples_LHC0_pointZ_1e6_Roman_sc1b_d4.h5'
+        nz = h5py.File(p,'r') 
+        z = np.array(nz['zbinsc'])
+        return ndiff, Cn, z
 
 def nearestPD(A):
     """Find the nearest positive-definite matrix to input
@@ -167,18 +186,17 @@ def getModes(D, Cn, chisq_threshold=0.1):
 # Load nzs and calculate mean, deviation from mean, and covariance
 # chisq_threshold=0.15
 # chisq_threshold=1e-25
-chisq_threshold=0.01
+chisq_threshold=0.0
 
 if SURVEY == 'ROMAN':
-    ndiff, Cn = get_nzs( SURVEY )
-    print("Cn.shape:",Cn.shape)
+    ndiff, Cn, z = get_nzs( SURVEY )
 elif SURVEY == 'DES':
-    n     = get_nzs( SURVEY )
-    nbar  = np.mean(n, axis=0)
+    n,z = get_nzs( SURVEY )
+    nbar = np.mean(n, axis=0)
     ndiff = n - nbar
     Cn = np.einsum('ij,ik->jk',ndiff,ndiff) / n.shape[0] # a[i,j]a[i,k] = c[j,k]
 
-print('Cn shape:',Cn.shape)
+print('Cn.shape:',Cn.shape)
 
 D = fisher( SURVEY )
 
@@ -194,43 +212,60 @@ if not isPD(D):
 print('D shape:',D.shape)
 
 X,U,dchisq,resids = getModes(D, Cn, chisq_threshold=chisq_threshold)
-print('Chisq kept:',dchisq,'discarded:',resids)
+# print('Chisq kept:',dchisq,'discarded:',resids)
 # print(U)
 
 ## Save eigenvectors/basis/modes to file
 print('U shape 1:',U.shape)
+def save_eigvectors():
+    np.savetxt('U_nz_compression.txt',U)
+    return None
+save_eigvectors()
+# k=4
+for k in range(4):
+    plt.figure()
+    plt.plot(z,U[Nz*k:Nz*(k+1):,0],color='#1b5f6f',lw=2,label='PC 1')
+    plt.plot(z,U[Nz*k:Nz*(k+1):,1],color='#E69F00',lw=2,label='PC 2')
+    plt.plot(z,U[Nz*k:Nz*(k+1):,2],color='#56B4E9',lw=2,label='PC 3')
+    plt.plot(z,U[Nz*k:Nz*(k+1):,6],color='#0072B2',lw=2,ls='--',label='PC 7')
+    plt.legend(loc='best')
+    plt.savefig(f'test{k}.pdf')
+
 if SURVEY=="DES":
     U = np.reshape(U.T, (np.shape(U.T)[0], 4, -1))
 elif SURVEY=="ROMAN":
     U = np.reshape(U.T, (np.shape(U.T)[0], 9, -1))
 # print('U:',U)
 print('U shape 2:',U.shape)
-np.savez(f'{path}/U_source_{chisq_threshold}.npz', U=U, perbin=0)
 
 chisq_kept = np.array([dchisq])
-np.savetxt(f'{path}/chisq_kept_{chisq_threshold}.txt', chisq_kept)
 chisq_discard = np.array([resids])
-np.savetxt(f'{path}/chisq_discard_{chisq_threshold}.txt', chisq_discard)
 
 # Encode
 u = ndiff @ X.T   # u is (Nz,M)
 nEig = np.shape(u)[1]
 print('nEig: ', nEig)
 # Save corresponding amplitudes to file
-np.savetxt(f'{path}/u_{chisq_threshold}.txt', u)
 
-############################
-from getdist import MCSamples, plots
+# np.savez(f'{path}/U_source_{chisq_threshold}.npz', U=U, perbin=0)
+# np.savetxt(f'{path}/chisq_kept_{chisq_threshold}.txt', chisq_kept)
+# np.savetxt(f'{path}/chisq_discard_{chisq_threshold}.txt', chisq_discard)
+# np.savetxt(f'{path}/u_{chisq_threshold}.txt', u)
 
-names = ["u%s" %i for i in range(nEig)]
-chains = MCSamples(samples=u,names=names)
+def plot_alphas():
+    ############################
+    from getdist import MCSamples, plots
 
-g = plots.get_subplot_plotter()
-g.triangle_plot(chains,["u%s" %i for i in range(3)],filled=True)
-g.export('test.pdf')
-############################
+    names = ["u%s" %i for i in range(nEig)]
+    chains = MCSamples(samples=u,names=names)
 
-print()
-print("ndiff shape:",ndiff.shape)
-print("X shape:",X.shape)
-print("Weights shape:",u.shape)
+    g = plots.get_subplot_plotter()
+    g.triangle_plot(chains,["u%s" %i for i in range(3)],filled=True)
+    g.export('test.pdf')
+    ############################
+
+    print()
+    print("ndiff shape:",ndiff.shape)
+    print("X shape:",X.shape)
+    print("Weights shape:",u.shape)
+    return None
