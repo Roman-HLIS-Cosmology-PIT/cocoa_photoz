@@ -1,5 +1,5 @@
 #!/bin/bash -l
-#SBATCH --job-name=RREAL
+#SBATCH --job-name=PCA_same_gauss
 #SBATCH --output=cocoa_photoz/results/outs_jacobian/%x_%A_%a.out
 #SBATCH --error=cocoa_photoz/results/outs_jacobian/%x_%A_%a.err
 ###############SBATCH --ntasks-per-node=4
@@ -12,8 +12,8 @@
 # yaml_file=cocoa_photoz/yamls/roman_sc1bd4_g/SHIFT_MODEL_MCMC${SLURM_ARRAY_TASK_ID}.yaml
 # yaml_file=cocoa_photoz/yamls/roman_sc1bd4_test_dv/PCA_MODEL_printdv_3x2_MCMC${SLURM_ARRAY_TASK_ID}.yaml
 # yaml_file=cocoa_photoz/yamls/roman_sc1bd4_g/ROMAN_REAL_MCMC0_print_datavector_file_example1_3x2pt.modelvector.yaml
-# yaml_file=cocoa_photoz/yamls/roman_sc1bd4_g_18decimal_diff_params_than_cosmocov/PCA_MODEL_MCMC${SLURM_ARRAY_TASK_ID}.yaml
-yaml_file=cocoa_photoz/yamls/roman_real/ROMAN_REAL_MCMC${SLURM_ARRAY_TASK_ID}.yaml
+yaml_file=cocoa_photoz/yamls/roman_sc1bd4_g_18decimal_same_params_than_cosmocov_gauss_alphas_prior/PCA_MODEL_MCMC${SLURM_ARRAY_TASK_ID}.yaml
+# yaml_file=cocoa_photoz/yamls/roman_real/ROMAN_REAL_MCMC${SLURM_ARRAY_TASK_ID}.yaml
 
 echo Running on host `hostname`
 echo Time is `date`
