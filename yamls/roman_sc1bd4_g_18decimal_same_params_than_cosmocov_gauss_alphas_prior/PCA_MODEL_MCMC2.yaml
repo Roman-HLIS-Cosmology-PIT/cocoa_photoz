@@ -1,4 +1,4 @@
-output: ./cocoa_photoz/results/chains/diff_params_than_cosmocov/PCA_EXAMPLE_EVALUATE0
+output: ./cocoa_photoz/results/chains/same_params_than_cosmocov_gauss_alphas_prior/PCA_MODEL_MCMC2
 
 timing: True
 debug: False
@@ -7,7 +7,7 @@ stop_at_error: True
 likelihood:
   roman_real.roman_real_cosmic_shear:
     path: ./external_modules/data/roman_real/sc1bd4_g
-    data_file: diff_params_than_cosmocov.dataset
+    data_file: same_params_than_cosmocov.dataset
     # path: ./external_modules/data/roman_real
     # data_file: example1.dataset
     accuracyboost: 1.0
@@ -17,14 +17,13 @@ likelihood:
     non_linear_emul: 2
     IA_model: 0 #NLA
     IA_redshift_evolution: 3
-    print_datavector: True
-    print_datavector_file: 'diff_params_from_cosmocov_a3=-1.modelvector'
+    print_datavector: False
     # ggl_exclude: [[6,0],[7,0],[7,1]]
     ggl_exclude: []
     external_nz_modeling: 1
     epsilon: 1e-3
     photoz_pc_file: '/gpfs/scratch/pit-roman-hlis/Diogo/cocoapy310/Cocoa/projects/roman_real/data/sc1bd4_g/U.txt'
-    photoz_npc: 3
+    photoz_npc: 2
     
 params:
   As_1e9:
@@ -114,9 +113,6 @@ params:
   tau:
     value: 0.0697186
     latex: \tau_\mathrm{reio}
-  # mnu:
-  #   value: 0.06
-  #   latex: m_\nu
   # ---------------------------------------------------------------------------------------
   # ------------------------------------- DERIVED PARAMETERS ------------------------------
   # ---------------------------------------------------------------------------------------
@@ -165,21 +161,39 @@ params:
     latex: \Omega_\mathrm{\\nu}
   ### NUISSANCE PARAMETERS
   # WL photo-z errors (lens=source -> same errors for both)
-  roman_alpha_1: 0.0
-    # prior:
-    #   min: -3.0
-    #   max: 3.0
-    # latex: \alpha_1
-  roman_alpha_2: 0.0
-    # prior:
-    #   min: -3.0
-    #   max: 3.0
-    # latex: \alpha_2
-  roman_alpha_3: -1.0
-    # prior:
-    #   min: -3.0
-    #   max: 3.0
-    # latex: \alpha_3
+  roman_alpha_1:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 0.001
+    latex: \alpha_1
+  roman_alpha_2:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 0.001
+    latex: \alpha_2
+  roman_alpha_3: 0.0
+
+  roman_DZ_S1: 0.0
+  roman_DZ_S2: 0.0
+  roman_DZ_S3: 0.0
+  roman_DZ_S4: 0.0
+  roman_DZ_S5: 0.0
+  roman_DZ_S6: 0.0
+  roman_DZ_S7: 0.0
+  roman_DZ_S8: 0.0
+  roman_DZ_S9: 0.0
 
   roman_M1:
     prior:
@@ -269,17 +283,17 @@ params:
       scale: 0.005
     proposal: 0.005
     latex: m_\mathrm{roman}^8
-  roman_M9:
-    prior:
-      dist: norm
-      loc: 0.0
-      scale: 0.005
-    ref:
-      dist: norm
-      loc: 0.0
-      scale: 0.005
-    proposal: 0.005
-    latex: m_\mathrm{roman}^9
+  # roman_M9:
+  #   prior:
+  #     dist: norm
+  #     loc: 0.0
+  #     scale: 0.005
+  #   ref:
+  #     dist: norm
+  #     loc: 0.0
+  #     scale: 0.005
+  #   proposal: 0.005
+  #   latex: m_\mathrm{roman}^9
 
   # Intrinsic alignment
   roman_A1_1:
@@ -319,34 +333,20 @@ theory:
       k_per_logint: 15
 
 sampler:
-  evaluate:
-    N: 1
-    override:
-      As_1e9: 2.1
-      ns: 0.96605
-      H0: 67.32
-      omegab: 0.04
-      omegam: 0.3
-      mnu: 0.06
-      w0pwa: -1.0
-      w: -1.0
-      roman_DZ_S1: 0.0
-      roman_DZ_S2: 0.0
-      roman_DZ_S3: 0.0
-      roman_DZ_S4: 0.0
-      roman_DZ_S5: 0.0
-      roman_DZ_S6: 0.0
-      roman_DZ_S7: 0.0
-      roman_DZ_S8: 0.0
-      roman_DZ_S9: 0.0
-      roman_M1: 0.0
-      roman_M2: 0.0
-      roman_M3: 0.0
-      roman_M4: 0.0
-      roman_M5: 0.0
-      roman_M6: 0.0
-      roman_M7: 0.0
-      roman_M8: 0.0
-      roman_M9: 0.0
-      roman_A1_1: 0.6
-      roman_A1_2: -1.5
+  mcmc:
+    covmat: 
+    covmat_params:
+    learn_proposal: True
+    learn_proposal_Rminus1_min: 0.03
+    learn_proposal_Rminus1_max: 100.
+    learn_proposal_Rminus1_max_early: 500.
+    max_samples: .inf
+    Rminus1_stop: 0.015
+    Rminus1_cl_stop: 0.17
+    Rminus1_cl_level: 0.95
+    measure_speeds: False
+    drag: False
+    learn_every: 10d
+    max_tries: 10000
+    burn_in: 0
+    Rminus1_single_split: 4

@@ -1,4 +1,4 @@
-output: ./cocoa_photoz/results/chains/diff_params_than_cosmocov/PCA_EXAMPLE_EVALUATE0
+output: ./cocoa_photoz/results/chains/same_params_than_cosmocov_gauss_alphas_prior/PCA_EXAMPLE_EVALUATE0
 
 timing: True
 debug: False
@@ -7,7 +7,7 @@ stop_at_error: True
 likelihood:
   roman_real.roman_real_cosmic_shear:
     path: ./external_modules/data/roman_real/sc1bd4_g
-    data_file: diff_params_than_cosmocov.dataset
+    data_file: same_params_than_cosmocov.dataset
     # path: ./external_modules/data/roman_real
     # data_file: example1.dataset
     accuracyboost: 1.0
@@ -18,13 +18,13 @@ likelihood:
     IA_model: 0 #NLA
     IA_redshift_evolution: 3
     print_datavector: True
-    print_datavector_file: 'diff_params_from_cosmocov_a3=-1.modelvector'
+    print_datavector_file: 'same_params_from_cosmocov.modelvector'
     # ggl_exclude: [[6,0],[7,0],[7,1]]
     ggl_exclude: []
-    external_nz_modeling: 1
+    external_nz_modeling: 0
     epsilon: 1e-3
     photoz_pc_file: '/gpfs/scratch/pit-roman-hlis/Diogo/cocoapy310/Cocoa/projects/roman_real/data/sc1bd4_g/U.txt'
-    photoz_npc: 3
+    photoz_npc: 0
     
 params:
   As_1e9:
@@ -165,21 +165,39 @@ params:
     latex: \Omega_\mathrm{\\nu}
   ### NUISSANCE PARAMETERS
   # WL photo-z errors (lens=source -> same errors for both)
-  roman_alpha_1: 0.0
-    # prior:
-    #   min: -3.0
-    #   max: 3.0
-    # latex: \alpha_1
-  roman_alpha_2: 0.0
-    # prior:
-    #   min: -3.0
-    #   max: 3.0
-    # latex: \alpha_2
-  roman_alpha_3: -1.0
-    # prior:
-    #   min: -3.0
-    #   max: 3.0
-    # latex: \alpha_3
+  roman_alpha_1:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 0.9
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 0.9
+    proposal: 0.002
+    latex: \alpha_1
+  roman_alpha_2:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 0.9
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 0.9
+    proposal: 0.002
+    latex: \alpha_2
+  roman_alpha_3:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 0.9
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 0.9
+    proposal: 0.002
+    latex: \alpha_3
 
   roman_M1:
     prior:
