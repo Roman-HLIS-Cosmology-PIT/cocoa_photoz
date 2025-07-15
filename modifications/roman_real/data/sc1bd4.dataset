@@ -1,0 +1,10 @@
+data_file = dv_sc1bd4r0.modelvector
+cov_file = cov_sc1bd4r0
+mask_file = mask_sc1bd4r0.mask
+nz_lens_file = nz_sc1bd4r0.nz
+nz_source_file = nz_sc1bd4r0.nz
+lens_ntomo = 9
+source_ntomo = 9
+n_theta = 15
+theta_min_arcmin = 2.5
+theta_max_arcmin = 250.
