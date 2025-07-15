@@ -18,7 +18,7 @@ likelihood:
     print_datavector: False
     ggl_exclude: [[6,0],[7,0],[7,1]]
     external_nz_modeling: 1
-    npcs_nz: 20            # number of PCs. Maximum 414 = 3200 tomo bins * 400 z bins
+    npcs_nz: 20            # number of PCs. Maximum 3200 = tomo bins * 400 z bins
     nbar_file: example1.nz # fake nbar = example1.nz
     pcs_file: fake_pcs.txt # fake PCs
     # Model: n(z) = <n>(z) + α_1*PC_1(z) + α_2*PC_2(z) + ... + α_n*PC_n(z)
