@@ -293,11 +293,11 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       # insert mod function here <-
       # source_nz_local = f(source_nz_local, nuisance parameters)
 
-      if self.npcs_nz>0:
-        source_nz_local = self.pca_obj.pca(params_values).copy()
+      # if self.npcs_nz>0:
+      source_nz_local = self.pca_obj.pca(params_values).copy()
         # Model: n(z) = <n>(z) + α_1*PC_1(z) + α_2*PC_2(z) + ... + α_n*PC_n(z)
-      else:
-        source_nz_local = self.source_nz.copy()
+      # else:
+        # source_nz_local = self.source_nz.copy()
       # DHFS MOD END 
 
 
@@ -364,7 +364,6 @@ class _cosmolike_prototype_base(DataSetLikelihood):
     if self.external_nz_modeling: 
       # here we send n(z) at every point in the chain as the user may
       # modify it using an external function (example: adding outliers)
-     
       # to modify it
       # (1) deep copy the numpy array (so we keep track of the fiducial
       # (2) modify the copy
