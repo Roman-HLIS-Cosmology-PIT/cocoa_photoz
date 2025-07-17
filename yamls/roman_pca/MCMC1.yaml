@@ -170,15 +170,18 @@ params:
   ####################
   ###### ALPHAS ######
   ####################  
-  roman_alpha_1:
+  # Cobaya: nuisance parameters section
+  # mode amplitude. 
+  # just one mode: n(z) = <n>(z) + alpha_1*PC_1 + 0 
+  roman_alpha_1: 
     prior: {dist: norm, loc: 0.0, scale: 1.0}
     ref: {dist: norm, loc: 0.0, scale: 1.0}
     proposal: 0.3
     latex: \alpha_1    
   roman_alpha_2: 0.0
   roman_alpha_3: 0.0
-  
-  roman_DZ_S1: 0.0
+  # analogous to [wl_photoz_errors] in CosmoSIS
+  roman_DZ_S1: 0.0 
   roman_DZ_S2: 0.0
   roman_DZ_S3: 0.0
   roman_DZ_S4: 0.0

@@ -6,22 +6,38 @@ stop_at_error: True
 
 likelihood:
   roman_real.roman_real_cosmic_shear:
-    path: ./external_modules/data/roman_real/sc1bd4_g
-    data_file: diff_params_than_cosmocov.dataset
+    path: ./external_modules/data/roman_real/sc1bd4
+    data_file: sc1bd4.dataset
     accuracyboost: 1.0
     integration_accuracy: 0
     kmax_boltzmann: 5.0
     # 1 EE2, 2 Halofit
     non_linear_emul: 2
-    IA_model: 0 #NLA
+    IA_model: 0
     IA_redshift_evolution: 3
-    print_datavector: False
     ggl_exclude: []
     external_nz_modeling: 1
-    epsilon: 1e-3
-    photoz_pc_file: ./projects/roman_real/data/sc1bd4_g/U.txt
-    photoz_npc: 0
-    
+    npcs_nz: 0                 # number of PCs. Maximum 414 = 9 tomo bins * 46 z bins
+    nbar_file: nbar_sc1b_d4.nz # mean of 1M redshift distributions
+    pcs_file: U.txt            # PCs 
+    # Model: n(z) = <n>(z) + α_1*PC_1(z) + α_2*PC_2(z) + ... + α_n*PC_n(z)
+
+theory:
+  camb:
+    path: ./external_modules/code/CAMB
+    stop_at_error: False
+    use_renames: True
+    extra_args:
+      halofit_version: takahashi
+      AccuracyBoost: 1.1
+      kmax: 5
+      lens_potential_accuracy: 1.0
+      num_massive_neutrinos: 1
+      nnu: 3.046
+      dark_energy_model: ppf
+      accurate_massive_neutrino_transfers: false
+      k_per_logint: 20
+
 params:
   As_1e9:
     prior:
@@ -78,14 +94,7 @@ params:
     latex: \Omega_\mathrm{m}
     drop: true
   mnu:
-    prior:
-      min: 0.06
-      max: 0.6
-    ref:
-      dist: norm
-      loc: 0.25
-      scale: 0.1
-    proposal: 0.05
+    value: 0.06
   w0pwa:
     prior:
       min: -5 
@@ -158,10 +167,11 @@ params:
     latex: \Omega_\mathrm{\\nu}
   ### NUISSANCE PARAMETERS
   # WL photo-z errors (lens=source -> same errors for both)
+
   roman_alpha_1: 0.0
   roman_alpha_2: 0.0
   roman_alpha_3: 0.0
-
+  
   roman_DZ_S1: 0.0
   roman_DZ_S2: 0.0
   roman_DZ_S3: 0.0
@@ -171,7 +181,6 @@ params:
   roman_DZ_S7: 0.0
   roman_DZ_S8: 0.0
   roman_DZ_S9: 0.0
-
 
   roman_M1:
     prior:
@@ -261,17 +270,17 @@ params:
       scale: 0.005
     proposal: 0.005
     latex: m_\mathrm{roman}^8
-  # roman_M9:
-  #   prior:
-  #     dist: norm
-  #     loc: 0.0
-  #     scale: 0.005
-  #   ref:
-  #     dist: norm
-  #     loc: 0.0
-  #     scale: 0.005
-  #   proposal: 0.005
-  #   latex: m_\mathrm{roman}^9
+  roman_M9:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 0.005
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 0.005
+    proposal: 0.005
+    latex: m_\mathrm{roman}^9
 
   # Intrinsic alignment
   roman_A1_1:
@@ -295,24 +304,9 @@ params:
     proposal: 0.5
     latex: A_\mathrm{1-IA,roman}^2
 
-theory:
-  camb:
-    path: ./external_modules/code/CAMB
-    stop_at_error: False
-    use_renames: True
-    extra_args:
-      halofit_version: takahashi
-      AccuracyBoost: 1.0
-      lens_potential_accuracy: 1.0
-      num_massive_neutrinos: 1
-      nnu: 3.046
-      dark_energy_model: ppf
-      accurate_massive_neutrino_transfers: false
-      k_per_logint: 15
-
 sampler:
   mcmc:
-    covmat: 
+    covmat: ./projects/roman_real/data/DC1_PROPOSAL.covmat
     covmat_params:
     learn_proposal: True
     learn_proposal_Rminus1_min: 0.03
@@ -324,7 +318,26 @@ sampler:
     Rminus1_cl_level: 0.95
     measure_speeds: False
     drag: False
-    learn_every: 10d
+    # oversample_power: 0.3
+    # oversample_thin: True
+    # blocking:
+    # - [1,
+    #     [
+    #       As_1e9, ns, H0, omegab, omegam, w0pwa, w
+    #     ]
+    #   ]
+    # - [6,
+    #     [
+    #       roman_A1_1, roman_A1_2,
+    #     ]
+    #   ]
+    # - [25,
+    #     [
+    #       roman_M1, roman_M2, roman_M3, roman_M4, roman_M5,
+    #       roman_M6, roman_M7, roman_M8,roman_M9
+    #     ]
+    #   ]
+    # learn_every: 10d
     max_tries: 10000
     burn_in: 0
     Rminus1_single_split: 4
