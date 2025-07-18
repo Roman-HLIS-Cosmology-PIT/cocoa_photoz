@@ -18,8 +18,8 @@ likelihood:
     ggl_exclude: []
     print_datavector: False
     print_datavector_file: "dv_sc1bd4r0.modelvector"
-    external_nz_modeling: 1
-    npcs_nz: 2                 # number of PCs. Maximum 414 = 9 tomo bins * 46 z bins
+    external_nz_modeling: 0
+    npcs_nz: 0                 # number of PCs. Maximum 414 = 9 tomo bins * 46 z bins
     nbar_file: nbar_sc1b_d4.nz # mean of 1M redshift distributions
     pcs_file: U.txt            # PCs 
     # Model: n(z) = <n>(z) + α_1*PC_1(z) + α_2*PC_2(z) + ... + α_n*PC_n(z)
@@ -41,7 +41,7 @@ theory:
       k_per_logint: 20
 
 params:
-  As_1e9:
+  As_1e9: #1
     prior:
       min: 0.5
       max: 5
@@ -53,7 +53,7 @@ params:
     latex: 10^9 A_\mathrm{s})
     drop: true
     renames: A
-  ns:
+  ns: #2
     prior:
       min: 0.87
       max: 1.07
@@ -63,7 +63,7 @@ params:
       scale: 0.01
     proposal: 0.01
     latex: n_\mathrm{s}
-  H0:
+  H0: #3
     prior:
       min: 55
       max: 91
@@ -73,7 +73,7 @@ params:
       scale: 5
     proposal: 3
     latex: H_0
-  omegab:
+  omegab: #4
     prior:
       min: 0.03
       max: 0.07
@@ -84,7 +84,7 @@ params:
     proposal: 0.004
     latex: \Omega_\mathrm{b}
     drop: true
-  omegam:
+  omegam: #5
     prior:
       min: 0.1
       max: 0.9
@@ -553,26 +553,26 @@ sampler:
       omegab: 0.04
       omegam: 0.3
       mnu: 0.06
-      roman_alpha_1: 0.01
-      roman_alpha_2: 0.02
-      roman_alpha_3: 0.03
-      roman_alpha_4: 0.04
-      roman_alpha_5: 0.05
-      roman_alpha_6: 0.06
-      roman_alpha_7: 0.07
-      roman_alpha_8: 0.08
-      roman_alpha_9: 0.09
-      roman_alpha_10: 0.1
-      roman_alpha_11: 0.01
-      roman_alpha_12: 0.02
-      roman_alpha_13: 0.03
-      roman_alpha_14: 0.04
-      roman_alpha_15: 0.05
-      roman_alpha_16: 0.06
-      roman_alpha_17: 0.07
-      roman_alpha_18: 0.08
-      roman_alpha_19: 0.09
-      roman_alpha_20: 0.1
+      roman_alpha_1:  0.0
+      roman_alpha_2:  0.0
+      roman_alpha_3:  0.0
+      roman_alpha_4:  0.0
+      roman_alpha_5:  0.0
+      roman_alpha_6:  0.0
+      roman_alpha_7:  0.0
+      roman_alpha_8:  0.0
+      roman_alpha_9:  0.0
+      roman_alpha_10: 0.0
+      roman_alpha_11: 0.0
+      roman_alpha_12: 0.0
+      roman_alpha_13: 0.0
+      roman_alpha_14: 0.0
+      roman_alpha_15: 0.0
+      roman_alpha_16: 0.0
+      roman_alpha_17: 0.0
+      roman_alpha_18: 0.0
+      roman_alpha_19: 0.0
+      roman_alpha_20: 0.0
       roman_DZ_S1: 0.0
       roman_DZ_S2: 0.0
       roman_DZ_S3: 0.0

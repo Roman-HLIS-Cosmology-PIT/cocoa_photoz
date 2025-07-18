@@ -18,7 +18,6 @@ likelihood:
     ggl_exclude: []
     external_nz_modeling: 1
     npcs_nz: 1                 # number of PCs. Maximum 414 = 9 tomo bins * 46 z bins
-    nbar_file: nbar_sc1b_d4.nz # mean of 1M redshift distributions
     pcs_file: U.txt            # PCs 
     # Model: n(z) = <n>(z) + α_1*PC_1(z) + α_2*PC_2(z) + ... + α_n*PC_n(z)
 

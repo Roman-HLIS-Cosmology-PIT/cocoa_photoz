@@ -52,9 +52,9 @@ class _cosmolike_prototype_base(DataSetLikelihood):
 
     # DHFS MOD START
     if self.external_nz_modeling:
-      self.pca_obj = nz_pca.PCA(self.path+"/"+self.nbar_file,
-                                self.path+"/"+self.pcs_file,
-                                self.npcs_nz)
+      self.pca_obj = nz_pca.PCA(nbar_path = self.source_file,
+                                pcs_path = self.path+"/"+self.pcs_file,
+                                npcs_nz = self.npcs_nz)
     # DHFS MOD END
 
     # ------------------------------------------------------------------------
@@ -289,17 +289,11 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       # (2) modify the copy
       # (3) call set_source_sample
 
-      #DHFS MOD START
       # insert mod function here <-
       # source_nz_local = f(source_nz_local, nuisance parameters)
+      # source_nz_local = self.source_nz.copy()
 
-      # if self.npcs_nz>0:
-      source_nz_local = self.pca_obj.pca(params_values).copy()
-        # Model: n(z) = <n>(z) + α_1*PC_1(z) + α_2*PC_2(z) + ... + α_n*PC_n(z)
-      # else:
-        # source_nz_local = self.source_nz.copy()
-      # DHFS MOD END 
-
+      source_nz_local = self.pca_obj.pca(params_values).copy() # DHFS MOD
 
       ci.set_source_sample(source_nz_local)
       

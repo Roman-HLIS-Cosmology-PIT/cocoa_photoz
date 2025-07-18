@@ -11,6 +11,7 @@ class PCA:
         self.z = self.nbar[:,0]
     
     def pca(self, params_values):
+        # Model: n(z) = <n>(z) + α_1*PC_1(z) + α_2*PC_2(z) + ... + α_n*PC_n(z)
         if self.npcs_nz > 0:
             alphas = np.array([params_values.get("roman_alpha_"+str(i+1)) for i in range(self.npcs_nz)])
             correction = (alphas * self.U).sum(axis=1)
