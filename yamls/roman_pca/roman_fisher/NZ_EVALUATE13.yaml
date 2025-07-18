@@ -1,44 +1,26 @@
-output: ./projects/roman_real/chains/EXAMPLE_EVALUATE1
+output: ./cocoa_photoz/chains/roman_real/EXAMPLE_EVALUATE13
 
 timing: True
 debug: False
-stop_at_error: False
+stop_at_error: True
+force: True
 
 likelihood:
   roman_real.roman_real_cosmic_shear:
     path: ./external_modules/data/roman_real
-    data_file: example1.dataset # that assumes lens = source
+    data_file: example1.dataset
     accuracyboost: 1.0
     integration_accuracy: 0
     kmax_boltzmann: 5.0
     # 1 EE2, 2 Halofit
     non_linear_emul: 2
-    IA_model: 0
+    IA_model: 0 #NLA
     IA_redshift_evolution: 3
     print_datavector: False
     ggl_exclude: [[6,0],[7,0],[7,1]]
     external_nz_modeling: 1
-    npcs_nz: 20            # number of PCs. Maximum 3200 = tomo bins * 400 z bins
-    nbar_file: example1.nz # fake nbar = example1.nz
-    pcs_file: fake_pcs.txt # fake PCs
-    # Model: n(z) = <n>(z) + α_1*PC_1(z) + α_2*PC_2(z) + ... + α_n*PC_n(z)
-
-theory:
-  camb:
-    path: ./external_modules/code/CAMB
-    stop_at_error: False
-    use_renames: True
-    extra_args:
-      halofit_version: takahashi
-      AccuracyBoost: 1.1
-      kmax: 5
-      lens_potential_accuracy: 1.0
-      num_massive_neutrinos: 1
-      nnu: 3.046
-      dark_energy_model: ppf
-      accurate_massive_neutrino_transfers: false
-      k_per_logint: 20
-
+    epsilon: 1e-7
+    
 params:
   As_1e9:
     prior:
@@ -131,6 +113,7 @@ params:
   # ------------------------------------- DERIVED PARAMETERS ------------------------------
   # ---------------------------------------------------------------------------------------
   # WARNING: DO NOT REMOVE omegabh2/omegach2/omegamh2/wa/As/ FROM DERIVED PARAMETERS
+  # WARNING: DO NOT REMOVE THE DROP FLAG FROM omegab/omegam/As_1e9/w0pwa
   # SEE: github.com/CosmoLike/cocoa#warning-warning-warning-weak-lensing-yaml-files-in-cobaya-
   # --------------------------------------------------------------------------------------- 
   As:
@@ -172,103 +155,98 @@ params:
   omegan:
     derived: 'lambda omegan2, H0: omegan2/((H0/100)**2)'
     latex: \Omega_\mathrm{\\nu}
-  # ------------------------------------------------------------------------
-  # ------------------------------------------------------------------------
-  # Nuisance parameters below (it overwrites the default settings)
-  # Default settings in likelihood/roman_real_params_lens.yaml
-  # Default settings in likelihood/roman_real_params_source.yaml
-  # ------------------------------------------------------------------------
-  # ------------------------------------------------------------------------
+  ### NUISSANCE PARAMETERS
+  # WL photo-z errors (lens=source -> same errors for both)
   roman_DZ_S1:
     prior:
       dist: norm
       loc: 0.0
-      scale: 0.002
+      scale: 0.003
     ref:
       dist: norm
       loc: 0.0
-      scale: 0.002
-    proposal: 0.002
+      scale: 0.003
+    proposal: 0.003
     latex: \Delta z_\mathrm{s,roman}^1
   roman_DZ_S2:
     prior:
       dist: norm
       loc: 0.0
-      scale: 0.002
+      scale: 0.003
     ref:
       dist: norm
       loc: 0.0
-      scale: 0.002
-    proposal: 0.002
+      scale: 0.003
+    proposal: 0.003
     latex: \Delta z_\mathrm{s,roman}^2
   roman_DZ_S3:
     prior:
       dist: norm
       loc: 0.0
-      scale: 0.002
+      scale: 0.003
     ref:
       dist: norm
       loc: 0.0
-      scale: 0.002
-    proposal: 0.002
+      scale: 0.003
+    proposal: 0.003
     latex: \Delta z_\mathrm{s,roman}^3
   roman_DZ_S4:
     prior:
       dist: norm
       loc: 0.0
-      scale: 0.002
+      scale: 0.003
     ref:
       dist: norm
       loc: 0.0
-      scale: 0.002
-    proposal: 0.002
+      scale: 0.003
+    proposal: 0.003
     latex: \Delta z_\mathrm{s,roman}^4
   roman_DZ_S5:
     prior:
       dist: norm
       loc: 0.0
-      scale: 0.002
+      scale: 0.003
     ref:
       dist: norm
       loc: 0.0
-      scale: 0.002
-    proposal: 0.002
+      scale: 0.003
+    proposal: 0.003
     latex: \Delta z_\mathrm{s,roman}^5
   roman_DZ_S6:
     prior:
       dist: norm
       loc: 0.0
-      scale: 0.002
+      scale: 0.003
     ref:
       dist: norm
       loc: 0.0
-      scale: 0.002
-    proposal: 0.002
+      scale: 0.003
+    proposal: 0.003
     latex: \Delta z_\mathrm{s,roman}^6
   roman_DZ_S7:
     prior:
       dist: norm
       loc: 0.0
-      scale: 0.002
+      scale: 0.003
     ref:
       dist: norm
       loc: 0.0
-      scale: 0.002
-    proposal: 0.002
+      scale: 0.003
+    proposal: 0.003
     latex: \Delta z_\mathrm{s,roman}^7
   roman_DZ_S8:
     prior:
       dist: norm
       loc: 0.0
-      scale: 0.002
+      scale: 0.003
     ref:
       dist: norm
       loc: 0.0
-      scale: 0.002
-    proposal: 0.002
+      scale: 0.003
+    proposal: 0.003
     latex: \Delta z_\mathrm{s,roman}^8
-  # ------------------------------------------------------------------------
-  # ------------------------------------------------------------------------
+
+
   roman_M1:
     prior:
       dist: norm
@@ -357,8 +335,7 @@ params:
       scale: 0.005
     proposal: 0.005
     latex: m_\mathrm{roman}^8
-  # ------------------------------------------------------------------------
-  # ------------------------------------------------------------------------
+
   # Intrinsic alignment
   roman_A1_1:
     prior:
@@ -366,7 +343,7 @@ params:
       max:  5
     ref:
       dist: norm
-      loc: 0.7
+      loc: 0.0
       scale: 0.5
     proposal: 0.5
     latex: A_\mathrm{1-IA,roman}^1
@@ -376,145 +353,25 @@ params:
       max:  5
     ref:
       dist: norm
-      loc: -1.7
+      loc: 0.0
       scale: 0.5
     proposal: 0.5
-  roman_A2_1:
-    value: 0.0
-    #prior:
-    #  min: -5
-    #  max:  5
-    #ref:
-    #  dist: norm
-    #  loc: -1.36
-    #  scale: 0.5
-    #proposal: 0.5
-    latex: A_\mathrm{2-IA,Roman}^1
-  roman_A2_2:
-    value: 0.0
-    #prior:
-    #  min: -5
-    #  max:  5
-    #ref:
-    #  dist: norm
-    #  loc: -2.5
-    #  scale: 0.5
-    #proposal: 0.5
-    latex: A_\mathrm{2-IA,Roman}^2
-  roman_BTA_1:
-    value: 0.0
-    #prior:
-    #  min: 0
-    #  max: 2
-    #ref:
-    #  dist: norm
-    #  loc: 1
-    #  scale: 0.15
-    #proposal: 0.1
-    latex: A_\mathrm{BTA-IA,Roman}^1
-  ####################
-  ###### ALPHAS ######
-  ####################
-  roman_alpha_1:
-    prior: {dist: norm, loc: 0.0, scale: 1.0}
-    ref: {dist: norm, loc: 0.0, scale: 1.0}
-    proposal: 0.3
-    latex: \alpha_1
-  roman_alpha_2:
-    prior: {dist: norm, loc: 0.0, scale: 1.0}
-    ref: {dist: norm, loc: 0.0, scale: 1.0}
-    proposal: 0.3
-    latex: \alpha_2
-  roman_alpha_3:
-    prior: {dist: norm, loc: 0.0, scale: 1.0}
-    ref: {dist: norm, loc: 0.0, scale: 1.0}
-    proposal: 0.3
-    latex: \alpha_3
-  roman_alpha_4:
-    prior: {dist: norm, loc: 0.0, scale: 1.0}
-    ref: {dist: norm, loc: 0.0, scale: 1.0}
-    proposal: 0.3
-    latex: \alpha_4
-  roman_alpha_5:
-    prior: {dist: norm, loc: 0.0, scale: 1.0}
-    ref: {dist: norm, loc: 0.0, scale: 1.0}
-    proposal: 0.3
-    latex: \alpha_5
-  roman_alpha_6:
-    prior: {dist: norm, loc: 0.0, scale: 1.0}
-    ref: {dist: norm, loc: 0.0, scale: 1.0}
-    proposal: 0.3
-    latex: \alpha_6
-  roman_alpha_7:
-    prior: {dist: norm, loc: 0.0, scale: 1.0}
-    ref: {dist: norm, loc: 0.0, scale: 1.0}
-    proposal: 0.3
-    latex: \alpha_7
-  roman_alpha_8:
-    prior: {dist: norm, loc: 0.0, scale: 1.0}
-    ref: {dist: norm, loc: 0.0, scale: 1.0}
-    proposal: 0.3
-    latex: \alpha_8
-  roman_alpha_9:
-    prior: {dist: norm, loc: 0.0, scale: 1.0}
-    ref: {dist: norm, loc: 0.0, scale: 1.0}
-    proposal: 0.3
-    latex: \alpha_9
-  roman_alpha_10:
-    prior: {dist: norm, loc: 0.0, scale: 1.0}
-    ref: {dist: norm, loc: 0.0, scale: 1.0}
-    proposal: 0.3
-    latex: \alpha_{10}
-  roman_alpha_11:
-    prior: {dist: norm, loc: 0.0, scale: 1.0}
-    ref: {dist: norm, loc: 0.0, scale: 1.0}
-    proposal: 0.3
-    latex: \alpha_{11}
-  roman_alpha_12:
-    prior: {dist: norm, loc: 0.0, scale: 1.0}
-    ref: {dist: norm, loc: 0.0, scale: 1.0}
-    proposal: 0.3
-    latex: \alpha_{12}
-  roman_alpha_13:
-    prior: {dist: norm, loc: 0.0, scale: 1.0}
-    ref: {dist: norm, loc: 0.0, scale: 1.0}
-    proposal: 0.3
-    latex: \alpha_{13}
-  roman_alpha_14:
-    prior: {dist: norm, loc: 0.0, scale: 1.0}
-    ref: {dist: norm, loc: 0.0, scale: 1.0}
-    proposal: 0.3
-    latex: \alpha_{14}
-  roman_alpha_15:
-    prior: {dist: norm, loc: 0.0, scale: 1.0}
-    ref: {dist: norm, loc: 0.0, scale: 1.0}
-    proposal: 0.3
-    latex: \alpha_{15}
-  roman_alpha_16:
-    prior: {dist: norm, loc: 0.0, scale: 1.0}
-    ref: {dist: norm, loc: 0.0, scale: 1.0}
-    proposal: 0.3
-    latex: \alpha_{16}
-  roman_alpha_17:
-    prior: {dist: norm, loc: 0.0, scale: 1.0}
-    ref: {dist: norm, loc: 0.0, scale: 1.0}
-    proposal: 0.3
-    latex: \alpha_{17}
-  roman_alpha_18:
-    prior: {dist: norm, loc: 0.0, scale: 1.0}
-    ref: {dist: norm, loc: 0.0, scale: 1.0}
-    proposal: 0.3
-    latex: \alpha_{18}
-  roman_alpha_19:
-    prior: {dist: norm, loc: 0.0, scale: 1.0}
-    ref: {dist: norm, loc: 0.0, scale: 1.0}
-    proposal: 0.3
-    latex: \alpha_{19}
-  roman_alpha_20:
-    prior: {dist: norm, loc: 0.0, scale: 1.0}
-    ref: {dist: norm, loc: 0.0, scale: 1.0}
-    proposal: 0.3
-    latex: \alpha_{20}
+    latex: A_\mathrm{1-IA,roman}^2
+
+theory:
+  camb:
+    path: ./external_modules/code/CAMB
+    stop_at_error: False
+    use_renames: True
+    extra_args:
+      halofit_version: takahashi
+      AccuracyBoost: 1.0
+      lens_potential_accuracy: 1.0
+      num_massive_neutrinos: 1
+      nnu: 3.046
+      dark_energy_model: ppf
+      accurate_massive_neutrino_transfers: false
+      k_per_logint: 15
 
 sampler:
   evaluate:
@@ -526,26 +383,6 @@ sampler:
       omegab: 0.04
       omegam: 0.3
       mnu: 0.06
-      roman_alpha_1: 0.01
-      roman_alpha_2: 0.02
-      roman_alpha_3: 0.03
-      roman_alpha_4: 0.04
-      roman_alpha_5: 0.05
-      roman_alpha_6: 0.06
-      roman_alpha_7: 0.07
-      roman_alpha_8: 0.08
-      roman_alpha_9: 0.09
-      roman_alpha_10: 0.1
-      roman_alpha_11: 0.01
-      roman_alpha_12: 0.02
-      roman_alpha_13: 0.03
-      roman_alpha_14: 0.04
-      roman_alpha_15: 0.05
-      roman_alpha_16: 0.06
-      roman_alpha_17: 0.07
-      roman_alpha_18: 0.08
-      roman_alpha_19: 0.09
-      roman_alpha_20: 0.1
       roman_DZ_S1: 0.0
       roman_DZ_S2: 0.0
       roman_DZ_S3: 0.0
@@ -564,5 +401,5 @@ sampler:
       roman_M8: 0.0
       roman_A1_1: 0.6
       roman_A1_2: -1.5
-      w0pwa: -1.0
-      w: -1.0
+      w0pwa: -0.9
+      w: -0.9
