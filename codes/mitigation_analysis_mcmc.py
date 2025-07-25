@@ -5,59 +5,121 @@ from getdist import plots,loadMCSamples,MCSamples
 burnin=0.5
 settings = {"ignore_rows": burnin}
 path = '../results/chains/roman_pca/MCMC'
+# path = '../results/chains/edge_roman_pca/MCMC'
+# path = '../results/datachallenge_1/MCMC'
 
-start,end = 0,3
-idx = list(range(start,end+1))
+colors = [
+    '#1f77b4',  # blue
+    '#ff7f0e',  # orange
+    '#2ca02c',  # green
+    '#d62728',  # red
+    '#9467bd',  # purple
+    '#8c564b',  # brown
+    '#e377c2',  # pink
+    '#7f7f7f',  # gray
+    '#bcbd22',  # olive
+    '#17becf',  # cyan
+    '#aec7e8'   # light blue
+]
+
+
+start,end = 15,23
+# idxes = [34, 35]#+list(range(start,end+1))
+# idxes = [0, 12, 2, 11] #, 16, 17, 18, 19, 20, 21, 22, 23]
+idxes = [0, 12] #, 16, 17, 18, 19, 20, 21, 22, 23]
+print(idxes)
 
 def roman_pca_mcmc():
-    no_pc    = loadMCSamples(f"{path}{idx[0]}", settings=settings)
-    one_pc   = loadMCSamples(f"{path}{idx[1]}", settings=settings)
-    two_pc   = loadMCSamples(f"{path}{idx[2]}", settings=settings)
-    three_pc = loadMCSamples(f"{path}{idx[3]}", settings=settings)
+    chains=[]
+    for i in idxes:
+        chains.append(loadMCSamples(f"{path}{i}", settings=settings)) 
 
-    g = plots.get_subplot_plotter()
+    # g = plots.get_subplot_plotter()
 
-    g.plots_1d([no_pc,one_pc,two_pc,three_pc],["omegam","sigma8","w","wa"],
-            markers={"omegam":0.3,"sigma8":0.8120,"w":-1,"wa":0}, # planck best-fit 1807.06209
-            nx=4,legend_ncol=5,legend_labels=['No PC', '1 PC', '2 PC', '3 PC'],
-            colors=['#1b5f6f',"#E69F00","#D55E00","#56B4E9"],
-            ls=['-','--','-.',':'],lws=[3,3,3,3])
-    g.export("1d_marg.pdf")
+    # g.triangle_plot(chains,
+    #                 ["omegam","sigma8",
+    #                 #  "roman_DZ_S1","roman_DZ_S2","roman_DZ_S3","roman_DZ_S4","roman_DZ_S5","roman_DZ_S6","roman_DZ_S7","roman_DZ_S8","roman_DZ_S9"
+    #                  ],
+    #                  markers={"omegam": 0.3156, "omegab": 0.0492, "sigma8": 0.812229, "H0": 67.32,}, # planck best-fit 1807.06209
+    #                 #  markers={"omegam": 0.3, "omegab": 0.04, "sigma8": 0.8277, "H0": 67.32,}, # datachallenge 1
+    #                  legend_ncol=1,
+    #                 #  legend_labels=[],
+    #                 #  line_args=[],
+    #                  contour_colors=colors,
+    #                  filled=True)
+    # g.export("triangle_plot.pdf")
+    
+    # g = plots.get_subplot_plotter()
+    # g.plots_1d(chains,["omegam"],
+    #         markers={"omegam": 0.3156},
+    #         # colors=["#D55E00"],
+    #         nx=1,
+    #         # ls=['-'],
+    #         # lws=[3]
+    #         )
+    g = plots.get_subplot_plotter(width_inch=4)
+    print(g,type(g))
+    g.plot_1d(chains,"omegam")
+    g.add_x_marker(0.3156,lw=1.5)
+    g.settings.legend_fontsize=9
+    # g.add_legend(["No PC + Shift + "+r"$\bar{n}$","1 PC + "+r"$\bar{n}$","10 PC + "+r"$\bar{n}$", "No PC"],legend_loc='center right',legend_ncol=1);
+    g.add_legend(["No PC + Shift + "+r"$\bar{n}$", "No PC + Shift + "+r"$n_\text{fid}$"],legend_loc='center right',legend_ncol=1);
+    g.export("plot_1d_omegam.pdf")
 
-    g.triangle_plot([no_pc,one_pc,two_pc,three_pc],
-                    ["omegam","sigma8","w","wa"],
-                     markers={"omegam":0.3,"sigma8":0.8120,"w":-1,"wa":0}, # planck best-fit 1807.06209
-                     legend_ncol=1,legend_labels=['No PC', '1 PC', '2 PC', '3 PC'],
-                     line_args=[{"ls": "-", "color": "#1b5f6f", "lw":3},
-                                {"ls": "--", "color": "#E69F00", "lw":3},
-                                {"ls": "-.", "color": "#D55E00", "lw":3},
-                                {"ls": ":", "color": "#56B4E9", "lw":3},],
-                     contour_colors=["#1b5f6f", "#E69F00", "#D55E00", "#56B4E9"],
-                     
-                     filled=True)
-    g.export("triangle_plot.pdf")
+    g = plots.get_subplot_plotter(width_inch=4)
+    print(g,type(g))
+    g.plot_1d(chains,"sigma8")
+    g.add_x_marker(0.812229,lw=1.5)
+    g.settings.legend_fontsize=9
+    g.add_legend(["No PC + Shift + "+r"$\bar{n}$", "No PC + Shift + "+r"$n_\text{fid}$"],legend_loc='center left',legend_ncol=1);
+    g.export("plot_1d_sigma8.pdf")
 
-    g = plots.get_subplot_plotter()
-    g.plots_1d([one_pc],["roman_alpha_1"],
-            markers={"roman_alpha_1":0.0},
-            colors=["#E69F00"],
-            ls=['-'],lws=[3])
-    g.export("alpha_1pc.pdf")
+#     g = plots.get_subplot_plotter()
+#     g.plots_1d([one_pc],["roman_alpha_1"],
+#             markers={"roman_alpha_1":0.0},
+#             colors=["#E69F00"],
+#             ls=['-'],lws=[3])
+#     g.export("alpha_1pc.pdf")
 
-    g = plots.get_subplot_plotter()
-    g.plots_1d([two_pc],["roman_alpha_1","roman_alpha_2"],
-            markers={"roman_alpha_1":0.0,"roman_alpha_2":0.0},
-            colors=["#D55E00"],nx=2,
-            ls=['-'],lws=[3])
-    g.export("alpha_2pc.pdf")
+#     g = plots.get_subplot_plotter()
+#     g.plots_1d([two_pc],["roman_alpha_1","roman_alpha_2"],
+#             markers={"roman_alpha_1":0.0,"roman_alpha_2":0.0},
+#             colors=["#D55E00"],nx=2,
+#             ls=['-'],lws=[3])
+#     g.export("alpha_2pc.pdf")
 
-    g = plots.get_subplot_plotter()
-    g.plots_1d([three_pc],["roman_alpha_1","roman_alpha_2","roman_alpha_3"],
-            markers={"roman_alpha_1":0.0,"roman_alpha_2":0.0,"roman_alpha_3":0.0},
-            colors=["#56B4E9"],nx=3,
-            ls=['-'],lws=[3])
-    g.export("alpha_3pc.pdf")
-    return None
+    # g = plots.get_subplot_plotter()
+    # g.plots_1d([mcmc11],["roman_alpha_1","roman_alpha_2","roman_alpha_3"],
+    #         markers={"roman_alpha_1":0.0,"roman_alpha_2":0.0,"roman_alpha_3":0.0},
+    #         colors=["#56B4E9"],nx=3,
+    #         ls=['-'],lws=[3])
+    # g.export("alpha_3pc.pdf")
+    # g.settings.title_limit_fontsize = 14
+    # g.triangle_plot([mcmc11
+    #                  ],
+    #                 ["omegam","sigma8","roman_alpha_1",
+    #                  "roman_alpha_2","roman_alpha_3","roman_alpha_4","roman_alpha_5"
+    #                 ,"roman_alpha_6","roman_alpha_7","roman_alpha_8","roman_alpha_9","roman_alpha_10"
+    #                 ],
+    #                  markers={"omegam": 0.3156, "omegab": 0.0492, "sigma8": 0.811, "H0": 67.32,
+    #                 "roman_alpha_1": -0.0006333320119154361,
+    #                 "roman_alpha_2": 0.002574517895020503,
+    #                 "roman_alpha_3": 0.006577603048039325,
+    #                 "roman_alpha_4": 0.28971425278177315,
+    #                 "roman_alpha_5": -0.004522791743629093,
+    #                 "roman_alpha_6": 0.2661174278304146,
+    #                 "roman_alpha_7": 0.0015610308292448886,
+    #                 "roman_alpha_8": 0.1492990608421329,
+    #                 "roman_alpha_9": 0.013365201830143171,
+    #                 "roman_alpha_10": -0.2167643230744845,
+    #                 }, # planck best-fit 1807.06209
+    #                  legend_ncol=1,
+    #                  legend_labels=['10 PC'],
+    #                  filled=True,
+    #                  line_args=[{"ls": "-" ,"color": "C0", "lw":2},]  # no pc + shift)
+    # )
+    # g.export("triangle_plot_10pc.pdf")
+    # return None
 roman_pca_mcmc()
 
 # def roman_real_mcmc():
