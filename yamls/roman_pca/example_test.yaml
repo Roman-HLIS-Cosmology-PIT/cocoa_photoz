@@ -1,0 +1,5383 @@
+output: ./cocoa_photoz/results/chains/roman_pca/example0
+
+timing: True
+debug: False
+stop_at_error: False
+
+likelihood:
+  roman_real.roman_real_cosmic_shear:
+    path: ./external_modules/data/roman_real/sc1bd4
+    # data_file: sc1bd4_modelvector.dataset
+    data_file: sc1bd4.dataset
+    accuracyboost: 1.0
+    integration_accuracy: 0
+    kmax_boltzmann: 5.0
+    # 1 EE2, 2 Halofit
+    non_linear_emul: 2
+    IA_model: 0
+    IA_redshift_evolution: 3
+    ggl_exclude: []
+    external_nz_modeling: 1
+    npcs_nz: 33                 # number of PCs. Maximum 414 = 9 tomo bins * 46 z bins
+    pcs_file: U.txt            # PCs 
+    # Model: n(z) = <n>(z) + α_1*PC_1(z) + α_2*PC_2(z) + ... + α_n*PC_n(z)
+    print_datavector: True
+    print_datavector_file: "dv_sc1bd4r0_fidP18.modelvector"
+
+## SET PRIORS ON COSMOLOGICAL PARAMETERS
+params:
+  As_1e9:
+    prior:
+      min: 1.1
+      max: 2.8
+    ref:
+      dist: norm
+      loc: 2.1
+      scale: 0.2
+    proposal: 0.2
+    latex: 10^9 A_\mathrm{s})
+    drop: true
+    renames: A
+  ns:
+    prior:
+      min: 0.87
+      max: 1.07
+    ref:
+      dist: norm
+      loc: 0.96605
+      scale: 0.01
+    proposal: 0.01
+    latex: n_\mathrm{s}
+  H0:
+    prior:
+      min: 60
+      max: 76
+    ref:
+      dist: norm
+      loc: 67.32
+      scale: 3
+    proposal: 3
+    latex: H_0
+  omegab:
+    prior:
+      min: 0.04
+      max: 0.055
+    ref:
+      dist: norm
+      loc: 0.0495
+      scale: 0.004
+    proposal: 0.004
+    latex: \Omega_\mathrm{b}
+    drop: true
+  omegam:
+    prior:
+      min: 0.1
+      max: 0.6
+    ref:
+      dist: norm
+      loc: 0.316
+      scale: 0.015
+    proposal: 0.015
+    latex: \Omega_\mathrm{m}
+    drop: true
+  w0pwa:
+    value: -1.0
+  w:
+    value: -1.0
+    latex: w_{0,\mathrm{DE}}
+  mnu:
+    value: 0.06
+  tau:
+    value: 0.0697186
+    latex: \tau_\mathrm{reio}
+  # ---------------------------------------------------------------------------------------
+  # ------------------------------------- DERIVED PARAMETERS ------------------------------
+  # ---------------------------------------------------------------------------------------
+  # WARNING: DO NOT REMOVE omegabh2/omegach2/omegamh2/wa/As/ FROM DERIVED PARAMETERS
+  # SEE: github.com/CosmoLike/cocoa#warning-warning-warning-weak-lensing-yaml-files-in-cobaya-
+  # --------------------------------------------------------------------------------------- 
+  As:
+    value: 'lambda As_1e9: 1e-9 * As_1e9'
+    latex: A_\mathrm{s}
+  wa:
+    value: 'lambda w0pwa, w: w0pwa - w'
+    latex: w_{a,\mathrm{DE}}
+  omegabh2:
+    value: 'lambda omegab, H0: omegab*(H0/100)**2'
+    latex: \Omega_\mathrm{b} h^2
+  omegach2:
+    value: 'lambda omegam, omegab, mnu, H0: (omegam-omegab)*(H0/100)**2-(mnu*(3.046/3)**0.75)/94.0708'
+    latex: \Omega_\mathrm{c} h^2
+  omegal:
+    latex: \Omega_\Lambda
+  omegamh2:
+    derived: 'lambda omegam, H0: omegam*(H0/100)**2'
+    latex: \Omega_\mathrm{m} h^2
+  sigma8:
+    latex: \sigma_8
+  s8h5:
+    derived: 'lambda sigma8, H0: sigma8*(H0*1e-2)**(-0.5)'
+    latex: \sigma_8/h^{0.5}
+  s8omegamp5:
+    derived: 'lambda sigma8, omegam: sigma8*omegam**0.5'
+    latex: \sigma_8 \Omega_\mathrm{m}^{0.5}
+  s8omegamp25:
+    derived: 'lambda sigma8, omegam: sigma8*omegam**0.25'
+    latex: \sigma_8 \Omega_\mathrm{m}^{0.25}
+  age:
+    latex: '{\rm{Age}}/\mathrm{Gyr}'
+  rdrag:
+    latex: r_\mathrm{drag}
+  yheused:
+    latex: Y_P^\mathrm{BBN}
+  omegan2:
+    latex: \Omega_\mathrm{\\nu} h^2
+  omegan:
+    derived: 'lambda omegan2, H0: omegan2/((H0/100)**2)'
+    latex: \Omega_\mathrm{\\nu}
+
+  ### NUISSANCE PARAMETERS
+  # WL photo-z errors (lens=source -> same errors for both)
+
+  ######
+  roman_alpha_1:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{1}
+  roman_alpha_2:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{2}
+  roman_alpha_3:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{3}
+  roman_alpha_4:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{4}
+  roman_alpha_5:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{5}
+  roman_alpha_6:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{6}
+  roman_alpha_7:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{7}
+  roman_alpha_8:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{8}
+  roman_alpha_9:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{9}
+  roman_alpha_10:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{10}
+  roman_alpha_11:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{11}
+  roman_alpha_12:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{12}
+  roman_alpha_13:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{13}
+  roman_alpha_14:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{14}
+  roman_alpha_15:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{15}
+  roman_alpha_16:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{16}
+  roman_alpha_17:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{17}
+  roman_alpha_18:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{18}
+  roman_alpha_19:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{19}
+  roman_alpha_20:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{20}
+  roman_alpha_21:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{21}
+  roman_alpha_22:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{22}
+  roman_alpha_23:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{23}
+  roman_alpha_24:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{24}
+  roman_alpha_25:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{25}
+  roman_alpha_26:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{26}
+  roman_alpha_27:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{27}
+  roman_alpha_28:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{28}
+  roman_alpha_29:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{29}
+  roman_alpha_30:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{30}
+  roman_alpha_31:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{31}
+  roman_alpha_32:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{32}
+  roman_alpha_33:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{33}
+  roman_alpha_34:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{34}
+  roman_alpha_35:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{35}
+  roman_alpha_36:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{36}
+  roman_alpha_37:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{37}
+  roman_alpha_38:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{38}
+  roman_alpha_39:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{39}
+  roman_alpha_40:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{40}
+  roman_alpha_41:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{41}
+  roman_alpha_42:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{42}
+  roman_alpha_43:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{43}
+  roman_alpha_44:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{44}
+  roman_alpha_45:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{45}
+  roman_alpha_46:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{46}
+  roman_alpha_47:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{47}
+  roman_alpha_48:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{48}
+  roman_alpha_49:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{49}
+  roman_alpha_50:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{50}
+  roman_alpha_51:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{51}
+  roman_alpha_52:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{52}
+  roman_alpha_53:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{53}
+  roman_alpha_54:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{54}
+  roman_alpha_55:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{55}
+  roman_alpha_56:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{56}
+  roman_alpha_57:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{57}
+  roman_alpha_58:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{58}
+  roman_alpha_59:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{59}
+  roman_alpha_60:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{60}
+  roman_alpha_61:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{61}
+  roman_alpha_62:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{62}
+  roman_alpha_63:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{63}
+  roman_alpha_64:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{64}
+  roman_alpha_65:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{65}
+  roman_alpha_66:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{66}
+  roman_alpha_67:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{67}
+  roman_alpha_68:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{68}
+  roman_alpha_69:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{69}
+  roman_alpha_70:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{70}
+  roman_alpha_71:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{71}
+  roman_alpha_72:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{72}
+  roman_alpha_73:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{73}
+  roman_alpha_74:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{74}
+  roman_alpha_75:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{75}
+  roman_alpha_76:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{76}
+  roman_alpha_77:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{77}
+  roman_alpha_78:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{78}
+  roman_alpha_79:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{79}
+  roman_alpha_80:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{80}
+  roman_alpha_81:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{81}
+  roman_alpha_82:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{82}
+  roman_alpha_83:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{83}
+  roman_alpha_84:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{84}
+  roman_alpha_85:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{85}
+  roman_alpha_86:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{86}
+  roman_alpha_87:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{87}
+  roman_alpha_88:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{88}
+  roman_alpha_89:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{89}
+  roman_alpha_90:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{90}
+  roman_alpha_91:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{91}
+  roman_alpha_92:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{92}
+  roman_alpha_93:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{93}
+  roman_alpha_94:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{94}
+  roman_alpha_95:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{95}
+  roman_alpha_96:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{96}
+  roman_alpha_97:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{97}
+  roman_alpha_98:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{98}
+  roman_alpha_99:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{99}
+  roman_alpha_100:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{100}
+  roman_alpha_101:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{101}
+  roman_alpha_102:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{102}
+  roman_alpha_103:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{103}
+  roman_alpha_104:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{104}
+  roman_alpha_105:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{105}
+  roman_alpha_106:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{106}
+  roman_alpha_107:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{107}
+  roman_alpha_108:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{108}
+  roman_alpha_109:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{109}
+  roman_alpha_110:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{110}
+  roman_alpha_111:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{111}
+  roman_alpha_112:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{112}
+  roman_alpha_113:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{113}
+  roman_alpha_114:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{114}
+  roman_alpha_115:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{115}
+  roman_alpha_116:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{116}
+  roman_alpha_117:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{117}
+  roman_alpha_118:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{118}
+  roman_alpha_119:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{119}
+  roman_alpha_120:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{120}
+  roman_alpha_121:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{121}
+  roman_alpha_122:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{122}
+  roman_alpha_123:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{123}
+  roman_alpha_124:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{124}
+  roman_alpha_125:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{125}
+  roman_alpha_126:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{126}
+  roman_alpha_127:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{127}
+  roman_alpha_128:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{128}
+  roman_alpha_129:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{129}
+  roman_alpha_130:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{130}
+  roman_alpha_131:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{131}
+  roman_alpha_132:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{132}
+  roman_alpha_133:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{133}
+  roman_alpha_134:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{134}
+  roman_alpha_135:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{135}
+  roman_alpha_136:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{136}
+  roman_alpha_137:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{137}
+  roman_alpha_138:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{138}
+  roman_alpha_139:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{139}
+  roman_alpha_140:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{140}
+  roman_alpha_141:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{141}
+  roman_alpha_142:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{142}
+  roman_alpha_143:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{143}
+  roman_alpha_144:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{144}
+  roman_alpha_145:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{145}
+  roman_alpha_146:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{146}
+  roman_alpha_147:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{147}
+  roman_alpha_148:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{148}
+  roman_alpha_149:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{149}
+  roman_alpha_150:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{150}
+  roman_alpha_151:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{151}
+  roman_alpha_152:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{152}
+  roman_alpha_153:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{153}
+  roman_alpha_154:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{154}
+  roman_alpha_155:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{155}
+  roman_alpha_156:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{156}
+  roman_alpha_157:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{157}
+  roman_alpha_158:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{158}
+  roman_alpha_159:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{159}
+  roman_alpha_160:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{160}
+  roman_alpha_161:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{161}
+  roman_alpha_162:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{162}
+  roman_alpha_163:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{163}
+  roman_alpha_164:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{164}
+  roman_alpha_165:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{165}
+  roman_alpha_166:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{166}
+  roman_alpha_167:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{167}
+  roman_alpha_168:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{168}
+  roman_alpha_169:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{169}
+  roman_alpha_170:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{170}
+  roman_alpha_171:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{171}
+  roman_alpha_172:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{172}
+  roman_alpha_173:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{173}
+  roman_alpha_174:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{174}
+  roman_alpha_175:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{175}
+  roman_alpha_176:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{176}
+  roman_alpha_177:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{177}
+  roman_alpha_178:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{178}
+  roman_alpha_179:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{179}
+  roman_alpha_180:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{180}
+  roman_alpha_181:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{181}
+  roman_alpha_182:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{182}
+  roman_alpha_183:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{183}
+  roman_alpha_184:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{184}
+  roman_alpha_185:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{185}
+  roman_alpha_186:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{186}
+  roman_alpha_187:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{187}
+  roman_alpha_188:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{188}
+  roman_alpha_189:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{189}
+  roman_alpha_190:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{190}
+  roman_alpha_191:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{191}
+  roman_alpha_192:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{192}
+  roman_alpha_193:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{193}
+  roman_alpha_194:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{194}
+  roman_alpha_195:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{195}
+  roman_alpha_196:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{196}
+  roman_alpha_197:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{197}
+  roman_alpha_198:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{198}
+  roman_alpha_199:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{199}
+  roman_alpha_200:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{200}
+  roman_alpha_201:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{201}
+  roman_alpha_202:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{202}
+  roman_alpha_203:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{203}
+  roman_alpha_204:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{204}
+  roman_alpha_205:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{205}
+  roman_alpha_206:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{206}
+  roman_alpha_207:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{207}
+  roman_alpha_208:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{208}
+  roman_alpha_209:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{209}
+  roman_alpha_210:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{210}
+  roman_alpha_211:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{211}
+  roman_alpha_212:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{212}
+  roman_alpha_213:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{213}
+  roman_alpha_214:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{214}
+  roman_alpha_215:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{215}
+  roman_alpha_216:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{216}
+  roman_alpha_217:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{217}
+  roman_alpha_218:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{218}
+  roman_alpha_219:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{219}
+  roman_alpha_220:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{220}
+  roman_alpha_221:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{221}
+  roman_alpha_222:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{222}
+  roman_alpha_223:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{223}
+  roman_alpha_224:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{224}
+  roman_alpha_225:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{225}
+  roman_alpha_226:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{226}
+  roman_alpha_227:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{227}
+  roman_alpha_228:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{228}
+  roman_alpha_229:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{229}
+  roman_alpha_230:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{230}
+  roman_alpha_231:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{231}
+  roman_alpha_232:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{232}
+  roman_alpha_233:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{233}
+  roman_alpha_234:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{234}
+  roman_alpha_235:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{235}
+  roman_alpha_236:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{236}
+  roman_alpha_237:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{237}
+  roman_alpha_238:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{238}
+  roman_alpha_239:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{239}
+  roman_alpha_240:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{240}
+  roman_alpha_241:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{241}
+  roman_alpha_242:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{242}
+  roman_alpha_243:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{243}
+  roman_alpha_244:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{244}
+  roman_alpha_245:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{245}
+  roman_alpha_246:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{246}
+  roman_alpha_247:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{247}
+  roman_alpha_248:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{248}
+  roman_alpha_249:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{249}
+  roman_alpha_250:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{250}
+  roman_alpha_251:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{251}
+  roman_alpha_252:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{252}
+  roman_alpha_253:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{253}
+  roman_alpha_254:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{254}
+  roman_alpha_255:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{255}
+  roman_alpha_256:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{256}
+  roman_alpha_257:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{257}
+  roman_alpha_258:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{258}
+  roman_alpha_259:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{259}
+  roman_alpha_260:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{260}
+  roman_alpha_261:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{261}
+  roman_alpha_262:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{262}
+  roman_alpha_263:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{263}
+  roman_alpha_264:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{264}
+  roman_alpha_265:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{265}
+  roman_alpha_266:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{266}
+  roman_alpha_267:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{267}
+  roman_alpha_268:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{268}
+  roman_alpha_269:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{269}
+  roman_alpha_270:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{270}
+  roman_alpha_271:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{271}
+  roman_alpha_272:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{272}
+  roman_alpha_273:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{273}
+  roman_alpha_274:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{274}
+  roman_alpha_275:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{275}
+  roman_alpha_276:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{276}
+  roman_alpha_277:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{277}
+  roman_alpha_278:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{278}
+  roman_alpha_279:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{279}
+  roman_alpha_280:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{280}
+  roman_alpha_281:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{281}
+  roman_alpha_282:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{282}
+  roman_alpha_283:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{283}
+  roman_alpha_284:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{284}
+  roman_alpha_285:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{285}
+  roman_alpha_286:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{286}
+  roman_alpha_287:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{287}
+  roman_alpha_288:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{288}
+  roman_alpha_289:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{289}
+  roman_alpha_290:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{290}
+  roman_alpha_291:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{291}
+  roman_alpha_292:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{292}
+  roman_alpha_293:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{293}
+  roman_alpha_294:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{294}
+  roman_alpha_295:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{295}
+  roman_alpha_296:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{296}
+  roman_alpha_297:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{297}
+  roman_alpha_298:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{298}
+  roman_alpha_299:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{299}
+  roman_alpha_300:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{300}
+  roman_alpha_301:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{301}
+  roman_alpha_302:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{302}
+  roman_alpha_303:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{303}
+  roman_alpha_304:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{304}
+  roman_alpha_305:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{305}
+  roman_alpha_306:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{306}
+  roman_alpha_307:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{307}
+  roman_alpha_308:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{308}
+  roman_alpha_309:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{309}
+  roman_alpha_310:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{310}
+  roman_alpha_311:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{311}
+  roman_alpha_312:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{312}
+  roman_alpha_313:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{313}
+  roman_alpha_314:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{314}
+  roman_alpha_315:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{315}
+  roman_alpha_316:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{316}
+  roman_alpha_317:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{317}
+  roman_alpha_318:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{318}
+  roman_alpha_319:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{319}
+  roman_alpha_320:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{320}
+  roman_alpha_321:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{321}
+  roman_alpha_322:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{322}
+  roman_alpha_323:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{323}
+  roman_alpha_324:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{324}
+  roman_alpha_325:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{325}
+  roman_alpha_326:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{326}
+  roman_alpha_327:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{327}
+  roman_alpha_328:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{328}
+  roman_alpha_329:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{329}
+  roman_alpha_330:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{330}
+  roman_alpha_331:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{331}
+  roman_alpha_332:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{332}
+  roman_alpha_333:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{333}
+  roman_alpha_334:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{334}
+  roman_alpha_335:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{335}
+  roman_alpha_336:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{336}
+  roman_alpha_337:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{337}
+  roman_alpha_338:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{338}
+  roman_alpha_339:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{339}
+  roman_alpha_340:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{340}
+  roman_alpha_341:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{341}
+  roman_alpha_342:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{342}
+  roman_alpha_343:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{343}
+  roman_alpha_344:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{344}
+  roman_alpha_345:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{345}
+  roman_alpha_346:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{346}
+  roman_alpha_347:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{347}
+  roman_alpha_348:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{348}
+  roman_alpha_349:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{349}
+  roman_alpha_350:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{350}
+  roman_alpha_351:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{351}
+  roman_alpha_352:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{352}
+  roman_alpha_353:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{353}
+  roman_alpha_354:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{354}
+  roman_alpha_355:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{355}
+  roman_alpha_356:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{356}
+  roman_alpha_357:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{357}
+  roman_alpha_358:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{358}
+  roman_alpha_359:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{359}
+  roman_alpha_360:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{360}
+  roman_alpha_361:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{361}
+  roman_alpha_362:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{362}
+  roman_alpha_363:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{363}
+  roman_alpha_364:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{364}
+  roman_alpha_365:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{365}
+  roman_alpha_366:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{366}
+  roman_alpha_367:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{367}
+  roman_alpha_368:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{368}
+  roman_alpha_369:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{369}
+  roman_alpha_370:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{370}
+  roman_alpha_371:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{371}
+  roman_alpha_372:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{372}
+  roman_alpha_373:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{373}
+  roman_alpha_374:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{374}
+  roman_alpha_375:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{375}
+  roman_alpha_376:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{376}
+  roman_alpha_377:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{377}
+  roman_alpha_378:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{378}
+  roman_alpha_379:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{379}
+  roman_alpha_380:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{380}
+  roman_alpha_381:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{381}
+  roman_alpha_382:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{382}
+  roman_alpha_383:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{383}
+  roman_alpha_384:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{384}
+  roman_alpha_385:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{385}
+  roman_alpha_386:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{386}
+  roman_alpha_387:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{387}
+  roman_alpha_388:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{388}
+  roman_alpha_389:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{389}
+  roman_alpha_390:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{390}
+  roman_alpha_391:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{391}
+  roman_alpha_392:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{392}
+  roman_alpha_393:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{393}
+  roman_alpha_394:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{394}
+  roman_alpha_395:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{395}
+  roman_alpha_396:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{396}
+  roman_alpha_397:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{397}
+  roman_alpha_398:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{398}
+  roman_alpha_399:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{399}
+  roman_alpha_400:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{400}
+  roman_alpha_401:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{401}
+  roman_alpha_402:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{402}
+  roman_alpha_403:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{403}
+  roman_alpha_404:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{404}
+  roman_alpha_405:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{405}
+  roman_alpha_406:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{406}
+  roman_alpha_407:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{407}
+  roman_alpha_408:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{408}
+  roman_alpha_409:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{409}
+  roman_alpha_410:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{410}
+  roman_alpha_411:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{411}
+  roman_alpha_412:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{412}
+  roman_alpha_413:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{413}
+  roman_alpha_414:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 1.0
+    latex: \alpha_{414}
+  ######  
+  roman_DZ_S1:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 0.003
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 0.003
+    proposal: 0.003
+    latex: \Delta z_\mathrm{s,roman}^1
+  roman_DZ_S2:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 0.003
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 0.003
+    proposal: 0.003
+    latex: \Delta z_\mathrm{s,roman}^2
+  roman_DZ_S3:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 0.003
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 0.003
+    proposal: 0.003
+    latex: \Delta z_\mathrm{s,roman}^3
+  roman_DZ_S4:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 0.003
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 0.003
+    proposal: 0.003
+    latex: \Delta z_\mathrm{s,roman}^4
+  roman_DZ_S5:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 0.003
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 0.003
+    proposal: 0.003
+    latex: \Delta z_\mathrm{s,roman}^5
+  roman_DZ_S6:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 0.003
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 0.003
+    proposal: 0.003
+    latex: \Delta z_\mathrm{s,roman}^6
+  roman_DZ_S7:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 0.003
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 0.003
+    proposal: 0.003
+    latex: \Delta z_\mathrm{s,roman}^7
+  roman_DZ_S8:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 0.003
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 0.003
+    proposal: 0.003
+    latex: \Delta z_\mathrm{s,roman}^8
+  roman_DZ_S9:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 0.003
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 0.003
+    proposal: 0.003
+    latex: \Delta z_\mathrm{s,roman}^9
+
+  roman_M1:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 0.005
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 0.005
+    proposal: 0.005
+    latex: m_\mathrm{roman}^1
+  roman_M2:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 0.005
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 0.005
+    proposal: 0.005
+    latex: m_\mathrm{roman}^2
+  roman_M3:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 0.005
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 0.005
+    proposal: 0.005
+    latex: m_\mathrm{roman}^3
+  roman_M4:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 0.005
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 0.005
+    proposal: 0.005
+    latex: m_\mathrm{roman}^4
+  roman_M5:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 0.005
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 0.005
+    proposal: 0.005
+    latex: m_\mathrm{roman}^5
+  roman_M6:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 0.005
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 0.005
+    proposal: 0.005
+    latex: m_\mathrm{roman}^6
+  roman_M7:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 0.005
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 0.005
+    proposal: 0.005
+    latex: m_\mathrm{roman}^7
+  roman_M8:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 0.005
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 0.005
+    proposal: 0.005
+    latex: m_\mathrm{roman}^8
+  roman_M9:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 0.005
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 0.005
+    proposal: 0.005
+    latex: m_\mathrm{roman}^9
+
+  # Intrinsic alignment
+  roman_A1_1:
+    prior:
+      min: -5
+      max:  5
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 0.5
+    proposal: 0.5
+    latex: A_\mathrm{1-IA,roman}^1
+  roman_A1_2:
+    prior:
+      min: -5
+      max:  5
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 0.5
+    proposal: 0.5
+    latex: A_\mathrm{1-IA,roman}^2
+
+theory:
+  camb:
+    path: ./external_modules/code/CAMB
+    stop_at_error: False
+    use_renames: True
+    extra_args:
+      halofit_version: takahashi
+      AccuracyBoost: 1.1
+      lens_potential_accuracy: 1.0
+      num_massive_neutrinos: 1
+      nnu: 3.046
+      dark_energy_model: ppf
+      accurate_massive_neutrino_transfers: false
+      k_per_logint: 20
+
+sampler:
+  evaluate:
+    N: 1
+    override:
+      omegam: 0.3156
+      omegab: 0.0492 
+      H0: 67.32
+      As_1e9: 2.1
+      ns: 0.966
+      # mnu: 0.06
+      ###
+      roman_alpha_1: -0.3279481143061275
+      roman_alpha_2: 0.19529961405513133
+      roman_alpha_3: -0.8377603234551243
+      roman_alpha_4: 0.2757960192752586
+      roman_alpha_5: 0.2133957250349448
+      roman_alpha_6: 0.3159448890181971
+      roman_alpha_7: -0.10774912279486318
+      roman_alpha_8: 0.2214639831873735
+      roman_alpha_9: 0.1086536868373383
+      roman_alpha_10: -0.21116600829831994
+      roman_alpha_11: 0.7135801936439325
+      roman_alpha_12: -0.27262937286164496
+      roman_alpha_13: 0.5457018527765328
+      roman_alpha_14: 0.37746101002354565
+      roman_alpha_15: -0.4687798150833383
+      roman_alpha_16: 0.11803375881704567
+      roman_alpha_17: 0.10813364730150057
+      roman_alpha_18: -0.2978251391657273
+      roman_alpha_19: 0.19540327239344132
+      roman_alpha_20: 0.1740008604510842
+      roman_alpha_21: 0.2872521697867583
+      roman_alpha_22: -0.12623393695666352
+      roman_alpha_23: -0.20422565128711165
+      roman_alpha_24: -0.4782238294510371
+      roman_alpha_25: 0.08883410560008233
+      roman_alpha_26: 0.014968703625617634
+      roman_alpha_27: 0.016596598916468405
+      roman_alpha_28: 0.351867359205012
+      roman_alpha_29: -0.17703118001609175
+      roman_alpha_30: -0.20709376042228206
+      roman_alpha_31: 0.5314383290272885
+      roman_alpha_32: 0.49271193336007735
+      roman_alpha_33: -0.2719047653750137
+      roman_alpha_34: -0.20046808676052089
+      roman_alpha_35: -0.10866063615447617
+      roman_alpha_36: 0.23611358618870856
+      roman_alpha_37: 0.2862594164073791
+      roman_alpha_38: 0.15347062405548034
+      roman_alpha_39: -0.12330995140048018
+      roman_alpha_40: -0.12675649740279704
+      roman_alpha_41: 0.20653020829520766
+      roman_alpha_42: -0.19019400127572444
+      roman_alpha_43: 0.317022882897525
+      roman_alpha_44: -0.06086714871824339
+      roman_alpha_45: -0.005161844406119681
+      roman_alpha_46: 0.03963731280791259
+      roman_alpha_47: -0.05529829198424014
+      roman_alpha_48: -0.02760007978372028
+      roman_alpha_49: -0.11965487747756465
+      roman_alpha_50: -0.22524397834575474
+      roman_alpha_51: -0.040045142824465405
+      roman_alpha_52: -0.15406062815672147
+      roman_alpha_53: 0.14522296566591503
+      roman_alpha_54: 0.17448683319958863
+      roman_alpha_55: 0.0496675478328732
+      roman_alpha_56: 0.044608787641207015
+      roman_alpha_57: -0.10933322780300544
+      roman_alpha_58: -0.06032296248115494
+      roman_alpha_59: -0.0965393179282014
+      roman_alpha_60: -0.016642402217481537
+      roman_alpha_61: -0.10068460820610899
+      roman_alpha_62: -0.017677601306872168
+      roman_alpha_63: 0.08379487154098011
+      roman_alpha_64: 0.04227239227467634
+      roman_alpha_65: -0.03746630014510979
+      roman_alpha_66: 0.03399126153313067
+      roman_alpha_67: 0.08351759467723996
+      roman_alpha_68: -0.048052261221874025
+      roman_alpha_69: 0.1110981962502546
+      roman_alpha_70: -0.08247405977348929
+      roman_alpha_71: 0.036172182564864715
+      roman_alpha_72: 0.04405841671168817
+      roman_alpha_73: -0.029720574061997275
+      roman_alpha_74: 0.04880275386949327
+      roman_alpha_75: -0.04415482668495545
+      roman_alpha_76: -0.10390802220017573
+      roman_alpha_77: 0.008286069740589434
+      roman_alpha_78: -0.07847536898052891
+      roman_alpha_79: -0.10443493424461273
+      roman_alpha_80: 0.0029767658877995757
+      roman_alpha_81: 0.07759020102854272
+      roman_alpha_82: 0.03768019018040874
+      roman_alpha_83: 0.049852754917677745
+      roman_alpha_84: -0.012878509719794286
+      roman_alpha_85: 0.010680546273385522
+      roman_alpha_86: 0.006297971811569497
+      roman_alpha_87: -0.029353752742634152
+      roman_alpha_88: -0.097635231338359
+      roman_alpha_89: -0.02523531866645462
+      roman_alpha_90: 0.042898159306687084
+      roman_alpha_91: 0.04372352173419382
+      roman_alpha_92: 0.013389855748310467
+      roman_alpha_93: 0.013163588154912894
+      roman_alpha_94: -0.11621343096851186
+      roman_alpha_95: -0.017473316989302542
+      roman_alpha_96: 0.030467032202219423
+      roman_alpha_97: 0.020163412414525406
+      roman_alpha_98: 0.04595429415213859
+      roman_alpha_99: 0.020119590455042913
+      roman_alpha_100: 0.012350458216616272
+      roman_alpha_101: 0.0020443413998428943
+      roman_alpha_102: -0.02983668937534458
+      roman_alpha_103: 0.07049977015058004
+      roman_alpha_104: 0.020615129025367752
+      roman_alpha_105: -0.024778632814369907
+      roman_alpha_106: 0.018064311731477968
+      roman_alpha_107: -0.020993462706425728
+      roman_alpha_108: -0.02963725294548729
+      roman_alpha_109: -0.0710510602222695
+      roman_alpha_110: 0.038975284188626926
+      roman_alpha_111: -0.0861279443253304
+      roman_alpha_112: 0.02252158595016412
+      roman_alpha_113: 0.022783365182512696
+      roman_alpha_114: -0.04381269642778252
+      roman_alpha_115: 0.040233880037407924
+      roman_alpha_116: -0.0036913359936660128
+      roman_alpha_117: -0.0015151224940127266
+      roman_alpha_118: -0.0403941678940683
+      roman_alpha_119: 0.014073308988492397
+      roman_alpha_120: -0.00802532211975242
+      roman_alpha_121: 0.019852031299885015
+      roman_alpha_122: -0.06187865449789267
+      roman_alpha_123: -0.024631479109234366
+      roman_alpha_124: -0.03598062831202297
+      roman_alpha_125: 0.010720287056141578
+      roman_alpha_126: 0.0028221741919885667
+      roman_alpha_127: -0.017354281870722087
+      roman_alpha_128: -0.056252051555474365
+      roman_alpha_129: 0.03127204752840563
+      roman_alpha_130: -0.012910673078641851
+      roman_alpha_131: -0.0041966899162985604
+      roman_alpha_132: 0.014178686831449069
+      roman_alpha_133: -0.014728847121962018
+      roman_alpha_134: 0.018402002548183933
+      roman_alpha_135: 0.02109447520259336
+      roman_alpha_136: -0.030906176870785056
+      roman_alpha_137: 0.014853359247982771
+      roman_alpha_138: -0.015552528729027992
+      roman_alpha_139: 0.006484525243806523
+      roman_alpha_140: -0.00031507978889855625
+      roman_alpha_141: 0.013785579505658918
+      roman_alpha_142: -0.023361845512219946
+      roman_alpha_143: -0.05705994680519971
+      roman_alpha_144: 0.033473597976924986
+      roman_alpha_145: 0.020722640141012348
+      roman_alpha_146: 0.002476726198661356
+      roman_alpha_147: 0.03481171037563885
+      roman_alpha_148: -0.03839429453237563
+      roman_alpha_149: 0.001751501320014338
+      roman_alpha_150: 0.0320884128764727
+      roman_alpha_151: 0.02621385568722447
+      roman_alpha_152: -0.00983071357890959
+      roman_alpha_153: 0.0276192781663814
+      roman_alpha_154: -0.025115856201088492
+      roman_alpha_155: 0.022932746917738823
+      roman_alpha_156: 0.02860983078521366
+      roman_alpha_157: 0.005696321911668846
+      roman_alpha_158: -0.018757804346178464
+      roman_alpha_159: 0.015469735255212037
+      roman_alpha_160: -0.002745325018032869
+      roman_alpha_161: -0.04170509598359689
+      roman_alpha_162: -0.0014337718536364806
+      roman_alpha_163: -0.005604324848213047
+      roman_alpha_164: -0.0034381759828331785
+      roman_alpha_165: -0.017814613708151957
+      roman_alpha_166: -0.019699070452457713
+      roman_alpha_167: 0.015360646575971654
+      roman_alpha_168: 0.03050294328164884
+      roman_alpha_169: -0.030001573432921733
+      roman_alpha_170: -0.014375588951867493
+      roman_alpha_171: -0.013991672771461234
+      roman_alpha_172: -0.0037012436937169037
+      roman_alpha_173: 0.025662117871792317
+      roman_alpha_174: 0.0019288500295774403
+      roman_alpha_175: 0.019360679549622062
+      roman_alpha_176: -0.0038520802134187093
+      roman_alpha_177: -0.013466637080850797
+      roman_alpha_178: -0.009199520150311167
+      roman_alpha_179: -0.03638291252136961
+      roman_alpha_180: 0.0025756334070577923
+      roman_alpha_181: 0.011502113534597002
+      roman_alpha_182: -0.020967827920274806
+      roman_alpha_183: -0.019354271194848054
+      roman_alpha_184: -0.015635879899944242
+      roman_alpha_185: -0.01367753528275708
+      roman_alpha_186: -0.004381775039869481
+      roman_alpha_187: 0.014521879537830445
+      roman_alpha_188: 0.02754180912987948
+      roman_alpha_189: 0.0035177310392739405
+      roman_alpha_190: 0.0061824802415041446
+      roman_alpha_191: -0.0014349276735642661
+      roman_alpha_192: 0.009964739891397482
+      roman_alpha_193: 0.008609316173868396
+      roman_alpha_194: 0.024442562065873717
+      roman_alpha_195: 0.013175047614836252
+      roman_alpha_196: 0.0028230019931294236
+      roman_alpha_197: -0.017692806650748478
+      roman_alpha_198: -0.007371289017714192
+      roman_alpha_199: 0.0243953890516085
+      roman_alpha_200: -0.015829757355081263
+      roman_alpha_201: -0.01101735533729109
+      roman_alpha_202: -0.023637259348961187
+      roman_alpha_203: -0.012606546674265208
+      roman_alpha_204: -0.0026915105258517183
+      roman_alpha_205: -0.00806829293425455
+      roman_alpha_206: 0.004578326287936459
+      roman_alpha_207: -0.004664319596430846
+      roman_alpha_208: -0.004030568550984373
+      roman_alpha_209: -0.01602321900853895
+      roman_alpha_210: -0.003871005461209812
+      roman_alpha_211: 0.001957078299262451
+      roman_alpha_212: 0.011611550496173597
+      roman_alpha_213: 0.01269240855268249
+      roman_alpha_214: 0.00016560728303291637
+      roman_alpha_215: -0.000782924071980426
+      roman_alpha_216: 0.0042996930492233045
+      roman_alpha_217: -0.000456789815443085
+      roman_alpha_218: 0.006272447408699664
+      roman_alpha_219: 0.014032457255421679
+      roman_alpha_220: 0.01585625244336921
+      roman_alpha_221: 0.011814482648165791
+      roman_alpha_222: -0.0028235980323293264
+      roman_alpha_223: 0.0033681014799488798
+      roman_alpha_224: -0.01293291994858469
+      roman_alpha_225: -0.002616566532600874
+      roman_alpha_226: 0.011721838493560363
+      roman_alpha_227: -0.013775386904241708
+      roman_alpha_228: 0.004581574768154502
+      roman_alpha_229: -0.0016103921781219729
+      roman_alpha_230: 0.0013858427982903643
+      roman_alpha_231: 0.008636028818223136
+      roman_alpha_232: -0.005909522218466896
+      roman_alpha_233: -0.0017976150013332814
+      roman_alpha_234: 0.004034701458664718
+      roman_alpha_235: 0.003105680356136276
+      roman_alpha_236: -0.00958206035542169
+      roman_alpha_237: 0.004924604073037044
+      roman_alpha_238: -0.010412013298404355
+      roman_alpha_239: 0.0010042584755694845
+      roman_alpha_240: -0.009779220939214553
+      roman_alpha_241: -0.00023017891792612532
+      roman_alpha_242: 0.007375463124857549
+      roman_alpha_243: -0.004503789286449532
+      roman_alpha_244: -0.006736727593757125
+      roman_alpha_245: -0.00011160419524029615
+      roman_alpha_246: 0.0057185961258948426
+      roman_alpha_247: 0.007998975788491219
+      roman_alpha_248: -0.005165199344105102
+      roman_alpha_249: -0.01542381807995025
+      roman_alpha_250: -3.6098489237576535e-06
+      roman_alpha_251: -0.005050701487060552
+      roman_alpha_252: -0.005502145121127865
+      roman_alpha_253: 0.002301543905538654
+      roman_alpha_254: 0.007354477061722317
+      roman_alpha_255: -0.003238352948779734
+      roman_alpha_256: 0.012814887643041548
+      roman_alpha_257: -0.0036757591778880843
+      roman_alpha_258: 0.0050467646357042015
+      roman_alpha_259: 0.0039451496434686015
+      roman_alpha_260: -0.0017522168480469755
+      roman_alpha_261: 0.003005745008147107
+      roman_alpha_262: 0.0026682405847416645
+      roman_alpha_263: -0.008218472562943146
+      roman_alpha_264: 0.0004086352591100294
+      roman_alpha_265: -0.0007680091379430108
+      roman_alpha_266: 0.0021095587289426967
+      roman_alpha_267: 0.0015795023309647415
+      roman_alpha_268: -0.002162394989716035
+      roman_alpha_269: -0.004507565862652507
+      roman_alpha_270: 0.0004329805930215073
+      roman_alpha_271: -0.0001428678473865456
+      roman_alpha_272: 0.0006746729159739877
+      roman_alpha_273: 0.0074137731062372154
+      roman_alpha_274: 0.0008623540836929973
+      roman_alpha_275: 0.0033831521191974353
+      roman_alpha_276: 0.0034014557999190085
+      roman_alpha_277: -0.0003129521459183039
+      roman_alpha_278: -0.0030472212179335234
+      roman_alpha_279: 0.0020228916150142745
+      roman_alpha_280: 3.986558658111849e-05
+      roman_alpha_281: -0.003722786005588414
+      roman_alpha_282: -0.0028629620109913907
+      roman_alpha_283: -0.00018491929223471282
+      roman_alpha_284: -0.002167263532672099
+      roman_alpha_285: -0.00313572611321928
+      roman_alpha_286: 0.0019056119884464132
+      roman_alpha_287: -0.0008633353859594889
+      roman_alpha_288: 0.0004853971708576138
+      roman_alpha_289: 0.00018816618292456444
+      roman_alpha_290: 0.002316105522286159
+      roman_alpha_291: 0.0010447888024309872
+      roman_alpha_292: -0.0016342990511411333
+      roman_alpha_293: 0.0011284374915089075
+      roman_alpha_294: -0.0010432137076739313
+      roman_alpha_295: -0.00040546872607382723
+      roman_alpha_296: -0.00011381327306762646
+      roman_alpha_297: 0.0014979155164649542
+      roman_alpha_298: -0.0013664987636870952
+      roman_alpha_299: 0.0003593959166606922
+      roman_alpha_300: 0.0016612072414438355
+      roman_alpha_301: 0.0012054671155777594
+      roman_alpha_302: 0.002012927360175585
+      roman_alpha_303: 0.0006130285201328562
+      roman_alpha_304: -0.00016845341139286278
+      roman_alpha_305: 0.00017972271530829236
+      roman_alpha_306: 0.00027248898746460285
+      roman_alpha_307: -0.00024209329226359698
+      roman_alpha_308: -8.57015212746128e-05
+      roman_alpha_309: -0.0004997503323609194
+      roman_alpha_310: 0.00011827330884501251
+      roman_alpha_311: -3.878581658494973e-05
+      roman_alpha_312: 6.870789047805554e-05
+      roman_alpha_313: 0.0001840518378874949
+      roman_alpha_314: 0.0015859174046467227
+      roman_alpha_315: 0.00042474127827033653
+      roman_alpha_316: 0.0009044493726122661
+      roman_alpha_317: -0.0008269200774397712
+      roman_alpha_318: 0.0008216850773281742
+      roman_alpha_319: 0.000612857557189729
+      roman_alpha_320: 0.00016120197412900647
+      roman_alpha_321: 0.0002066829021060252
+      roman_alpha_322: -0.00021442911744307147
+      roman_alpha_323: -0.0006648259602828018
+      roman_alpha_324: 6.359403518870975e-05
+      roman_alpha_325: 8.773277135389958e-05
+      roman_alpha_326: -0.00013801060300342415
+      roman_alpha_327: -8.228161868625107e-05
+      roman_alpha_328: 0.00010299224573830097
+      roman_alpha_329: 0.00012890736633311146
+      roman_alpha_330: -7.217911932433087e-05
+      roman_alpha_331: -4.9566454019103285e-05
+      roman_alpha_332: -1.2132155836414487e-05
+      roman_alpha_333: -6.470288625791774e-05
+      roman_alpha_334: -7.211697516332362e-05
+      roman_alpha_335: -0.0003488950153133333
+      roman_alpha_336: -0.00030256493193202164
+      roman_alpha_337: -1.3089009781792341e-05
+      roman_alpha_338: 0.00033932961002198375
+      roman_alpha_339: -0.00024088478703781672
+      roman_alpha_340: -0.0003102030913325685
+      roman_alpha_341: -0.00014031438824449097
+      roman_alpha_342: -6.491082661122584e-05
+      roman_alpha_343: -1.2202947741509903e-05
+      roman_alpha_344: -2.353972839911823e-05
+      roman_alpha_345: -0.00013654889714039505
+      roman_alpha_346: 9.869917044036795e-05
+      roman_alpha_347: -3.594722164357072e-05
+      roman_alpha_348: 8.574603422175922e-05
+      roman_alpha_349: -7.435671565875671e-05
+      roman_alpha_350: -5.591584817958545e-06
+      roman_alpha_351: -4.182390656742248e-05
+      roman_alpha_352: 1.3370362052276308e-05
+      roman_alpha_353: 1.328827996963572e-05
+      roman_alpha_354: -2.6633929040576143e-05
+      roman_alpha_355: -4.5561606807536545e-06
+      roman_alpha_356: 2.7468197915100377e-05
+      roman_alpha_357: 1.665841033484807e-05
+      roman_alpha_358: 3.564718075507319e-06
+      roman_alpha_359: -2.476087467555192e-05
+      roman_alpha_360: -2.5291414539156367e-05
+      roman_alpha_361: -4.472348974092334e-06
+      roman_alpha_362: 6.354881322371921e-06
+      roman_alpha_363: -1.0969130417083679e-05
+      roman_alpha_364: 2.7670866536858857e-06
+      roman_alpha_365: 5.127373185235846e-06
+      roman_alpha_366: 3.1953795068846314e-06
+      roman_alpha_367: -4.849399390690758e-06
+      roman_alpha_368: 7.527589599972033e-07
+      roman_alpha_369: -2.4697221417433844e-05
+      roman_alpha_370: 3.283813722110869e-06
+      roman_alpha_371: -1.1524681674985706e-06
+      roman_alpha_372: -1.0649791559669612e-06
+      roman_alpha_373: -2.4732035384295184e-06
+      roman_alpha_374: -9.04745595477141e-06
+      roman_alpha_375: -3.874114388772069e-06
+      roman_alpha_376: -2.9572813112644095e-06
+      roman_alpha_377: -1.4309397407518852e-06
+      roman_alpha_378: 2.865082576426719e-06
+      roman_alpha_379: -6.187613769204429e-07
+      roman_alpha_380: -8.427003777305825e-08
+      roman_alpha_381: -5.397654911955162e-10
+      roman_alpha_382: 2.595786226547318e-10
+      roman_alpha_383: 1.1786891033909666e-11
+      roman_alpha_384: 2.4850926628482357e-11
+      roman_alpha_385: 3.906242473926619e-12
+      roman_alpha_386: 3.693625392851812e-12
+      roman_alpha_387: 2.198734283485068e-13
+      roman_alpha_388: -1.5163145494612015e-12
+      roman_alpha_389: 7.396866259674543e-14
+      roman_alpha_390: -3.71002150445592e-14
+      roman_alpha_391: -8.193088677681913e-14
+      roman_alpha_392: 6.17627261077011e-14
+      roman_alpha_393: 5.4286711272995805e-14
+      roman_alpha_394: -2.4052012287534694e-14
+      roman_alpha_395: -3.073638317390993e-14
+      roman_alpha_396: -2.4450646510908214e-14
+      roman_alpha_397: -7.215336372704906e-15
+      roman_alpha_398: -6.444253948822101e-15
+      roman_alpha_399: -2.651598863045273e-18
+      roman_alpha_400: -4.2853046690396455e-16
+      roman_alpha_401: -2.5356459475676375e-14
+      roman_alpha_402: -6.591433034415277e-14
+      roman_alpha_403: -2.1167496241263385e-14
+      roman_alpha_404: -2.4162271476743493e-14
+      roman_alpha_405: 2.7879763966887666e-14
+      roman_alpha_406: 2.2553567823319862e-14
+      roman_alpha_407: -9.284543829824892e-15
+      roman_alpha_408: 2.4597710353652556e-13
+      roman_alpha_409: 1.2641868632657787e-14
+      roman_alpha_410: -1.84515255062835e-11
+      roman_alpha_411: -3.019388062407229e-12
+      roman_alpha_412: 8.80048353885503e-12
+      roman_alpha_413: 5.358120464302461e-12
+      roman_alpha_414: -1.890620986051099e-11
+
+      ###
+      roman_DZ_S1: 0.0
+      roman_DZ_S2: 0.0
+      roman_DZ_S3: 0.0
+      roman_DZ_S4: 0.0
+      roman_DZ_S5: 0.0
+      roman_DZ_S6: 0.0
+      roman_DZ_S7: 0.0
+      roman_DZ_S8: 0.0
+      roman_DZ_S9: 0.0 #DHFS MOD
+      roman_M1: 0.0
+      roman_M2: 0.0
+      roman_M3: 0.0
+      roman_M4: 0.0
+      roman_M5: 0.0
+      roman_M6: 0.0
+      roman_M7: 0.0
+      roman_M8: 0.0
+      roman_M9: 0.0 #DHFS MOD
+      roman_A1_1: 0.6
+      roman_A1_2: -1.5
+      # w0pwa: -1.0
+      # w: -1.0
