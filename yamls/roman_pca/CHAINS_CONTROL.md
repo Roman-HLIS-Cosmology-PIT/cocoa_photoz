@@ -51,22 +51,22 @@ Gaussian (0,1)
 
 ## TEST 4 - fiducial cosmology from roman real: see l2_norm_for_nz.py
 ### No PC + Shift with synthetic xi(nfid) + model xi(nfid)
-36 sc1bd4 [realization index = 997946] / RUNNING (jpl)  
-37 sc1bd4 [realization index = 870731] / canceled (jpl) 
-38 sc1bd4 [realization index = 174820] / canceled (jpl) 
-39 sc1bd4 [realization index = 991213] / RUNNING (jpl) 
-40 sc1bd4 [realization index = 645431] / canceled (jpl) 
-41 sc1bd4 [realization index = 131103] / canceled (jpl) 
+36 sc1bd4 [realization index = 997946] / PAUSED (jpl)   [scp to edge done]
+37 sc1bd4 [realization index = 870731] / canceled (jpl)  [scp to edge done]
+38 sc1bd4 [realization index = 174820] / canceled (jpl)  [scp to edge done]
+39 sc1bd4 [realization index = 991213] / PAUSED (jpl)   [scp to edge done]
+40 sc1bd4 [realization index = 645431] / canceled (jpl)  [scp to edge done]
+41 sc1bd4 [realization index = 131103] / canceled (jpl)  [scp to edge done]
 42 sc1bd4 [realization index = 808898] / canceled (edge) [scp to jpl done]  
 43 sc1bd4 [realization index = 682038] / canceled (edge) [scp to jpl done]  
-44 sc1bd4 [realization index = 472580] / canceled (jpl) 
-45 sc1bd4 [realization index = 92550 ] / canceled (jpl)   
+44 sc1bd4 [realization index = 472580] / canceled (jpl)  [scp to edge done]
+45 sc1bd4 [realization index = 92550 ] / canceled (jpl)  [scp to edge done] 
 
 ### No PC + Shift with synthetic xi(nfid) + model xi(nbar)
-46 sc1bd4 [realization index = 997946] / RUNNING (edge)  
+46 sc1bd4 [realization index = 997946] / PAUSED (edge)  
 47 sc1bd4 [realization index = 870731] / canceled (edge) [scp to jpl done] 
 48 sc1bd4 [realization index = 174820] / canceled (edge) [scp to jpl done]   
-49 sc1bd4 [realization index = 991213] / RUNNING (edge)  
+49 sc1bd4 [realization index = 991213] / PAUSED (edge)  
 50 sc1bd4 [realization index = 645431] / canceled (edge) [scp to jpl done]   
 51 sc1bd4 [realization index = 131103] / canceled (edge) [scp to jpl done]   
 52 sc1bd4 [realization index = 808898] / canceled (edge) [scp to jpl done]   
@@ -75,8 +75,8 @@ Gaussian (0,1)
 55 sc1bd4 [realization index = 92550 ] / canceled (edge) [scp to jpl done]   
 
 ### No PC + No Shift with synthetic xi(nfid) + model xi(fid)
-56 sc1bd4 [realization index = 997946] / WAITING (jpl)
-57 sc1bd4 [realization index = 991213] / WAITING (jpl)
+56 sc1bd4 [realization index = 997946] / RUNNING (jpl)
+57 sc1bd4 [realization index = 991213] / RUNNING (jpl)
 
 ### No PC + No Shift with synthetic xi(nfid) + model xi(nbar)
 58 sc1bd4 [realization index = 997946] / WAITING (jpl)
@@ -84,10 +84,10 @@ Gaussian (0,1)
 
 ### 1 PC + No Shift with synthetic xi(nfid) + model xi(nbar)
 60 sc1bd4 [realization index = 997946] / WAITING (jpl)
-61 sc1bd4 [realization index = 991213] / WAITING (jpl)
+61 sc1bd4 [realization index = 991213] / RUNNING (edge)
 
 ### 2 PC + No Shift with synthetic xi(nfid) + model xi(nbar)
-62 sc1bd4 [realization index = 997946] / WAITING (jpl)
+62 sc1bd4 [realization index = 997946] / RUNNING (edge)
 63 sc1bd4 [realization index = 991213] / RUNNING (edge)
 
 ### 3 PC + No Shift with synthetic xi(nfid) + model xi(nbar)
@@ -102,6 +102,25 @@ Gaussian (0,1)
 68 sc1bd4 [realization index = 997946] / RUNNING (edge)
 69 sc1bd4 [realization index = 991213] / RUNNING (edge)
 
+### 6 PC + No Shift with synthetic xi(nfid) + model xi(nbar)
+70 sc1bd4 [realization index = 997946] / RUNNING (edge)
+71 sc1bd4 [realization index = 991213] / WAITING (jpl)
+
+### 7 PC + No Shift with synthetic xi(nfid) + model xi(nbar)
+72 sc1bd4 [realization index = 997946] / WAITING (jpl)
+73 sc1bd4 [realization index = 991213] / WAITING (jpl)
+
+### 8 PC + No Shift with synthetic xi(nfid) + model xi(nbar)
+74 sc1bd4 [realization index = 997946] / WAITING (jpl)
+75 sc1bd4 [realization index = 991213] / WAITING (jpl)
+
+### 9 PC + No Shift with synthetic xi(nfid) + model xi(nbar)
+76 sc1bd4 [realization index = 997946] / WAITING (jpl)
+77 sc1bd4 [realization index = 991213] / WAITING (jpl)
+
+### 10 PC + No Shift with synthetic xi(nfid) + model xi(nbar)
+78 sc1bd4 [realization index = 997946] / WAITING (jpl)
+79 sc1bd4 [realization index = 991213] / WAITING (jpl)
 
 ##
 # TESTS: the simulations do not seems to recover the fiducial cosmology. Which is odd. For Roman real above, the fid cosmology is recovered perfectely! So below are my attempts to investigate what is going on with these simulations.
