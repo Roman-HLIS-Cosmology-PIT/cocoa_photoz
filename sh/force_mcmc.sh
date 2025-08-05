@@ -1,13 +1,13 @@
 #!/bin/bash
-#SBATCH -J PCA_diff_gauss_A
-#SBATCH -o cocoa_photoz/results/outs_jacobian/%x_%A_%a.out
-#SBATCH -e cocoa_photoz/results/outs_jacobian/%x_%A_%a.err
+#SBATCH -J PCA
+#SBATCH -o cocoa_photoz/results/outs/%x_%A_%a.out
+#SBATCH -e cocoa_photoz/results/outs/%x_%A_%a.err
 #SBATCH -p compute
 #SBATCH --ntasks-per-node=4
 #SBATCH --cpus-per-task=7
 #SBATCH -t 10-00:00:00
 
-path=/gpfs/scratch/pit-roman-hlis/Diogo/cocoa8jul25/Cocoa/cocoa_photoz/yamls/roman_pca
+path=cocoa_photoz/yamls/roman_pca
 yaml=$path/MCMC${SLURM_ARRAY_TASK_ID}.yaml
 
 echo Running on host `hostname`

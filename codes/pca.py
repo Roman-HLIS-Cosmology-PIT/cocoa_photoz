@@ -105,7 +105,7 @@ def plot_eigvalues_and_related_quantities(plot_type):
         plt.xticks(range(0,Nd + 1, 100))
         plt.tight_layout()
     elif plot_type == 'explained_variance_ratio_paper':
-        M = 23 # maxium z
+        M = 23 # maximum z
         Ms = list(range(Nd))[:M]
         x = np.cumsum(eig_vals/np.sum(eig_vals))[:M]*100
         plt.plot(Ms,x,c=colors[0],marker='o')
@@ -116,6 +116,7 @@ def plot_eigvalues_and_related_quantities(plot_type):
         plt.xticks(range(0,M + 1, 2))
         plt.tight_layout()
     plt.savefig('test.pdf')
+    return None
 
 # plot_eigvalues_and_related_quantities('explained_variance_ratio')
 

@@ -75,71 +75,55 @@ Gaussian (0,1)
 55 sc1bd4 [realization index = 92550 ] / canceled (edge) [scp to jpl done]   
 
 ### No PC + No Shift with synthetic xi(nfid) + model xi(fid)
-56 sc1bd4 [realization index = 997946] / RUNNING (jpl)
-57 sc1bd4 [realization index = 991213] / RUNNING (jpl)
+56 sc1bd4 [realization index = 997946] / C (jpl)
+57 sc1bd4 [realization index = 991213] / C (jpl)
 
 ### No PC + No Shift with synthetic xi(nfid) + model xi(nbar)
-58 sc1bd4 [realization index = 997946] / WAITING (jpl)
-59 sc1bd4 [realization index = 991213] / WAITING (jpl)
+58 sc1bd4 [realization index = 997946] / C (jpl)
+59 sc1bd4 [realization index = 991213] / X (jpl)
 
 ### 1 PC + No Shift with synthetic xi(nfid) + model xi(nbar)
-60 sc1bd4 [realization index = 997946] / WAITING (jpl)
-61 sc1bd4 [realization index = 991213] / RUNNING (edge)
+60 sc1bd4 [realization index = 997946] / C (jpl)
+61 sc1bd4 [realization index = 991213] / C (edge)
 
 ### 2 PC + No Shift with synthetic xi(nfid) + model xi(nbar)
 62 sc1bd4 [realization index = 997946] / RUNNING (edge)
-63 sc1bd4 [realization index = 991213] / RUNNING (edge)
+63 sc1bd4 [realization index = 991213] / C (edge)
 
 ### 3 PC + No Shift with synthetic xi(nfid) + model xi(nbar)
-64 sc1bd4 [realization index = 997946] / RUNNING (edge)
-65 sc1bd4 [realization index = 991213] / RUNNING (edge)
+64 sc1bd4 [realization index = 997946] / C (edge)
+65 sc1bd4 [realization index = 991213] / C (edge)
 
 ### 4 PC + No Shift with synthetic xi(nfid) + model xi(nbar)
 66 sc1bd4 [realization index = 997946] / RUNNING (edge)
-67 sc1bd4 [realization index = 991213] / RUNNING (edge)
+67 sc1bd4 [realization index = 991213] / C (edge)
 
 ### 5 PC + No Shift with synthetic xi(nfid) + model xi(nbar)
 68 sc1bd4 [realization index = 997946] / RUNNING (edge)
-69 sc1bd4 [realization index = 991213] / RUNNING (edge)
+69 sc1bd4 [realization index = 991213] / C (edge)
 
 ### 6 PC + No Shift with synthetic xi(nfid) + model xi(nbar)
 70 sc1bd4 [realization index = 997946] / RUNNING (edge)
-71 sc1bd4 [realization index = 991213] / WAITING (jpl)
+71 sc1bd4 [realization index = 991213] / C (jpl)
 
 ### 7 PC + No Shift with synthetic xi(nfid) + model xi(nbar)
-72 sc1bd4 [realization index = 997946] / WAITING (jpl)
-73 sc1bd4 [realization index = 991213] / WAITING (jpl)
+72 sc1bd4 [realization index = 997946] / X (jpl)
+73 sc1bd4 [realization index = 991213] / C (jpl)
 
 ### 8 PC + No Shift with synthetic xi(nfid) + model xi(nbar)
-74 sc1bd4 [realization index = 997946] / WAITING (jpl)
-75 sc1bd4 [realization index = 991213] / WAITING (jpl)
+74 sc1bd4 [realization index = 997946] / RUNNING (jpl)
+75 sc1bd4 [realization index = 991213] / C (jpl)
 
 ### 9 PC + No Shift with synthetic xi(nfid) + model xi(nbar)
-76 sc1bd4 [realization index = 997946] / WAITING (jpl)
-77 sc1bd4 [realization index = 991213] / WAITING (jpl)
+76 sc1bd4 [realization index = 997946] / X (jpl)
+77 sc1bd4 [realization index = 991213] / X (jpl)
 
 ### 10 PC + No Shift with synthetic xi(nfid) + model xi(nbar)
-78 sc1bd4 [realization index = 997946] / WAITING (jpl)
-79 sc1bd4 [realization index = 991213] / WAITING (jpl)
+78 sc1bd4 [realization index = 997946] / X (jpl)
+79 sc1bd4 [realization index = 991213] / C (jpl)
 
-##
-# TESTS: the simulations do not seems to recover the fiducial cosmology. Which is odd. For Roman real above, the fid cosmology is recovered perfectely! So below are my attempts to investigate what is going on with these simulations.
+####################################################################
+####################################################################
 
-# TEST 1
-Goal - check whether a given relation can recover the fiducial cosmology
 
-step 1 - Select the 1st nz of each scenario.
-step 2 - normalize it.
-step 3 - given a fiducial cosmology (e.g. planck 18) run a CoCoA single evaluation to get the modelvector. Use this modevector as the synthetic datavector.
-step 4 - find the mask given the normalized nz
-step 5 - build the .dataset
-step 6 - run the MCMC
 
-# TEST 2
-Same as test 1, but with a different fiducial cosmology (e.g. the one used in roman real)
-
-# TEST 3
-Adapt test 1 for DES
-
-# TEST 4
-If test 3 achieve the goal of these tests (i.e., recover the fiducial cosmology), then I can proceed and include PCS.
