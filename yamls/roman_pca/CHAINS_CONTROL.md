@@ -64,15 +64,15 @@ Gaussian (0,1)
 
 ### No PC + Shift with synthetic xi(nfid) + model xi(nbar)
 46 sc1bd4 [realization index = 997946] / PAUSED (edge)       
-47 sc1bd4 [realization index = 870731] / canceled (edge)      [scp to jpl done] 
-48 sc1bd4 [realization index = 174820] / canceled (edge)      [scp to jpl done]   
-49 sc1bd4 [realization index = 991213] / PAUSED (edge)       
-50 sc1bd4 [realization index = 645431] / canceled (edge)      [scp to jpl done]   
-51 sc1bd4 [realization index = 131103] / canceled (edge)      [scp to jpl done]   
-52 sc1bd4 [realization index = 808898] / canceled (edge)      [scp to jpl done]   
-53 sc1bd4 [realization index = 682038] / canceled (edge)      [scp to jpl done]   
-54 sc1bd4 [realization index = 472580] / canceled (edge)      [scp to jpl done]   
-55 sc1bd4 [realization index = 92550 ] / canceled (edge)      [scp to jpl done]   
+47 sc1bd4 [realization index = 870731] / canceled (edge)      [scp to jpl done]   
+48 sc1bd4 [realization index = 174820] / canceled (edge)      [scp to jpl done]     
+49 sc1bd4 [realization index = 991213] / PAUSED (edge)         
+50 sc1bd4 [realization index = 645431] / canceled (edge)      [scp to jpl done]     
+51 sc1bd4 [realization index = 131103] / canceled (edge)      [scp to jpl done]     
+52 sc1bd4 [realization index = 808898] / canceled (edge)      [scp to jpl done]     
+53 sc1bd4 [realization index = 682038] / canceled (edge)      [scp to jpl done]     
+54 sc1bd4 [realization index = 472580] / canceled (edge)      [scp to jpl done]     
+55 sc1bd4 [realization index = 92550 ] / canceled (edge)      [scp to jpl done]     
 
 ### No PC + No Shift with synthetic xi(nfid) + model xi(fid)
 56 sc1bd4 [realization index = 997946] / C (jpl)     
