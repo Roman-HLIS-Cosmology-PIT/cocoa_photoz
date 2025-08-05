@@ -51,16 +51,16 @@ Gaussian (0,1)
 
 ## TEST 4 - fiducial cosmology from roman real: see l2_norm_for_nz.py  
 ### No PC + Shift with synthetic xi(nfid) + model xi(nfid)  
-36 sc1bd4 [realization index = 997946] / PAUSED (jpl)        [scp to edge done]
-37 sc1bd4 [realization index = 870731] / canceled (jpl)       [scp to edge done]
-38 sc1bd4 [realization index = 174820] / canceled (jpl)       [scp to edge done]
-39 sc1bd4 [realization index = 991213] / PAUSED (jpl)        [scp to edge done]
-40 sc1bd4 [realization index = 645431] / canceled (jpl)       [scp to edge done]
-41 sc1bd4 [realization index = 131103] / canceled (jpl)       [scp to edge done]
-42 sc1bd4 [realization index = 808898] / canceled (edge)      [scp to jpl done]  
-43 sc1bd4 [realization index = 682038] / canceled (edge)      [scp to jpl done]  
-44 sc1bd4 [realization index = 472580] / canceled (jpl)       [scp to edge done]
-45 sc1bd4 [realization index = 92550 ] / canceled (jpl)       [scp to edge done] 
+36 sc1bd4 [realization index = 997946] / PAUSED (jpl)        [scp to edge done]  
+37 sc1bd4 [realization index = 870731] / canceled (jpl)       [scp to edge done]    
+38 sc1bd4 [realization index = 174820] / canceled (jpl)       [scp to edge done]    
+39 sc1bd4 [realization index = 991213] / PAUSED (jpl)        [scp to edge done]    
+40 sc1bd4 [realization index = 645431] / canceled (jpl)       [scp to edge done]    
+41 sc1bd4 [realization index = 131103] / canceled (jpl)       [scp to edge done]    
+42 sc1bd4 [realization index = 808898] / canceled (edge)      [scp to jpl done]      
+43 sc1bd4 [realization index = 682038] / canceled (edge)      [scp to jpl done]      
+44 sc1bd4 [realization index = 472580] / canceled (jpl)       [scp to edge done]    
+45 sc1bd4 [realization index = 92550 ] / canceled (jpl)       [scp to edge done]     
 
 ### No PC + Shift with synthetic xi(nfid) + model xi(nbar)
 46 sc1bd4 [realization index = 997946] / PAUSED (edge)       
