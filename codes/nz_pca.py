@@ -1,5 +1,4 @@
 import numpy as np
-from itertools import chain
 
 class PCA:
     def __init__(self, nbar_path, pcs_path, npcs_nz):
@@ -24,7 +23,7 @@ class PCA:
         else:
             return self.nbar
 
-    # Adapted from cosmosis/samplers/fisher/* to use with CoCoA's prototype
+# Adapted from cosmosis/samplers/fisher/* to use with CoCoA's prototype
 class Fisher:
     def __init__(self,start_vector,ci):
         """
@@ -41,11 +40,12 @@ class Fisher:
         """
         self.start_vector = np.genfromtxt(start_vector) # shape=(Nz,1+Nt)
         self.z = self.start_vector[:,0]
-        self.Nz = len(self.z)
-        self.Nt = self.start_vector[:,1].shape[1]
-        self.start_vector = list(chain.from_iterable(start_vector[:,1].T)) # shape=(Nt*Nz,)
-        self.nparams = len(self.start_vector) # = self.Nz * self.Nt
+        (self.Nz, self.Nt) = self.start_vector[:,1].shape
+        self.start_vector = start_vector[:,1].T.flatten() # shape=(Nt*Nz,)
+        self.nparams = self.Nz * self.Nt
         self.ci = ci
+        self.ijs = [(i,j) for i in range(self.Nt) for j in range(self.Nt) if j>=i]
+        self.step_size = 0.01
     
     def five_points_stencil_points(self, param_index):
         delta = np.zeros(self.nparams) # Nt*Nz
@@ -62,54 +62,40 @@ class Fisher:
 
     def generate_sample_points(self):
         points = []
-        for index in range(self.nparams):
-            points += self.five_points_stencil_points(index) # List concatenation
-        return points # (4*Nt*Nz, Nt*Nz)
+        for p in range(self.nparams):
+            points += self.five_points_stencil_points(p)
+        return points
 
     def compute_obs(self):
-        points = self.generate_sample_points()
-
+        observable = []
+        points = generate_sample_points()
         for point in points:
-            point=point.copy()
+            point = point.reshape(self.Nt,self.Nz).T # (Nt,Nz) -> (Nz,Nt)
+            point = np.column_stack((self.z,point)) # (Nz,1+Nt) CoCoA .nz like-format
             self.ci.set_source_sample(point)
-            (ξp, ξm) = self.ci.xi_pm_tomo()
-            (ntheta, ntomo, ntomo2) = ξp.shape
-            ξp_list += ξp[:,tbi,tbj] list(chain.from_iterable(ξp))
-            ξp = [ξp[:,tbi,tbj] for tbi in range(ntomo) for tbj in range(ntomo) if tbj>=tbi].reshape(1,self.jacob_dim1)
-            ξp_list=[]
-            ξp_list += ξp[:,]
-            ξm = self.ci.xi_pm_tomo()[1].copy()
+            (ξ_p, ξ_m) = self.ci.xi_pm_tomo()
+            ξp = np.array([ξ_p[:,ij[0],ij[1]] for ij in self.ijs]).flatten()
+            ξm = np.array([ξ_m[:,ij[0],ij[1]] for ij in self.ijs]).flatten()
+            ξpm = np.hstack((ξp,ξm))
+            observable.append(ξpm) # (4*Nt*Nz,len(ξpm))
+        return observable    
 
     def five_point_stencil_deriv(self, obs):
         deriv = (-obs[0] + 8*obs[1] - 8*obs[2] + obs[3]) / (12*self.step_size)
         return deriv
 
     def extract_derivatives(self, results):
+        results = self.compute_obs()
         derivatives = []
-        #Now get out the results that correspond to each dimension
         for p in range(self.nparams):
             results_p = results[4*p:4*(p+1)]
             derivative = self.five_point_stencil_deriv(results_p, p)
             derivatives.append(derivative)
         return np.array(derivatives)
-    
-    def compute_derivatives(self):
-            derivatives = []
-            points = self.generate_sample_points()
-            print("Calculating derivatives using {} total models".format(len(points)))
-            if self.pool is None:
-                results = list(map(self.compute_vector, points))
-            else:
-                results = self.pool.map(self.compute_vector, points)
 
-            _, inv_cov = self.compute_vector(points[0], cov=True)
-
-            derivatives = self.extract_derivatives(results)
-
-            return derivatives, inv_cov # ORIGINAL
-    
     def compute_fisher_matrix(self):
-        derivatives, inv_cov = self.compute_derivatives()
+        derivatives = self.extract_derivatives(results)
+        inv_cov = self.ci.get_inv_cov_masked()
         fisher_matrix = np.einsum("il,lk,jk->ij", derivatives, inv_cov, derivatives)
         return fisher_matrix
     
