@@ -123,44 +123,44 @@ Gaussian (0,1)
 79 sc1bd4 [realization index = 991213] / C (jpl)       
 
 ### 11 PC + No Shift with synthetic xi(nfid) + model xi(nbar)
-80 sc1bd4 [realization index = 997946] /      
-81 sc1bd4 [realization index = 991213] / 
+80 sc1bd4 [realization index = 997946] / RUNNING (edge)     
+81 sc1bd4 [realization index = 991213] / RUNNING (edge)      
 
 ### 12 PC + No Shift with synthetic xi(nfid) + model xi(nbar)
-82 sc1bd4 [realization index = 997946] /      
-83 sc1bd4 [realization index = 991213] / 
+82 sc1bd4 [realization index = 997946] / WAITING (edge)     
+83 sc1bd4 [realization index = 991213] / WAITING (edge)      
 
 ### 13 PC + No Shift with synthetic xi(nfid) + model xi(nbar)
-84 sc1bd4 [realization index = 997946] /      
-85 sc1bd4 [realization index = 991213] / 
+84 sc1bd4 [realization index = 997946] / WAITING (edge)     
+85 sc1bd4 [realization index = 991213] / WAITING (edge)      
 
 ### 14 PC + No Shift with synthetic xi(nfid) + model xi(nbar)
-86 sc1bd4 [realization index = 997946] /      
-87 sc1bd4 [realization index = 991213] / 
+86 sc1bd4 [realization index = 997946] / WAITING (edge)     
+87 sc1bd4 [realization index = 991213] / WAITING (edge)      
 
 ### 15 PC + No Shift with synthetic xi(nfid) + model xi(nbar)
-88 sc1bd4 [realization index = 997946] /      
-89 sc1bd4 [realization index = 991213] / 
+88 sc1bd4 [realization index = 997946] / WAITING (edge)           
+89 sc1bd4 [realization index = 991213] / WAITING (edge)      
 
 ### 16 PC + No Shift with synthetic xi(nfid) + model xi(nbar)
-90 sc1bd4 [realization index = 997946] /      
-91 sc1bd4 [realization index = 991213] / 
+90 sc1bd4 [realization index = 997946] / RUNNING (edge)      
+91 sc1bd4 [realization index = 991213] / RUNNING (edge)      
 
 ### 17 PC + No Shift with synthetic xi(nfid) + model xi(nbar)
-92 sc1bd4 [realization index = 997946] /      
-93 sc1bd4 [realization index = 991213] / 
+92 sc1bd4 [realization index = 997946] / RUNNING (edge)     
+93 sc1bd4 [realization index = 991213] / RUNNING (edge)      
 
 ### 18 PC + No Shift with synthetic xi(nfid) + model xi(nbar)
-94 sc1bd4 [realization index = 997946] /      
-95 sc1bd4 [realization index = 991213] / 
+94 sc1bd4 [realization index = 997946] / RUNNING (edge)     
+95 sc1bd4 [realization index = 991213] / RUNNING (edge)      
 
 ### 19 PC + No Shift with synthetic xi(nfid) + model xi(nbar)
-96 sc1bd4 [realization index = 997946] /      
-97 sc1bd4 [realization index = 991213] / 
+96 sc1bd4 [realization index = 997946] / RUNNING (edge)     
+97 sc1bd4 [realization index = 991213] / RUNNING (edge)      
 
 ### 20 PC + No Shift with synthetic xi(nfid) + model xi(nbar)
-98 sc1bd4 [realization index = 997946] /      
-99 sc1bd4 [realization index = 991213] / 
+98 sc1bd4 [realization index = 997946] / RUNNING (edge)     
+99 sc1bd4 [realization index = 991213] / RUNNING (edge)      
 
 ####################################################################  
 ####################################################################  
