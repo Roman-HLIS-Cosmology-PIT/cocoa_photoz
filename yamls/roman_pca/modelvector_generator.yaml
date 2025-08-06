@@ -7,7 +7,7 @@ stop_at_error: False
 likelihood:
   roman_real.roman_real_cosmic_shear:
     path: ./external_modules/data/roman_real/sc1bd4
-    data_file: sc1bd4_nbar_r92550_fidRR.dataset
+    data_file: sc1bd4.dataset
     accuracyboost: 1.0
     integration_accuracy: 0
     kmax_boltzmann: 5.0

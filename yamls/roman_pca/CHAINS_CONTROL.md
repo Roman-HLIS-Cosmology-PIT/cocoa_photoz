@@ -80,7 +80,7 @@ Gaussian (0,1)
 
 ### No PC + No Shift with synthetic xi(nfid) + model xi(nbar)
 58 sc1bd4 [realization index = 997946] / C (jpl)     
-59 sc1bd4 [realization index = 991213] / X (jpl)     
+59 sc1bd4 [realization index = 991213] / C (jpl)     
 
 ### 1 PC + No Shift with synthetic xi(nfid) + model xi(nbar)
 60 sc1bd4 [realization index = 997946] / C (jpl)     
@@ -107,20 +107,60 @@ Gaussian (0,1)
 71 sc1bd4 [realization index = 991213] / C (jpl)     
 
 ### 7 PC + No Shift with synthetic xi(nfid) + model xi(nbar)
-72 sc1bd4 [realization index = 997946] / X (jpl)     
+72 sc1bd4 [realization index = 997946] / RUNNING (jpl)     
 73 sc1bd4 [realization index = 991213] / C (jpl)     
 
 ### 8 PC + No Shift with synthetic xi(nfid) + model xi(nbar)
-74 sc1bd4 [realization index = 997946] / RUNNING (jpl)     
+74 sc1bd4 [realization index = 997946] / WAITING (jpl)     
 75 sc1bd4 [realization index = 991213] / C (jpl)     
 
 ### 9 PC + No Shift with synthetic xi(nfid) + model xi(nbar)
-76 sc1bd4 [realization index = 997946] / X (jpl)     
-77 sc1bd4 [realization index = 991213] / X (jpl)     
+76 sc1bd4 [realization index = 997946] / waiting (jpl)     
+77 sc1bd4 [realization index = 991213] / RUNNING (jpl)     
 
 ### 10 PC + No Shift with synthetic xi(nfid) + model xi(nbar)
-78 sc1bd4 [realization index = 997946] / X (jpl)     
+78 sc1bd4 [realization index = 997946] / RUNNING (jpl)     
 79 sc1bd4 [realization index = 991213] / C (jpl)       
+
+### 11 PC + No Shift with synthetic xi(nfid) + model xi(nbar)
+80 sc1bd4 [realization index = 997946] /      
+81 sc1bd4 [realization index = 991213] / 
+
+### 12 PC + No Shift with synthetic xi(nfid) + model xi(nbar)
+82 sc1bd4 [realization index = 997946] /      
+83 sc1bd4 [realization index = 991213] / 
+
+### 13 PC + No Shift with synthetic xi(nfid) + model xi(nbar)
+84 sc1bd4 [realization index = 997946] /      
+85 sc1bd4 [realization index = 991213] / 
+
+### 14 PC + No Shift with synthetic xi(nfid) + model xi(nbar)
+86 sc1bd4 [realization index = 997946] /      
+87 sc1bd4 [realization index = 991213] / 
+
+### 15 PC + No Shift with synthetic xi(nfid) + model xi(nbar)
+88 sc1bd4 [realization index = 997946] /      
+89 sc1bd4 [realization index = 991213] / 
+
+### 16 PC + No Shift with synthetic xi(nfid) + model xi(nbar)
+90 sc1bd4 [realization index = 997946] /      
+91 sc1bd4 [realization index = 991213] / 
+
+### 17 PC + No Shift with synthetic xi(nfid) + model xi(nbar)
+92 sc1bd4 [realization index = 997946] /      
+93 sc1bd4 [realization index = 991213] / 
+
+### 18 PC + No Shift with synthetic xi(nfid) + model xi(nbar)
+94 sc1bd4 [realization index = 997946] /      
+95 sc1bd4 [realization index = 991213] / 
+
+### 19 PC + No Shift with synthetic xi(nfid) + model xi(nbar)
+96 sc1bd4 [realization index = 997946] /      
+97 sc1bd4 [realization index = 991213] / 
+
+### 20 PC + No Shift with synthetic xi(nfid) + model xi(nbar)
+98 sc1bd4 [realization index = 997946] /      
+99 sc1bd4 [realization index = 991213] / 
 
 ####################################################################  
 ####################################################################  

@@ -246,7 +246,6 @@ params:
     proposal: 0.003
     latex: \Delta z_\mathrm{s,roman}^8
 
-
   roman_M1:
     prior:
       dist: norm
