@@ -38,17 +38,17 @@ class Fisher:
           ]. 
           E.g.: For Roman, Nt=9; for DES, Nt=4 or 6; for LSST, Nt = 5.
         """
-        self.start_vector = np.genfromtxt(start_vector) # shape=(Nz,1+Nt)
+        self.start_vector = np.genfromtxt(start_vector) # shape: (Nz,1+Nt)
         self.z = self.start_vector[:,0]
         (self.Nz, self.Nt) = self.start_vector[:,1].shape
-        self.start_vector = start_vector[:,1].T.flatten() # shape=(Nt*Nz,)
+        self.start_vector = start_vector[:,1].T.flatten() # shape: (Nt*Nz,)
         self.nparams = self.Nz * self.Nt
         self.ci = ci
-        self.ijs = [(i,j) for i in range(self.Nt) for j in range(self.Nt) if j>=i]
+        self.ijs = [(i,j) for i in range(self.Nt) for j in range(self.Nt) if j>=i] # Tomo bin combinations
         self.step_size = 0.01
     
     def five_points_stencil_points(self, param_index):
-        delta = np.zeros(self.nparams) # Nt*Nz
+        delta = np.zeros(self.nparams) # (Nt*Nz,)
         delta[param_index] = 1.0
         points = [self.start_vector + x*delta for x in
                   [
@@ -67,35 +67,38 @@ class Fisher:
         return points
 
     def compute_obs(self):
+        # TODO: check nz normalization post stencil
         observable = []
-        points = generate_sample_points()
+        points = self.generate_sample_points() # (4*Nt*Nz,Nt*Nz)
         for point in points:
-            point = point.reshape(self.Nt,self.Nz).T # (Nt,Nz) -> (Nz,Nt)
+            point = point.reshape(self.Nt,self.Nz).T # (Nt*Nz,) -> (Nt,Nz) -> (Nz,Nt)
             point = np.column_stack((self.z,point)) # (Nz,1+Nt) CoCoA .nz like-format
             self.ci.set_source_sample(point)
-            (ξ_p, ξ_m) = self.ci.xi_pm_tomo()
-            ξp = np.array([ξ_p[:,ij[0],ij[1]] for ij in self.ijs]).flatten()
-            ξm = np.array([ξ_m[:,ij[0],ij[1]] for ij in self.ijs]).flatten()
+            (ξ_p, ξ_m) = self.ci.xi_pm_tomo() # ξ_p (Nθ,Nt,Nt), ξ_m (Nθ,Nt,Nt)
+            print('ξ_p.shape:', ξ_p.shape)
+            ξp = np.array([ξ_p[:,ij[0],ij[1]] for ij in self.ijs]).flatten() # shape: 
+            ξm = np.array([ξ_m[:,ij[0],ij[1]] for ij in self.ijs]).flatten() # shape: 
             ξpm = np.hstack((ξp,ξm))
-            observable.append(ξpm) # (4*Nt*Nz,len(ξpm))
-        return observable    
+            observable.append(ξpm) 
+        return observable   # (4*Nt*Nz,len(ξpm))
 
     def five_point_stencil_deriv(self, obs):
         deriv = (-obs[0] + 8*obs[1] - 8*obs[2] + obs[3]) / (12*self.step_size)
         return deriv
 
     def extract_derivatives(self, results):
-        results = self.compute_obs()
         derivatives = []
         for p in range(self.nparams):
             results_p = results[4*p:4*(p+1)]
-            derivative = self.five_point_stencil_deriv(results_p, p)
+            derivative = self.five_point_stencil_deriv(results_p)
             derivatives.append(derivative)
         return np.array(derivatives)
 
     def compute_fisher_matrix(self):
+        results = self.compute_obs()
         derivatives = self.extract_derivatives(results)
         inv_cov = self.ci.get_inv_cov_masked()
         fisher_matrix = np.einsum("il,lk,jk->ij", derivatives, inv_cov, derivatives)
         return fisher_matrix
+    
     
