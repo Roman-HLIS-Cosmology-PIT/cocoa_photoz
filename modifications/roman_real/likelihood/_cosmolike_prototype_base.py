@@ -54,7 +54,14 @@ class _cosmolike_prototype_base(DataSetLikelihood):
     if self.external_nz_modeling:
       self.pca_obj = nz_pca.PCA(nbar_path = self.source_file,
                                 pcs_path = self.path+"/"+self.pcs_file,
-                                npcs_nz = self.npcs_nz)
+                                npcs_nz = self.npcs_nz
+                               )
+      if self.fisher_path is not None and self.step_size is not None:
+        self.fisher_obj = nz_pca.Fisher(ci=ci,
+                                        step_size=self.step_size,
+                                        start_vector=self.source_file,
+                                        fisher_path=self.fisher_path
+                                      )
     # DHFS MOD END
 
     # ------------------------------------------------------------------------
@@ -293,7 +300,11 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       # source_nz_local = f(source_nz_local, nuisance parameters)
       # source_nz_local = self.source_nz.copy()
 
-      source_nz_local = self.pca_obj.pca(params_values).copy() # DHFS MOD
+      # DHFS MOD START
+      source_nz_local = self.pca_obj.pca(params_values).copy()
+      # if self.fisher_path is not None and self.step_size is not None: self.fisher_obj.execute()
+      if self.fisher_path is not None and self.step_size is not None: self.fisher_obj.test()
+      # DHFS MOD END
 
       ci.set_source_sample(source_nz_local)
       
