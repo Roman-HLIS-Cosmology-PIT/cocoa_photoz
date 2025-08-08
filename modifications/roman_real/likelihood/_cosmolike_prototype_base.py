@@ -56,11 +56,11 @@ class _cosmolike_prototype_base(DataSetLikelihood):
                                 pcs_path = self.path+"/"+self.pcs_file,
                                 npcs_nz = self.npcs_nz
                                )
-      if self.fisher_path is not None and self.step_size is not None:
+      if self.fisher_file is not None and self.step_size is not None:
         self.fisher_obj = nz_pca.Fisher(ci=ci,
                                         step_size=self.step_size,
                                         start_vector=self.source_file,
-                                        fisher_path=self.fisher_path
+                                        fisher_file=self.fisher_file
                                       )
     # DHFS MOD END
 
@@ -302,8 +302,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
 
       # DHFS MOD START
       source_nz_local = self.pca_obj.pca(params_values).copy()
-      # if self.fisher_path is not None and self.step_size is not None: self.fisher_obj.execute()
-      if self.fisher_path is not None and self.step_size is not None: self.fisher_obj.test()
+      if self.fisher_file is not None and self.step_size is not None: self.fisher_obj.execute()
       # DHFS MOD END
 
       ci.set_source_sample(source_nz_local)
