@@ -52,15 +52,26 @@ class Fisher:
     def five_points_stencil_points(self, param_index):
         delta = np.zeros(self.nparams) # (Nt*Nz,)
         delta[param_index] = 1.0
-        points = [self.start_vector + x*delta for x in
-                  [
-                      +2*self.step_size, # forward far
-                      +1*self.step_size, # forward near
-                      -1*self.step_size, # backward near 
-                      -2*self.step_size  # backward far
-                  ]
-                 ] # (4, Nt*Nz)
-        return points
+        points_normalized=np.zeros((4,self.Nt*self.Nz))
+        
+        points = np.array([self.start_vector + x*delta for x in
+                           [
+                               +2*self.step_size, # forward far
+                               +1*self.step_size, # forward near
+                               -1*self.step_size, # backward near 
+                               -2*self.step_size  # backward far
+                           ]]) # (4, Nt*Nz)
+        
+        #  Normalize each bin for each stencil point
+        for p in range(4):
+            for t in range(self.Nt):
+                start = t * self.Nz
+                end = (t + 1) * self.Nz
+                y = points[p, start:end]
+                y /= np.trapz(y,x=self.z)
+                points_normalized[p,start:end] = y
+
+        return list(points_normalized)
 
     def generate_sample_points(self):
         points = []
@@ -69,7 +80,6 @@ class Fisher:
         return points
 
     def compute_ξpm(self):
-        # TODO: check nz normalization post stencil
         observable = []
         points = self.generate_sample_points() # (4*Nt*Nz,Nt*Nz)
         print('POINTS.SHAPE: ',np.array(points).shape)
@@ -85,20 +95,6 @@ class Fisher:
             observable.append(ξpm) 
         return observable   # (4*Nt*Nz,len(ξpm))
 
-    def compute_dv_masked(self):
-        # TODO: check nz normalization post stencil
-        observable = []
-        points = self.generate_sample_points() # (4*Nt*Nz,Nt*Nz)
-        print('POINTS.SHAPE: ',np.array(points).shape)
-        for idx,point in enumerate(points):
-            print('idx: ',idx)
-            point = point.reshape(self.Nt,self.Nz).T # (Nt*Nz,) -> (Nt,Nz) -> (Nz,Nt)
-            point = np.column_stack((self.z,point)) # (Nz,1+Nt) CoCoA .nz like-format
-            self.ci.set_source_sample(point)
-            dv_masked = self.ci.get_dv_masked()
-            observable.append(dv_masked) 
-        return observable   # (4*Nt*Nz,len(dv_masked))
-
     def five_point_stencil_deriv(self, obs):
         obs = np.array(obs)
         deriv = (-obs[0] + 8*obs[1] - 8*obs[2] + obs[3]) / (12*self.step_size)
@@ -113,34 +109,30 @@ class Fisher:
         return np.array(derivatives)
 
     def compute_fisher_matrix(self):
-        print('COMPUTING XIPM')
+
+        print('COMPUTING STENCIL POINTS')
+        stencil_points = self.generate_sample_points()
+        np.savetxt(f'{self.fisher_file}/stencil_points_{self.step_size}.txt',stencil_points)
+        print('shape: stencil_points: ', np.array(stencil_points).shape,'\n')
+
+        print('COMPUTING XIP and XIM')
         result_ξpm = self.compute_ξpm()
-        np.savetxt(f'fisher_product/ξpm_{self.step_size}.txt',result_ξpm)
+        np.savetxt(f'{self.fisher_file}/ξpm_{self.step_size}.txt',result_ξpm)
         print('shape: ξpm: ', np.array(result_ξpm).shape,'\n')
 
         print('COMPUTING JACOBIAN MATRIX FOR XIPM')
         deriv_ξpm = self.extract_derivatives(result_ξpm)
-        np.savetxt(f'fisher_product/deriv_ξpm_{self.step_size}.txt',deriv_ξpm)
+        np.savetxt(f'{self.fisher_file}/deriv_ξpm_{self.step_size}.txt',deriv_ξpm)
         print('shape: derivative ξpm: ', np.array(deriv_ξpm).shape,'\n')
-
-        print('COMPUTING FULL DV')
-        dv_masked = self.compute_dv_masked()
-        np.savetxt(f'fisher_product/dv_masked_{self.step_size}.txt',dv_masked)
-        print('shape: data vector: ', np.array(dv_masked).shape,'\n')
-
-        print('COMPUTING JACOBIAN MATRIX FOR FULL DV')
-        deriv_dv_masked = self.extract_derivatives(dv_masked)
-        np.savetxt(f'fisher_product/deriv_dv_masked_{self.step_size}.txt',deriv_dv_masked)
-        print('shape: derivative full dv: ', np.array(deriv_dv_masked).shape,'\n')
         
-        print('COMPUTING DERIVARIVE INVERSE COVARIANCE')
+        print('COMPUTING INVERSE OF COVARIANCE MATRIX')
         inv_cov = self.ci.get_inv_cov_masked()
-        np.savetxt('fisher_product/inv_cov.txt',inv_cov)
+        np.savetxt(f'{self.fisher_file}/inv_cov.txt',inv_cov)
         print('shape: inv covariance matrix: ', np.array(inv_cov).shape,'\n')
         
         print('COMPUTING FISHER MATRIX')
-        fisher_matrix = np.einsum("il,lk,jk->ij", deriv_dv_masked, inv_cov, deriv_dv_masked)
-        np.savetxt(f'fisher_product/{self.fisher_file}_{self.step_size}.txt',fisher_matrix)
+        fisher_matrix = deriv_ξpm @ inv_cov[:deriv_ξpm.shape[1],:deriv_ξpm.shape[1]] @ deriv_ξpm.T
+        np.savetxt(f'{self.fisher_file}/fisher_matrix_{self.step_size}.txt',fisher_matrix)
         print('shape: fisher_matrix_dv: ', np.array(fisher_matrix).shape,'\n')
         
         return None

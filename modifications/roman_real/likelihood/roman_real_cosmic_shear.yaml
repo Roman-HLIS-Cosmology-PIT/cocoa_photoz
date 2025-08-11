@@ -8,10 +8,10 @@ speed: 1
 non_linear_emul: 2
 debug: False
 external_nz_modeling: 0
-epsilon: 0
 npcs_nz: 0
 pcs_file: null
-nbar_file: null
+step_size: null
+fisher_file: null
 
 # IA REDSHIFT EVOLUTION: 0 = NO_IA (AMPLITUDES SET TO ZERO), 
 #                        1 = IA_NLA_LF
