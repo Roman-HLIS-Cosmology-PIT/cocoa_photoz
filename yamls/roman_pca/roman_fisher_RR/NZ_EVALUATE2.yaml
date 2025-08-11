@@ -1,8 +1,9 @@
-output: ./cocoa_photoz/results/chains/roman_pca/modelvector0
+output: ./cocoa_photoz/chains/roman_real/EXAMPLE_EVALUATE2
 
 timing: True
 debug: False
-stop_at_error: False
+stop_at_error: True
+force: True
 
 likelihood:
   roman_real.roman_real_cosmic_shear:
@@ -13,16 +14,17 @@ likelihood:
     kmax_boltzmann: 5.0
     # 1 EE2, 2 Halofit
     non_linear_emul: 2
-    IA_model: 0
+    IA_model: 0 #NLA
     IA_redshift_evolution: 3
+    print_datavector: False
+    print_datavector_file: null
     ggl_exclude: []
     external_nz_modeling: 1
-    npcs_nz: 0                 # number of PCs. Maximum 414 = 9 tomo bins * 46 z bins
-    pcs_file: U.txt            # PCs 
-    # Model: n(z) = <n>(z) + α_1*PC_1(z) + α_2*PC_2(z) + ... + α_n*PC_n(z)
-    print_datavector: False
-    print_datavector_file: ''
-
+    npcs_nz: 0
+    step_size: 1e-3
+    fisher_file: fisher_matrix_RR
+    pcs_file: U.txt
+    
 ## SET PRIORS ON COSMOLOGICAL PARAMETERS
 params:
   As_1e9:
@@ -137,116 +139,6 @@ params:
 
   ### NUISSANCE PARAMETERS
   # WL photo-z errors (lens=source -> same errors for both)
-  roman_alpha_1:
-    prior:
-      dist: norm
-      loc: 0.0
-      scale: 1.0
-    ref:
-      dist: norm
-      loc: 0.0
-      scale: 1.0
-    proposal: 1.0
-    latex: \alpha_{1}
-  roman_alpha_2:
-    prior:
-      dist: norm
-      loc: 0.0
-      scale: 1.0
-    ref:
-      dist: norm
-      loc: 0.0
-      scale: 1.0
-    proposal: 1.0
-    latex: \alpha_{2}
-  roman_alpha_3:
-    prior:
-      dist: norm
-      loc: 0.0
-      scale: 1.0
-    ref:
-      dist: norm
-      loc: 0.0
-      scale: 1.0
-    proposal: 1.0
-    latex: \alpha_{3}
-  roman_alpha_4:
-    prior:
-      dist: norm
-      loc: 0.0
-      scale: 1.0
-    ref:
-      dist: norm
-      loc: 0.0
-      scale: 1.0
-    proposal: 1.0
-    latex: \alpha_{4}
-  roman_alpha_5:
-    prior:
-      dist: norm
-      loc: 0.0
-      scale: 1.0
-    ref:
-      dist: norm
-      loc: 0.0
-      scale: 1.0
-    proposal: 1.0
-    latex: \alpha_{5}
-  roman_alpha_6:
-    prior:
-      dist: norm
-      loc: 0.0
-      scale: 1.0
-    ref:
-      dist: norm
-      loc: 0.0
-      scale: 1.0
-    proposal: 1.0
-    latex: \alpha_{6}
-  roman_alpha_7:
-    prior:
-      dist: norm
-      loc: 0.0
-      scale: 1.0
-    ref:
-      dist: norm
-      loc: 0.0
-      scale: 1.0
-    proposal: 1.0
-    latex: \alpha_{7}
-  roman_alpha_8:
-    prior:
-      dist: norm
-      loc: 0.0
-      scale: 1.0
-    ref:
-      dist: norm
-      loc: 0.0
-      scale: 1.0
-    proposal: 1.0
-    latex: \alpha_{8}
-  roman_alpha_9:
-    prior:
-      dist: norm
-      loc: 0.0
-      scale: 1.0
-    ref:
-      dist: norm
-      loc: 0.0
-      scale: 1.0
-    proposal: 1.0
-    latex: \alpha_{9}
-  roman_alpha_10:
-    prior:
-      dist: norm
-      loc: 0.0
-      scale: 1.0
-    ref:
-      dist: norm
-      loc: 0.0
-      scale: 1.0
-    proposal: 1.0
-    latex: \alpha_{10}
   roman_DZ_S1:
     prior:
       dist: norm
@@ -502,27 +394,6 @@ sampler:
       omegab: 0.04
       omegam: 0.3
       # Roman real END
-      # mnu: 0.06
-      roman_alpha_1:  0.0 #-0.0006333320119150953
-      roman_alpha_2:  0.0 #-0.0025745178950214898
-      roman_alpha_3:  0.0 #0.00657760304803695
-      roman_alpha_4:  0.0 #0.28971425278177304
-      roman_alpha_5:  0.0 #0.004522791743637017
-      roman_alpha_6:  0.0 #0.26611742783041464
-      roman_alpha_7:  0.0 #0.0015610308292440085
-      roman_alpha_8:  0.0 #-0.1492990608421327
-      roman_alpha_9:  0.0 #0.013365201830160038
-      roman_alpha_10: 0.0 #0.21676432307448404
-      # roman_alpha_11: 0.0
-      # roman_alpha_12: 0.0
-      # roman_alpha_13: 0.0
-      # roman_alpha_14: 0.0
-      # roman_alpha_15: 0.0
-      # roman_alpha_16: 0.0
-      # roman_alpha_17: 0.0
-      # roman_alpha_18: 0.0
-      # roman_alpha_19: 0.0
-      # roman_alpha_20: 0.0
       roman_DZ_S1: 0.0
       roman_DZ_S2: 0.0
       roman_DZ_S3: 0.0
@@ -545,3 +416,4 @@ sampler:
       roman_A1_2: -1.5
       # w0pwa: -1.0
       # w: -1.0
+      # mnu: 0.06

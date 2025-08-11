@@ -1,7 +1,8 @@
-Steps to run an evaluation and a mcmc with the PCA model for n(z)  
-Assuming you already have CoCoA installed, follow these steps:  
+## PCA model for n(z)  
 
-1) cd cocoa/Cocoa  
+## Installation  
+Assuming you already have CoCoA installed, follow these steps:  
+1) cd cocoa/Cocoa. Assuming that you're awalys in this path, proceed to:  
 2) git clone git@github.com:diogohf/cocoa_photoz.git  
 3) Copy and past the following files into the Roman Real folders likelihood, interface, and data:  
     cp cocoa_photoz/modifications/roman_real/likelihood/* projects/roman_real/likelihood/  
@@ -11,15 +12,20 @@ Assuming you already have CoCoA installed, follow these steps:
 5) Compile Roman Real: source projects/roman_real/scripts/compile_roman_real.sh   
 
 
-4) Minimal MCMC example with PCA:  
+## Minimal MCMC example with PCA model for n(z):  
 MCMC index / Roman scenario / realization index / chain status (NS=Not Started, R=Running, C=Converged)    
-### Setup: No PC & No Shift. Synthetic data vector: ξ±(nz_fid = nz_991213). Model: ξ±(nz = nz_fid)  
+
+Setup: No PC & No Shift. Synthetic data vector: ξ±(nz_fid = nz_991213). Model: ξ±(nz = nz_fid)  
 57         / sc1bd4         / 991213            / NS        
-### Setup: No PC & Shift. Synthetic data vector: ξ±(nz_fid = nz_991213). Model: ξ±(nz = nz_bar). nz_bar is the mean n(z) of 10^6 realization of the scenario sc1bd4  
+Setup: No PC & Shift. Synthetic data vector: ξ±(nz_fid = nz_991213). Model: ξ±(nz = nz_bar)  
 59         / sc1bd4         / 991213            / NS        
-### Setup: 1 PC & No Shift. Synthetic data vector: ξ±(nz_fid = nz_991213). Model: ξ±(nz = nz_bar + α_1*PC_1).
-61         / sc1bd4         / 991213            / NS        
-### Setup: 5 PC & No Shift. Synthetic data vector: ξ±(nz_fid = nz_991213). Model: ξ±(nz = nz_bar + α_1 * PC_1 +...+ α_5 * PC_5).
+Setup: 5 PC & No Shift. Synthetic data vector: ξ±(nz_fid = nz_991213). Model: ξ±(nz = nz_bar + α_1 * PC_1 +...+ α_5 * PC_5).
 69         / sc1bd4         / 991213            / NS        
-### Setup: 10 PC & No Shift. Synthetic data vector: ξ±(nz_fid = nz_991213). Model: ξ±(nz = nz_bar + α_1 * PC_1 +...+ α_10 * PC_10).
+Setup: 10 PC & No Shift. Synthetic data vector: ξ±(nz_fid = nz_991213). Model: ξ±(nz = nz_bar + α_1 * PC_1 +...+ α_10 * PC_10).
 79         / sc1bd4         / 991213            / NS        
+
+PS: nz_bar is the mean n(z) of 1 million realization of the scenario sc1bd4  
+
+## Analyzing the minimal MCMC example with PCA model for n(z):  
+(.local) (cocoa) souzadio@gattaca2-hn1:Cocoa$ python cocoa_photoz/codes/minimal_example.py  
+you should get cocoa_photoz/codes/minimal_example/triangle_plot_reference.pdf and triangle_plot_10pc_reference.pdf

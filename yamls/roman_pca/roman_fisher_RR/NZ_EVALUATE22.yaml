@@ -1,39 +1,36 @@
-output: ./cocoa_photoz/results/chains/roman_pca/modelvector0
+output: ./cocoa_photoz/chains/roman_real/EXAMPLE_EVALUATE22
 
 timing: True
 debug: False
-stop_at_error: False
+stop_at_error: True
+force: True
 
 likelihood:
   roman_real.roman_real_cosmic_shear:
-    path: ./external_modules/data/roman_real/sc1bd4
-    data_file: sc1bd4.dataset
+    path: ./external_modules/data/roman_real
+    data_file: example1.dataset
     accuracyboost: 1.0
     integration_accuracy: 0
     kmax_boltzmann: 5.0
     # 1 EE2, 2 Halofit
     non_linear_emul: 2
-    IA_model: 0
+    IA_model: 0 #NLA
     IA_redshift_evolution: 3
-    ggl_exclude: []
-    external_nz_modeling: 1
-    npcs_nz: 0                 # number of PCs. Maximum 414 = 9 tomo bins * 46 z bins
-    pcs_file: U.txt            # PCs 
-    # Model: n(z) = <n>(z) + α_1*PC_1(z) + α_2*PC_2(z) + ... + α_n*PC_n(z)
     print_datavector: False
-    print_datavector_file: ''
-
-## SET PRIORS ON COSMOLOGICAL PARAMETERS
+    ggl_exclude: [[6,0],[7,0],[7,1]]
+    external_nz_modeling: 1
+    epsilon: 4e-1
+    
 params:
   As_1e9:
     prior:
-      min: 1.1
-      max: 2.8
+      min: 0.5
+      max: 5
     ref:
       dist: norm
       loc: 2.1
-      scale: 0.2
-    proposal: 0.2
+      scale: 0.65
+    proposal: 0.4
     latex: 10^9 A_\mathrm{s})
     drop: true
     renames: A
@@ -49,18 +46,18 @@ params:
     latex: n_\mathrm{s}
   H0:
     prior:
-      min: 60
-      max: 76
+      min: 55
+      max: 91
     ref:
       dist: norm
       loc: 67.32
-      scale: 3
+      scale: 5
     proposal: 3
     latex: H_0
   omegab:
     prior:
-      min: 0.04
-      max: 0.055
+      min: 0.03
+      max: 0.07
     ref:
       dist: norm
       loc: 0.0495
@@ -71,21 +68,44 @@ params:
   omegam:
     prior:
       min: 0.1
-      max: 0.6
+      max: 0.9
     ref:
       dist: norm
       loc: 0.316
-      scale: 0.015
-    proposal: 0.015
+      scale: 0.02
+    proposal: 0.02
     latex: \Omega_\mathrm{m}
     drop: true
-  w0pwa:
-    value: -1.0
-  w:
-    value: -1.0
-    latex: w_{0,\mathrm{DE}}
   mnu:
-    value: 0.06
+    prior:
+      min: 0.06
+      max: 0.6
+    ref:
+      dist: norm
+      loc: 0.25
+      scale: 0.1
+    proposal: 0.05
+  w0pwa:
+    prior:
+      min: -5 
+      max: -0.01
+    ref:
+      dist: norm
+      loc: -0.99
+      scale: 0.05
+    proposal: 0.05
+    latex: w_{0,\mathrm{DE}}+w_{a,\mathrm{DE}}
+    drop: true
+  w:
+    prior:
+      min: -3
+      max: -0.01
+    ref:
+      dist: norm
+      loc: -0.99
+      scale: 0.05
+    proposal: 0.05
+    latex: w_{0,\mathrm{DE}}
   tau:
     value: 0.0697186
     latex: \tau_\mathrm{reio}
@@ -93,6 +113,7 @@ params:
   # ------------------------------------- DERIVED PARAMETERS ------------------------------
   # ---------------------------------------------------------------------------------------
   # WARNING: DO NOT REMOVE omegabh2/omegach2/omegamh2/wa/As/ FROM DERIVED PARAMETERS
+  # WARNING: DO NOT REMOVE THE DROP FLAG FROM omegab/omegam/As_1e9/w0pwa
   # SEE: github.com/CosmoLike/cocoa#warning-warning-warning-weak-lensing-yaml-files-in-cobaya-
   # --------------------------------------------------------------------------------------- 
   As:
@@ -134,119 +155,8 @@ params:
   omegan:
     derived: 'lambda omegan2, H0: omegan2/((H0/100)**2)'
     latex: \Omega_\mathrm{\\nu}
-
   ### NUISSANCE PARAMETERS
   # WL photo-z errors (lens=source -> same errors for both)
-  roman_alpha_1:
-    prior:
-      dist: norm
-      loc: 0.0
-      scale: 1.0
-    ref:
-      dist: norm
-      loc: 0.0
-      scale: 1.0
-    proposal: 1.0
-    latex: \alpha_{1}
-  roman_alpha_2:
-    prior:
-      dist: norm
-      loc: 0.0
-      scale: 1.0
-    ref:
-      dist: norm
-      loc: 0.0
-      scale: 1.0
-    proposal: 1.0
-    latex: \alpha_{2}
-  roman_alpha_3:
-    prior:
-      dist: norm
-      loc: 0.0
-      scale: 1.0
-    ref:
-      dist: norm
-      loc: 0.0
-      scale: 1.0
-    proposal: 1.0
-    latex: \alpha_{3}
-  roman_alpha_4:
-    prior:
-      dist: norm
-      loc: 0.0
-      scale: 1.0
-    ref:
-      dist: norm
-      loc: 0.0
-      scale: 1.0
-    proposal: 1.0
-    latex: \alpha_{4}
-  roman_alpha_5:
-    prior:
-      dist: norm
-      loc: 0.0
-      scale: 1.0
-    ref:
-      dist: norm
-      loc: 0.0
-      scale: 1.0
-    proposal: 1.0
-    latex: \alpha_{5}
-  roman_alpha_6:
-    prior:
-      dist: norm
-      loc: 0.0
-      scale: 1.0
-    ref:
-      dist: norm
-      loc: 0.0
-      scale: 1.0
-    proposal: 1.0
-    latex: \alpha_{6}
-  roman_alpha_7:
-    prior:
-      dist: norm
-      loc: 0.0
-      scale: 1.0
-    ref:
-      dist: norm
-      loc: 0.0
-      scale: 1.0
-    proposal: 1.0
-    latex: \alpha_{7}
-  roman_alpha_8:
-    prior:
-      dist: norm
-      loc: 0.0
-      scale: 1.0
-    ref:
-      dist: norm
-      loc: 0.0
-      scale: 1.0
-    proposal: 1.0
-    latex: \alpha_{8}
-  roman_alpha_9:
-    prior:
-      dist: norm
-      loc: 0.0
-      scale: 1.0
-    ref:
-      dist: norm
-      loc: 0.0
-      scale: 1.0
-    proposal: 1.0
-    latex: \alpha_{9}
-  roman_alpha_10:
-    prior:
-      dist: norm
-      loc: 0.0
-      scale: 1.0
-    ref:
-      dist: norm
-      loc: 0.0
-      scale: 1.0
-    proposal: 1.0
-    latex: \alpha_{10}
   roman_DZ_S1:
     prior:
       dist: norm
@@ -335,17 +245,7 @@ params:
       scale: 0.003
     proposal: 0.003
     latex: \Delta z_\mathrm{s,roman}^8
-  roman_DZ_S9:
-    prior:
-      dist: norm
-      loc: 0.0
-      scale: 0.003
-    ref:
-      dist: norm
-      loc: 0.0
-      scale: 0.003
-    proposal: 0.003
-    latex: \Delta z_\mathrm{s,roman}^9
+
 
   roman_M1:
     prior:
@@ -435,17 +335,6 @@ params:
       scale: 0.005
     proposal: 0.005
     latex: m_\mathrm{roman}^8
-  roman_M9:
-    prior:
-      dist: norm
-      loc: 0.0
-      scale: 0.005
-    ref:
-      dist: norm
-      loc: 0.0
-      scale: 0.005
-    proposal: 0.005
-    latex: m_\mathrm{roman}^9
 
   # Intrinsic alignment
   roman_A1_1:
@@ -476,53 +365,24 @@ theory:
     use_renames: True
     extra_args:
       halofit_version: takahashi
-      AccuracyBoost: 1.1
+      AccuracyBoost: 1.0
       lens_potential_accuracy: 1.0
       num_massive_neutrinos: 1
       nnu: 3.046
       dark_energy_model: ppf
       accurate_massive_neutrino_transfers: false
-      k_per_logint: 20
+      k_per_logint: 15
 
 sampler:
   evaluate:
     N: 1
     override:
-      # P18 START
-      # omegam: 0.3156
-      # omegab: 0.0492 
-      # H0: 67.32
-      # As_1e9: 2.1
-      # ns: 0.966
-      # P18 END
-      # Roman real START
       As_1e9: 2.1
       ns: 0.96605
       H0: 67.32
       omegab: 0.04
       omegam: 0.3
-      # Roman real END
-      # mnu: 0.06
-      roman_alpha_1:  0.0 #-0.0006333320119150953
-      roman_alpha_2:  0.0 #-0.0025745178950214898
-      roman_alpha_3:  0.0 #0.00657760304803695
-      roman_alpha_4:  0.0 #0.28971425278177304
-      roman_alpha_5:  0.0 #0.004522791743637017
-      roman_alpha_6:  0.0 #0.26611742783041464
-      roman_alpha_7:  0.0 #0.0015610308292440085
-      roman_alpha_8:  0.0 #-0.1492990608421327
-      roman_alpha_9:  0.0 #0.013365201830160038
-      roman_alpha_10: 0.0 #0.21676432307448404
-      # roman_alpha_11: 0.0
-      # roman_alpha_12: 0.0
-      # roman_alpha_13: 0.0
-      # roman_alpha_14: 0.0
-      # roman_alpha_15: 0.0
-      # roman_alpha_16: 0.0
-      # roman_alpha_17: 0.0
-      # roman_alpha_18: 0.0
-      # roman_alpha_19: 0.0
-      # roman_alpha_20: 0.0
+      mnu: 0.06
       roman_DZ_S1: 0.0
       roman_DZ_S2: 0.0
       roman_DZ_S3: 0.0
@@ -531,7 +391,6 @@ sampler:
       roman_DZ_S6: 0.0
       roman_DZ_S7: 0.0
       roman_DZ_S8: 0.0
-      roman_DZ_S9: 0.0 #DHFS MOD
       roman_M1: 0.0
       roman_M2: 0.0
       roman_M3: 0.0
@@ -540,8 +399,7 @@ sampler:
       roman_M6: 0.0
       roman_M7: 0.0
       roman_M8: 0.0
-      roman_M9: 0.0 #DHFS MOD
       roman_A1_1: 0.6
       roman_A1_2: -1.5
-      # w0pwa: -1.0
-      # w: -1.0
+      w0pwa: -0.9
+      w: -0.9
