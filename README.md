@@ -28,4 +28,5 @@ PS: nz_bar is the mean n(z) of 1 million realization of the scenario sc1bd4
 
 ## Analyzing the minimal MCMC example with PCA model for n(z):  
 (.local) (cocoa) souzadio@gattaca2-hn1:Cocoa$ python cocoa_photoz/codes/minimal_example.py  
-you should get cocoa_photoz/codes/minimal_example/triangle_plot_reference.pdf and triangle_plot_10pc_reference.pdf
+You be able to reproduce the constraints on Ωm, σ8 and the α_{1...10}.  
+Compare your results with the figures triangle_plot_10pc_reference.pdf and triangle_plot_reference.pdf at cocoa_photoz/codes/minimal_example/
