@@ -27,6 +27,6 @@ Setup: 10 PC & No Shift. Synthetic data vector: ξ±(nz_fid = nz_991213). Model:
 PS: nz_bar is the mean n(z) of 1 million realization of the scenario sc1bd4  
 
 ## Analyzing the minimal MCMC example with PCA model for n(z):  
-(.local) (cocoa) souzadio@gattaca2-hn1:Cocoa$ python cocoa_photoz/codes/minimal_example.py  
+(.local) (cocoa) {your_username}@{your_HPC}:Cocoa$ python cocoa_photoz/codes/minimal_example.py  
 You be able to reproduce the constraints on Ωm, σ8 and the α_{1...10}.  
 Compare your results with the figures triangle_plot_10pc_reference.pdf and triangle_plot_reference.pdf at cocoa_photoz/codes/minimal_example/
