@@ -50,20 +50,6 @@ class _cosmolike_prototype_base(DataSetLikelihood):
 
     self.theta_max_arcmin = ini.float("theta_max_arcmin")
 
-    # DHFS MOD START
-    if self.external_nz_modeling:
-      self.pca_obj = nz_pca.PCA(nbar_path = self.source_file,
-                                pcs_path = self.path+"/"+self.pcs_file,
-                                npcs_nz = self.npcs_nz
-                               )
-      if self.fisher_file is not None and self.step_size is not None:
-        self.fisher_obj = nz_pca.Fisher(ci=ci,
-                                        step_size=self.step_size,
-                                        start_vector=self.source_file,
-                                        fisher_file=self.fisher_file
-                                      )
-    # DHFS MOD END
-
     # ------------------------------------------------------------------------
     self.nz_interp_1d=int(500 + 250*self.accuracyboost)
     self.nz_interp_2d=int(min(60 + 15*self.accuracyboost,150))
@@ -132,12 +118,29 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       ci.init_lens_sample_size(int(self.lens_ntomo))
       ci.init_source_sample_size(int(self.source_ntomo))
       ci.init_ntomo_powerspectra() # must be called after set_source/lens_size 
+      
+      if self.npcs_nz > 0:
+        self.pca_obj = nz_pca.PCA(
+                                  nz_fid=self.source_nz,
+                                  pcs_path=self.path+"/"+self.pcs_file,
+                                  npcs_nz=self.npcs_nz
+                                  )
+      
+      if self.fisher_file is not None and self.step_size is not None:
+        self.fisher_obj = nz_pca.Fisher(
+                                        ci=ci,
+                                        nz_fid=self.source_nz,
+                                        step_size=self.step_size,
+                                        fisher_file=self.fisher_file
+                                        )
+        
     else:
       ci.init_redshift_distributions_from_files(
         lens_multihisto_file=self.lens_file,
         lens_ntomo=int(self.lens_ntomo), 
         source_multihisto_file=self.source_file,
         source_ntomo=int(self.source_ntomo))
+
     #DHFS MOD END
 
     ci.init_data_real(self.cov_file, self.mask_file, self.data_vector_file)
@@ -301,13 +304,16 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       # source_nz_local = self.source_nz.copy()
 
       # DHFS MOD START
-      source_nz_local = self.pca_obj.pca(params_values).copy()
-      if self.fisher_file is not None and self.step_size is not None: self.fisher_obj.execute()
+      if self.npcs_nz > 0:
+        source_nz_local = self.pca_obj.pca(params_values).copy()
+      else:
+        source_nz_local = self.source_nz.copy()
+
+      if self.fisher_file is not None and self.step_size is not None: 
+        self.fisher_obj.execute2()
       # DHFS MOD END
 
       ci.set_source_sample(source_nz_local)
-      
-      # ci.set_source_sample(source_nz_local)
       
       # user may choose to still add photo-z bias or not (here we ad)
       ci.set_nuisance_shear_photoz(

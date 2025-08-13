@@ -22,7 +22,7 @@ likelihood:
     external_nz_modeling: 1
     npcs_nz: 0
     step_size: 1e-10
-    fisher_file: fisher_matrix_RR
+    fisher_file: jacobian_outs
     pcs_file: U.txt
     
 ## SET PRIORS ON COSMOLOGICAL PARAMETERS
