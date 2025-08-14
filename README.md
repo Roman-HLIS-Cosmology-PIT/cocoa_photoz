@@ -1,8 +1,9 @@
-# PCA model for n(z)  
+#  PCA model for n(z)  
 Any questions, please contact me.
 
-<!-- ![Alt text](results/figures/readme_figures/readme_figure.png) -->
-[<img src="results/figures/readme_figures/readme_figure.png" width="400" />](results/figures/readme_figures/readme_figure.png)
+<p align="center">
+  <img src="results/figures/readme_figures/readme_figure.png" alt="Alt text" width="400">
+</p>
 
 ## Introduction  
 The PCA model for n(z) is described in the paper 2506.00758 developed for DES Y6 using [CosmoSIS](https://cosmosis.readthedocs.io/en/latest/). The pipeline cocoa_photoz implement new codes and modify some of [CoCoA](https://github.com/CosmoLike/cocoa)'s codes to, in a general view: *(i)* find the Fisher matrix, $F$, *(ii)* find the principal components (or modes), $\mathrm{e}_i(z)$, and its associated amplitudes, $\alpha_i$, and *(iii)* provide `yaml` files to run MCMCs with this PCA model of the redshift distribution $n(z)=\bar{n}(z)+\sum\alpha_i\mathrm{e}_i(z)$. Several intermediate steps and validation process are necessary to accomplish these three general milestones, which are explained in the paper 1234.5678. As a case of study, this new photo-z mitigation approach is applied to Roman High Latitude Wide Area Survey.     
