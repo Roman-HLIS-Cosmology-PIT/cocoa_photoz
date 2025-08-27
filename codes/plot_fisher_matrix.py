@@ -174,7 +174,7 @@ def get_fisher_matrix(dtwoptdn_relative_path,twopt="xip",savetxt=False):
     fisher_mat = dxipdn @ inv_cov_xip @ dxipdn.T
     if savetxt:
         # np.savetxt(f'results_fisher/{survey}/fisher.txt',fisher_mat)
-        np.savetxt(f'results/fisher_matrix/roman_sc1bd4/fisher.txt',fisher_mat)
+        np.savetxt(f'results/fisher_matrix/roman_sc1bd4/fisher2.txt',fisher_mat)
         return None
     else:
         return fisher_mat
@@ -191,7 +191,7 @@ def plot_fisher_matrix(dtwoptdn_relative_path,twopt="xip"):
     # plt.title(f'Fisher matrix: {titles[survey]}')
     # plt.savefig(f'./plot_fisher_matrix__plot_fisher_matrix_{twopt}__{survey}.pdf')
     plt.title(f'Fisher matrix: Roman scb1_d4_g')
-    plt.savefig(f'./plot_fisher_matrix__plot_fisher_matrix_{twopt}__roman_sc1bd4.pdf')
+    # plt.savefig(f'./plot_fisher_matrix__plot_fisher_matrix_{twopt}__roman_sc1bd4.pdf')
     return None
 
 
@@ -199,5 +199,5 @@ def plot_fisher_matrix(dtwoptdn_relative_path,twopt="xip"):
 #### EXECUTE ####
 #################
 
-plot_fisher_matrix(dtwoptdn_relative_path,twopt="xip")
-# get_fisher_matrix(dtwoptdn_relative_path,twopt="xip",savetxt=True)
+# plot_fisher_matrix(dtwoptdn_relative_path,twopt="xip")
+get_fisher_matrix(dtwoptdn_relative_path,twopt="xip",savetxt=True)

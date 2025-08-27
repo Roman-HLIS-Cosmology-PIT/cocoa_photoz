@@ -19,7 +19,7 @@ class PCA:
         nz_model = np.column_stack((self.z,nz_model))
         return nz_model
 
-# Adapted from cosmosis/samplers/fisher/* to use with CoCoA's prototype
+# 5 point stencil adapted from cosmosis/samplers/fisher/* to use with CoCoA's prototype
 class Fisher:
     def __init__(self,ci,nz_fid,step_size,fisher_file):
         """
@@ -30,17 +30,6 @@ class Fisher:
         fisher_file: the name or path to where store the fisher matrix.
         Outputs:
         fisher matrix, jacobian matrix, and the inverse of the masked covariance matrix
-        -----
-        Input nz_fid has shape (Nz,1+Nt), i.e. in CoCoA .nz like-format, 
-        Skip the 1st column in nz_fid (redshift). 
-        Transformed nz_fid = (Nt*Nz,) =
-          [ 
-          nz(z1)_t1,nz(z2)_t1,nz(z3)_t1,...,nz(zNz)_t1,
-          nz(z1)_t2,nz(z2)_t2,nz(z3)_t2,...,nz(zNz)_t2, 
-          ..., 
-          nz(z1)_Nt,nz(z2)_Nt,nz(z3)_Nt,...,nz(zNz)_Nt
-          ]. 
-          E.g.: For Roman, Nt=9; for DES, Nt=4 or 6; for LSST, Nt = 5.
         """
         self.ci = ci
         self.nz_fid = nz_fid.copy() # shape: (Nz,1+Nt)
@@ -53,13 +42,16 @@ class Fisher:
         self.tomo_bins = [(i,j) for i in range(self.Nt) for j in range(self.Nt) if j>=i] # Tomo bin combinations
         self.nparams = self.Nt * self.Nz
  
+    # ////////////////////////////////////////////////////////////
+    # /////////////////// 5 POINTS STENCIL ///////////////////////
+    # ////////////////////////////////////////////////////////////
+
     def five_points_stencil_points(self, param_index):
         delta = np.zeros(self.nparams) # (Nt*Nz,)
         delta[param_index] = 1.0
         points_normalized=np.zeros((4,self.Nt*self.Nz))
-        nz_fid_flat = self.nz_fid[:,1:].T.flatten() # shape: (Nt*Nz,) OBS: CosmoSIS perturb the normalized parameter. Here the physical parameter is pertubed directly.
-        
-        points = np.array([nz_fid_flat + x*delta for x in
+        nz_fid_flat = self.nz_fid[:,1:].T.flatten() # shape:(Nz,Nt)->(Nt,Nz)->(Nt*Nz,) OBS: CosmoSIS perturb the normalized parameter. Here the physical parameter is pertubed directly.
+        points = np.array([nz_fid_flat + x*delta for x in 
                            [
                                +2*self.step_size, # forward far
                                +1*self.step_size, # forward near
@@ -68,6 +60,7 @@ class Fisher:
                            ]]) # (4, Nt*Nz)
         
         #  Normalize each bin for each stencil point
+        # TODO: CHECK IF nz<0 FOR SOME PARAM_INDEX
         for p in range(4):
             for t in range(self.Nt):
                 start = t * self.Nz
@@ -100,8 +93,9 @@ class Fisher:
             observable.append(ξpm) 
         return observable   # (4*Nt*Nz,len(ξpm))
 
-    def five_point_stencil_deriv(self, obs):
-        obs = np.array(obs)
+    def five_point_stencil_deriv(self, obs_list):
+        """ f'(x) ≈ [-f(x+2h) + 8*f(x+h) - 8*f(x-h) + f(x-2h)] / (12*h) """
+        obs = np.array(obs_list)
         deriv = (-obs[0] + 8*obs[1] - 8*obs[2] + obs[3]) / (12*self.step_size)
         return deriv
 
@@ -112,6 +106,28 @@ class Fisher:
             derivative = self.five_point_stencil_deriv(results_p)
             derivatives.append(derivative)
         return np.array(derivatives)
+
+    def compute_fisher_matrix(self):
+
+        print('COMPUTING STENCIL POINTS')
+        stencil_points = self.generate_sample_points()
+        np.savetxt(f'{self.fisher_file}/stencil_points_{self.step_size}.txt',stencil_points)
+        print('shape: stencil_points: ', np.array(stencil_points).shape,'\n')
+
+        print('COMPUTING XIP and XIM')
+        result_ξpm = self.compute_ξpm()
+        np.savetxt(f'{self.fisher_file}/ξpm_{self.step_size}.txt',result_ξpm)
+        print('shape: ξpm: ', np.array(result_ξpm).shape,'\n')
+
+        print('COMPUTING JACOBIAN MATRIX FOR XIPM')
+        deriv_ξpm = self.extract_derivatives(result_ξpm)
+        np.savetxt(f'{self.fisher_file}/deriv_ξpm_{self.step_size}.txt',deriv_ξpm)
+        print('shape: derivative ξpm: ', np.array(deriv_ξpm).shape,'\n')
+        return None
+
+    # ////////////////////////////////////////////////////////////
+    # /////////////////// CENTRAL DIFFERENCE ////////////////////
+    # ////////////////////////////////////////////////////////////
 
     def central_difference(self,args):
         # truncate error ~ O(ϵ^2)
@@ -142,29 +158,6 @@ class Fisher:
         
         return dξpm_dn
 
-    def compute_fisher_matrix(self):
-
-        print('COMPUTING STENCIL POINTS')
-        stencil_points = self.generate_sample_points()
-        np.savetxt(f'{self.fisher_file}/stencil_points_{self.step_size}.txt',stencil_points)
-        print('shape: stencil_points: ', np.array(stencil_points).shape,'\n')
-
-        print('COMPUTING XIP and XIM')
-        result_ξpm = self.compute_ξpm()
-        np.savetxt(f'{self.fisher_file}/ξpm_{self.step_size}.txt',result_ξpm)
-        print('shape: ξpm: ', np.array(result_ξpm).shape,'\n')
-
-        print('COMPUTING JACOBIAN MATRIX FOR XIPM')
-        deriv_ξpm = self.extract_derivatives(result_ξpm)
-        np.savetxt(f'{self.fisher_file}/deriv_ξpm_{self.step_size}.txt',deriv_ξpm)
-        print('shape: derivative ξpm: ', np.array(deriv_ξpm).shape,'\n')
-        
-        # print('COMPUTING FISHER MATRIX')
-        # fisher_matrix = deriv_ξpm @ self.inv_cov[:deriv_ξpm.shape[1],:deriv_ξpm.shape[1]] @ deriv_ξpm.T
-        # np.savetxt(f'{self.fisher_file}/fisher_matrix_{self.step_size}.txt',fisher_matrix)
-        # print('shape: fisher_matrix_dv: ', np.array(fisher_matrix).shape,'\n')
-        return None
-
     def compute_fisher_matrix2(self):
         deriv_ξpm=[]
 
@@ -175,12 +168,21 @@ class Fisher:
             deriv_ξpm.append(self.central_difference(job))
         np.savetxt(f'{self.fisher_file}/deriv_ξpm_{self.step_size}.txt',deriv_ξpm)
         return None
-    
-    def execute(self):
+
+    # ////////////////////////////////////////////////////////////
+    # ///////////// EXECUTE THE DERIVATIVE METHOD ///////////////
+    # ////////////////////////////////////////////////////////////
+
+    def execute_stencil_5pts(self):
+        print('COMPUTING INVERSE OF COVARIANCE MATRIX')
+        self.inv_cov = self.ci.get_inv_cov_masked()
+        np.savetxt(f'{self.fisher_file}/inv_cov.txt',self.inv_cov)
+        print('shape: inv covariance matrix: ', np.array(self.inv_cov).shape,'\n')
+
         self.compute_fisher_matrix()
         return None
 
-    def execute2(self):
+    def execute_central_diff(self):
         print('COMPUTING INVERSE OF COVARIANCE MATRIX')
         self.inv_cov = self.ci.get_inv_cov_masked()
         np.savetxt(f'{self.fisher_file}/inv_cov.txt',self.inv_cov)

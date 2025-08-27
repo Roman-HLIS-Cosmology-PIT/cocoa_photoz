@@ -14,6 +14,9 @@ results_jacobian/*
 #
 roman_nz_realizations
 results_fisher
+#
+large_files/
+n_nbar_ndiff_covndiff/
 # extra folders
 projects/
 __pycache__/
