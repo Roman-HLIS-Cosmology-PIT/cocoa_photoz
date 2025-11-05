@@ -13,6 +13,8 @@ from camb import model
 import argparse
 import contextlib
 import shutil
+import re
+import warnings
 
 @contextlib.contextmanager
 def suppress_stdout_stderr():
@@ -28,24 +30,25 @@ def suppress_stdout_stderr():
             sys.stderr = old_stderr
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--model', type=str, required=True, help='Simulation name or tag')
-parser.add_argument('--fiducial', type=str, required=True, help='Simulation name or tag')
+parser.add_argument('--scenario_model', type=str, required=True, help='Simulation name or tag')
+parser.add_argument('--scenario_fiducial', type=str, required=True, help='Simulation name or tag')
 
 args        = parser.parse_args()
-mod         = args.model
-fid         = args.fiducial
+mod         = args.scenario_model
+fid         = args.scenario_fiducial
 cocoa_path  = '/gpfs/scratch/pit-roman-hlis/Diogo/cocoa/Cocoa' # Change for your path 
-start_point = 0
-output      = f"{cocoa_path}/chi2_vs_npcs_weighted/chi2_vs_npcs_Model{mod}_Fiducial{fid}_compute_1.txt"
 
-if os.path.exists(output):
-    if os.path.getsize(output) > 0:
-        # stop immediately
-        print(f"❌ File already exists and is not empty: {output}")
-        sys.exit(1)
-    else:
-        # do not exit — let program proceed
-        print(f"🚨 File exists but is empty, continuing: {output}")
+########################################################################
+n_so_far = 0
+start_point = 0
+name = f"chi2_vs_npcs_Model_{mod}_Fiducial_{fid}_compute"
+outdir = f"{cocoa_path}/chi2_vs_npcs_weighted"
+open(f"{outdir}/{name}_{n_so_far}.txt", "w").close()
+output = f"{outdir}/{name}_{n_so_far}.txt"
+
+# if os.path.exists(output):
+#     print(f"❌ File already exists: {output}")
+#     sys.exit(1)
 
 camb_path   = os.path.dirname(camb.__file__)
 path_model  = f"{cocoa_path}/projects/roman_real/data/{mod}"  

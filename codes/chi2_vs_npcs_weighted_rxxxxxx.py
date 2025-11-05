@@ -144,7 +144,11 @@ class SURVEY:
                 Cn = np.einsum('ij,ik->jk',ndiff,ndiff) / (ndiff.shape[0]-1) # equivalent to Cn = ndiff.T @ ndiff / sample size - 1
             else:
                 # Use Cn from all 10^6
-                Cn = np.load(f'{path}/n_nbar_ndiff_covndiff/cov_ndiff_sc1b_d4.npy') #TODO: path changed    
+                # Cn = np.load(f'{path}/n_nbar_ndiff_covndiff/cov_ndiff_sc1b_d4.npy') #TODO: path changed    
+                print("USING COVARIANCE OF REALIZATIONS:")
+                path_to_Cn = f'{cocoa_path}/cocoa_photoz/roman_nz_realizations/sc1bd4/Cn_sc1bd4.txt'
+                print(path_to_Cn)
+                Cn = np.genfromtxt(path_to_Cn) # TODO: path changed - !!!!  AUTOMATIZAR !!!!   TODO: INTEGRAR COM OUTPUTS DE PIP_1_NNORM_NBAR_NDIFF_CN.PY
                 ndiff = None # Because we can't load (414,1M) data here
         elif self.survey == 'des':
             ### nzs for DES already are normalized
@@ -464,4 +468,4 @@ def chi2_vs_npcs():
             f.write(f"{i}, {chi2_i}\n")
     return None        
 
-chi2_vs_npcs()
+# chi2_vs_npcs()

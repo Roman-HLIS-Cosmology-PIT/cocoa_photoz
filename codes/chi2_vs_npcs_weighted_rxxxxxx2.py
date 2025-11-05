@@ -73,11 +73,7 @@ print('Using CAMB %s installed at %s'%(camb.__version__,camb_path))
 possible_scenarios = ['sc1bd4','sc1bd5','sc1bd6','sc1bd7','sc2bd4','sc2bd5','sc2bd6','sc2bd7','sc3bd4','sc3bd5','sc3bd7']
 rename_scenarios = {'sc1bd4':'DRM-D1','sc1bd5':'DRM-D2','sc1bd6':'DRM-D3','sc1bd7':'DRM-D4',
                     'sc2bd4':'W-D1'  ,'sc2bd5':'W-D2'  ,'sc2bd6':'W-D3'  ,'sc2bd7':'W-D4'  ,
-                    'sc3bd4':'M-D1'  ,'sc3bd5':'W-D2'  ,'sc3bd7':'W-D4'
-                    }
-rename_scenarios2 = {'sc1bd4':'1','sc1bd5':'2','sc1bd6':'DRM-D3','sc1bd7':'DRM-D4',
-                    'sc2bd4':'W-D1'  ,'sc2bd5':'W-D2'  ,'sc2bd6':'W-D3'  ,'sc2bd7':'W-D4'  ,
-                    'sc3bd4':'M-D1'  ,'sc3bd5':'W-D2'  ,'sc3bd7':'W-D4'
+                    'sc3bd4':'M-D1'  ,'sc3bd5':'M-D2'  ,'sc3bd7':'M-D4'
                     }
 
 parser = argparse.ArgumentParser()
@@ -593,7 +589,7 @@ def projection(encoding,decoding,plot=False):
 
     return params_values
 
-def execute_end_to_end_pipeline(extra_info=False):
+def execute_end_to_end_pipeline(extra_info=True):
     if want_weights == 0:
         print("\033[31m!!-------ATTENTION--------!!\033[0m")
         print("\033[31m!!-------ATTENTION--------!!\033[0m")
@@ -630,7 +626,7 @@ def execute_end_to_end_pipeline(extra_info=False):
         print(f"\033[32m χ² FROM DROPPED MODES SAVED   @: {cocoa_path}/jacobian_outs/stencil_5pt_{sc_mod}/ssrev_{sc_mod}_weights{want_weights}.txt (BACKUP ONLY)\033[0m")
     return alphas
 
-alphas = execute_end_to_end_pipeline(extra_info=True)
+# alphas = execute_end_to_end_pipeline(extra_info=True)
 
 ##################################################################
 ##################################################################
@@ -721,7 +717,6 @@ def chi2_vs_npcs(eval):
             # CORRECT DV 
             # MEAN NZ
             # FULL PCS OR FULL RECONSTRUCTION
-
             info["likelihood"]["roman_real.roman_real_cosmic_shear"]["print_datavector"] = False
             info["likelihood"]["roman_real.roman_real_cosmic_shear"]["print_datavector_file"] = ''
             info["likelihood"]["roman_real.roman_real_cosmic_shear"]["external_nz_modeling"] = int(1)
@@ -784,7 +779,7 @@ def execute_all_steps():
         # 2: CROSS-CHECK 2
         # 3: COMPUTATION
         chi2_vs_npcs(eval=eval)
-execute_all_steps()
+# execute_all_steps()
 
 
 def compute_alpha_distribution(compute_simple=False,compute_specific=False,plot_simple=False,plot_specific=False):
@@ -893,10 +888,10 @@ def compute_alpha_distribution(compute_simple=False,compute_specific=False,plot_
         alphas_ff = np.load(f"{cocoa_path}/cocoa_photoz/roman_nz_realizations/{sc_fid}/alphas_distri_E_{sc_fid}@ndiff.T_{sc_fid}.npy")
         alphas_mf = np.load(f"{cocoa_path}/cocoa_photoz/roman_nz_realizations/{sc_mod}/alphas_distri_E_{sc_mod}@ndiff.T_{sc_fid}.npy")
         alphas_fm = np.load(f"{cocoa_path}/cocoa_photoz/roman_nz_realizations/{sc_fid}/alphas_distri_E_{sc_fid}@ndiff.T_{sc_mod}.npy")
-        alphas_partial_mm = alphas_mm[:,:100000].T
-        alphas_partial_ff = alphas_ff[:,:100000].T
-        alphas_partial_mf = alphas_mf[:,:100000].T
-        alphas_partial_fm = alphas_fm[:,:100000].T
+        alphas_partial_mm = alphas_mm[:,:1000].T
+        alphas_partial_ff = alphas_ff[:,:1000].T
+        alphas_partial_mf = alphas_mf[:,:1000].T
+        alphas_partial_fm = alphas_fm[:,:1000].T
 
         nEig=414
         names = ["projected_alpha%s" %i for i in range(nEig)]
@@ -951,10 +946,10 @@ def compute_alpha_distribution(compute_simple=False,compute_specific=False,plot_
                                 {"ls": ":" , "color": "#56B4E9",'lw':1.5}
                                 ],
                         )     
-        plt.suptitle(r"DRM-D: Encode$i$, ${\Delta}j$")
-        plt.savefig("alphas_distributions_specific.pdf")
+        # plt.suptitle(r"DRM-D: Encode$i$, ${\Delta}j$")
+        plt.savefig("alphas_distributions_mix.pdf")
     return None
-# compute_alpha_distribution(compute_simple  =False,
-#                            compute_specific=False,
-#                            plot_simple     =False,
-#                            plot_specific   =True)
+compute_alpha_distribution(compute_simple  =False,
+                           compute_specific=True,
+                           plot_simple     =False,
+                           plot_specific   =True)

@@ -65,7 +65,7 @@ print(f"The maximum chi2 found so far is {chi2_max}")
 def plot():
     plt.figure(figsize=(8, 5))
     plt.hist(chi2_values, bins='auto', alpha=0.7, edgecolor='black')
-    # plt.yscale("log")
+    plt.yscale("log")
     plt.title(f"Model: {rename[mod]}, Fiducial: {rename[fid]}", fontsize=14)
     plt.xlabel("χ²", fontsize=12)
     plt.ylabel("Frequency of extreme scenarios", fontsize=12)
@@ -74,3 +74,5 @@ def plot():
     plt.tight_layout()
     plt.savefig("test.pdf")
     return None
+
+plot()
