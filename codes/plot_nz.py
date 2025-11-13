@@ -11,8 +11,30 @@ import numpy as np
 import h5py
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter
+import matplotlib
 
-path='/gpfs/scratch/pit-roman-hlis/Diogo/cocoapy310/Cocoa/cocoa_photoz/'
+matplotlib.rcParams['mathtext.fontset'] = 'stix'
+matplotlib.rcParams['font.family'] = 'STIXGeneral'
+matplotlib.rcParams['mathtext.rm'] = 'Bitstream Vera Sans'
+matplotlib.rcParams['mathtext.it'] = 'Bitstream Vera Sans:italic'
+matplotlib.rcParams['mathtext.bf'] = 'Bitstream Vera Sans:bold'
+matplotlib.rcParams['xtick.bottom'] = True
+matplotlib.rcParams['xtick.top'] = False
+matplotlib.rcParams['ytick.right'] = False
+matplotlib.rcParams['axes.edgecolor'] = 'black'
+matplotlib.rcParams['axes.linewidth'] = '1.0'
+matplotlib.rcParams['axes.labelsize'] = 'medium'
+matplotlib.rcParams['axes.grid'] = True
+matplotlib.rcParams['grid.linewidth'] = '0.0'
+matplotlib.rcParams['grid.alpha'] = '0.18'
+matplotlib.rcParams['grid.color'] = 'lightgray'
+matplotlib.rcParams['legend.labelspacing'] = 0.77
+matplotlib.rcParams['savefig.bbox'] = 'tight'
+matplotlib.rcParams['savefig.format'] = 'pdf'
+matplotlib.rcParams['text.usetex'] = False
+matplotlib.rcParams['font.size'] = 15
+
+path='/gpfs/scratch/pit-roman-hlis/Diogo/cocoa/Cocoa/cocoa_photoz/'
 
 
 # from Readme: https://docs.google.com/document/d/1iLUo9ok0hWj75-D6QhRrpidgJe4xqB0W-1sKcQu2eJU/edit?tab=t.0 
@@ -21,20 +43,19 @@ path='/gpfs/scratch/pit-roman-hlis/Diogo/cocoapy310/Cocoa/cocoa_photoz/'
 # Scenario 2: (proposed wide layer) 5x91 s, bright sky, H band only, H<23.93
 # Scenario 3: (proposed medium layer, if placed in an Equatorial field), 5x91 s, bright sky, Y106+J129+H158, H<24.31
 
-
 # Secenarios
 scenarios = [
-'sc1b_d4','sc1b_d5','sc1b_d6','sc1b_d7',
-'sc2b_d4','sc2b_d5','sc2b_d6','sc2b_d7',
-'sc3b_d4','sc3b_d5','sc3b_d7']
+'sc1bd4','sc1bd5','sc1bd6','sc1bd7',
+'sc2bd4','sc2bd5','sc2bd6','sc2bd7',
+'sc3bd4','sc3bd5','sc3bd7']
 scenarios_label = [
-'DRM-D1','DRM-D2','DRM-D3','DRM-D4',
-'W-D1','W-D2','W-D3','W-D4',
-'M-D1','M-D2',        'M-D4']
+'M1-D1','M1-D2','M1-D3','M1-D4',
+'M2-D1','M2-D2','M2-D3','M2-D4',
+'M3-D1','M3-D2',        'M3-D4']
 
 # A thousand random integers between 1 and 1M
 np.random.seed(42)
-sims_indexes = np.random.randint(1, 10**6 + 1, size=100)
+sims_indexes = np.random.randint(1, 10**6 + 1, size=50)
 tot = len(sims_indexes)
 
 # Colors
@@ -59,7 +80,7 @@ def plot_scenarios(sc='sc1b_d4'):
 
     # Create a figure with subplots (3 rows)
     fig, axes = plt.subplots(nrows=3, ncols=4, figsize=(14, 8),
-                            sharex=True, sharey=True,
+                            sharex=False, sharey=False,
                             gridspec_kw={'wspace':0.0, 'hspace':0.0})
     axes = axes.flatten()  # flatten to easily iterate
 
@@ -69,6 +90,7 @@ def plot_scenarios(sc='sc1b_d4'):
         zr = np.array(nzr['zbinsc'])
         Nz = len(zr)
         nzmax = 0
+        nbar = np.genfromtxt(f'{path}roman_nz_realizations/{sc}/nbar_{sc}.nz')
         
         print(f'Nz: {Nz}, Scenario: {sc}, Axes: {ax}')
 
@@ -85,46 +107,32 @@ def plot_scenarios(sc='sc1b_d4'):
         if nzmax_temp > nzmax:
             nzmax = nzmax_temp
 
-        info = {'color':colors[ax],'alpha':0.05} 
+        info = {"color":colors[ax],"alpha":0.01,"lw":1} 
+
         for r in range(tot):
             [axes[ax].plot(zr,rows[r][Nz*k:Nz*(k+1)],**info,label=scl if k==0 else None) for k in range(9)]
             if r == 0:
                 axes[ax].legend(loc='upper right',fontsize=17, handlelength=0, handletextpad=0)
+        for i in range(1,9+1):
+            axes[ax].plot(zr,nbar[:,i],color=colors[ax],lw=1.5,ls="--")        
         # Hide unused subplot
         if len(axes) > len(scenarios):
             axes[len(scenarios)].axis('off')
-        # Hide tick labels on inner subplots
-        n_plots=11
-        ncols=4
-        nrows=3
-        for i in range(n_plots):
-            row = i // ncols
-            col = i % ncols
 
-            # Only bottom row gets x-axis labels
-            if row != nrows - 1:
-                axes[i].tick_params(labelbottom=False, bottom=False)
-            # Only first column gets y-axis labels
-            if col != 0:
-                axes[i].tick_params(labelleft=False, left=False)  
-            # Only bottom row: set x-axis label
-            if row == nrows - 1:
-                axes[i].set_xlabel(r'$\mathrm{z}$', fontsize=20)
-
-            # Only first column: set y-axis label
-            if col == 0:
-                axes[i].set_ylabel(r'$\mathrm{n(z)}$', fontsize=20)
-
-    plt.xlim(min(zr),max(zr))
-    plt.ylim(0,nzmax)
-    for ax in axes.flatten():
-        # Get current tick labels and set them again with larger fontsize
-        ax.set_xticklabels(ax.get_xticks(), fontsize=14)
-        ax.set_yticklabels(ax.get_yticks(), fontsize=14)
-        # ax.yaxis.set_major_formatter(FuncFormatter(lambda val, pos: f'{int(val)}'))
-        # ax.xaxis.set_major_formatter(FuncFormatter(lambda val, pos: f'{int(val)}'))
-    plt.tight_layout()    
-    plt.savefig(f'test.pdf')
+    for i in [7,8,9,10]:
+        axes[i].set_xlabel(r'$z$', fontsize=20)
+        axes[i].set_xticks([0,0.5,1,1.5,2,2.5])
+    for i in [0,4,8]:
+        axes[i].set_ylabel(r'$n(z)$', fontsize=20)
+        axes[i].set_yticks([0,1,2,3,4])
+    for i in [1,2,3,5,6,7,9,10]:
+        axes[i].set_yticks([])
+    for i in range(11):
+        axes[i].set_xlim(np.min(zr),np.max(zr))
+    for i in range(11):
+        axes[i].set_ylim(0,nzmax)
+    # plt.tight_layout()    
+    plt.savefig(f'roman_scenarios.pdf')
     # n = np.vstack(rows)
     # print('Saving n')
     # print('n.shape: ',n.shape)
@@ -143,7 +151,7 @@ def plot_scenarios(sc='sc1b_d4'):
     # # np.savetxt('ndiff_roman_sc1bd4.txt',ndiff)
     # np.save('ndiff_roman_sc1bd4.npy',ndiff)
     return None
-plot_scenarios()
+# plot_scenarios()
 
 def plot_ndiff():
     nzr = f'{path}roman_nz_realizations/sc1b_d4/nz_samples_LHC0_pointZ_1e6_Roman_sc1b_d4.h5'
@@ -174,21 +182,156 @@ def plot_ndiff():
 
 # plot_ndiff()
 
-def distribution_violinplot():
-    plt.figure()
-    
-    nzs = f'{path}roman_nz_realizations/sc1b_d4/nz_samples_LHC0_pointZ_1e6_Roman_sc1b_d4.h5'
-    nzs = h5py.File(nzs,'r') 
-    zbins = np.array(nzs['zbinsc'])
-    nzs = np.stack([nzs[f'bin0'][:100,:]], axis=1)
+def distribution_violinplot(sc='sc1bd4'):
+    #####
+    fig, axes = plt.subplots(nrows=3, ncols=9, figsize=(14, 5),
+                        sharex=False, sharey=True,
+                        gridspec_kw={'wspace':0.0, 'hspace':0.0})
 
-    plt.violinplot(nzs[:,0],positions=zbins,
-                   widths=0.1, showmeans=True,
-                   showmedians=True, showextrema=True)
-    plt.xlabel(r'$\mathrm{z}$',fontsize=18)
-    plt.ylabel(r'$\text{Distribution of } n^{tomo=1}(z)$',fontsize=18)
+    Nsim=5000
+    indices=[8,13,17,19,22,25,29,32,37]
+    slices = [(0,4),(4,8),(8,11)]
+
+    temp=0
+    for row,s in enumerate(slices): 
+        left,right = s[0],s[1]
+        for i,sc in enumerate(scenarios[left:right]):
+            print(sc)
+            nzsf = f'{path}roman_nz_realizations/{sc}/nz_samples_LHC0_pointZ_1e6_Roman_{sc}.h5'
+            nbar = np.genfromtxt(f'{path}roman_nz_realizations/{sc}/nbar_{sc}.nz')
+            nzs = h5py.File(nzsf,'r') 
+            zbins = np.array(nzs['zbinsc'])
+            for t,ind in enumerate(indices):
+                arr = nzs[f'bin{t}'][:Nsim, :]
+                arr_norm = arr / np.trapz(arr, x=zbins, axis=1)[:, None]
+                nzs_t = np.stack([arr_norm], axis=1)
+                zbar = np.trapz(y=nbar[:,0][:,None]*nbar[:,1:],x=nbar[:,0],axis=0)/\
+                    np.trapz(y=nbar[:,1:],x=nbar[:,0],axis=0)
+
+                vp=axes[row,t].violinplot(dataset=nzs_t[:,0][:,ind],positions=[zbins[ind]],
+                            widths=0.1, showmeans=False,
+                            showmedians=False, showextrema=False)
+
+                for body in vp['bodies']:
+                    body.set_facecolor('none')
+                    body.set_edgecolor(colors[i+temp])     
+                    body.set_linewidth(1)
+                    body.set_alpha(1)     
+        temp+=4
+    #####    
+
+    # plt.scatter(np.full_like(nzs[:,0][:,8], zbins[8]),nzs[:,0][:,8], marker='o', linestyle='None',s=4)
+    axes[1,0].set_ylabel(r'$\text{Distribution}$',fontsize=18)
+    axes[2,4].set_xlabel(r'$\mathrm{arg\,min}_{z_i} \, |z_i - \bar{z}|$', fontsize=18)
     plt.tight_layout()   
     plt.savefig('test.pdf')
     return None
 
 # distribution_violinplot()
+
+def nz_Delta_LensingEfficiencyKernel():
+
+    import camb.constants
+    from scipy.interpolate import interp1d
+    from scipy.integrate import quad
+
+    pars = camb.CAMBparams()
+    pars.set_cosmology(H0=67.5, ombh2=0.022, omch2=0.122)
+    results = camb.get_background(pars)
+    nbar = np.loadtxt("cocoa_photoz/roman_nz_realizations/sc1bd4/nbar_sc1bd4.nz")
+
+    z_tab = nbar[:,0]
+    const_factor = 3 * 0.5 * pars.H0**2 * pars.omegam / (camb.constants.c*1e-3)**2
+
+    def Wi(z_tab,nzi_tab):
+        """
+        z_tab: tabulated redshifts
+        nzi_tab: tabulated redshift distribution at bin i
+        """
+        chi = results.comoving_radial_distance(z_tab)
+
+        dchidz = np.gradient(chi,z_tab)
+
+        int_Wi_1 = nzi_tab * dchidz
+        int_Wi_2 = nzi_tab * dchidz / chi
+        int_Wi_1_interp = interp1d(z_tab, int_Wi_1)
+        int_Wi_2_interp = interp1d(z_tab, int_Wi_2)
+        pre_fac = chi*(1+z_tab)
+        pre_fac_interp = interp1d(z_tab, pre_fac, kind='cubic', bounds_error=False, fill_value='extrapolate')
+
+        Wi_1 = lambda z: quad(int_Wi_1_interp, z, z_tab[-1])[0]
+        Wi_2 = lambda z: quad(int_Wi_2_interp, z, z_tab[-1])[0]
+        Wi_temp = lambda z: const_factor*pre_fac_interp(z)*(Wi_1(z) - results.comoving_radial_distance(z)*Wi_2(z))
+        return np.array([Wi_temp(zi) for zi in z_tab],dtype=np.float64)
+
+    for i in range(1,10):
+        plt.plot(z_tab,Wi(z_tab,nbar[:,i]))
+
+    sc = 'sc1bd4'
+    cocoa_path = '/gpfs/scratch/pit-roman-hlis/Diogo/cocoa/Cocoa' # Change for your path 
+    nz = h5py.File(f'{cocoa_path}/cocoa_photoz/roman_nz_realizations/{sc}/nz_samples_LHC0_pointZ_1e6_Roman_{sc}.h5','r')
+    nz_mean = np.genfromtxt(f'{cocoa_path}/cocoa_photoz/roman_nz_realizations/{sc}/nbar_sc1bd4.nz')
+    z  = np.array(nz['zbinsc'])
+    Nt = 9
+    Nz = 46
+    nz_tomos=[]
+    Nsim = 100
+    for r in range(Nsim):
+        nz_tomos.append([np.column_stack(nz[f'bin{i}'][r]/np.trapz(y=nz[f'bin{i}'][r],x=z))[0] for i in range(9)])
+
+    nz_tomos=np.array(nz_tomos) # shape (Nsim,Nt,Nz)
+    nz_tomos=np.transpose(nz_tomos, (0, 2, 1)) # shape (Nsim,Nz,Nt)
+    print(nz_tomos.shape)
+    print(nz_tomos[0,:,0].shape)
+
+    # plt.figure()
+    # fig = plt.subplots(nrows=2, ncols=2, sharex=True, sharey=False,figsize=(8,3),
+    #                         gridspec_kw={'wspace':0.2, 'hspace':0.0,'height_ratios': [2, 1]})
+
+    fig = plt.figure(figsize=(8, 6))
+
+    gs = fig.add_gridspec(2, 2, wspace=0.4, hspace=0.3)
+
+    # Left column: two separate subplots
+    axes1 = fig.add_subplot(gs[0, :])  # top-left
+    axes2 = fig.add_subplot(gs[1, 0])  # bottom-left
+    axes3 = fig.add_subplot(gs[1, 1])  # all rows, column 1
+
+    for t in range(Nt):
+        print('bin:',t)
+        for s in range(Nsim):
+            print(s,end=',')
+            axes1.plot(z,nz_tomos[s,:,t],c='#1b5f6f',alpha=.03)
+            axes3.plot(z,Wi(z,nz_tomos[s,:,t]),c='#1b5f6f',alpha=.03)
+
+    for i in range(9): 
+        axes1.plot(z,nz_mean[:,i+1],c='#1b5f6f',ls='--')
+
+    for r in range(Nsim):
+        for i in range(9):
+            axes2.plot(z,nz_tomos[r,:,i]-nz_mean[:,i+1],c='gray',alpha=.03)
+
+
+    axes1.set_ylabel(r'$\bar{\mathbf{n}}$', labelpad=1)
+    axes2.set_ylabel(r'${\mathbf{\Delta}}$', labelpad=1)
+    axes3.set_ylabel(r'$W_i$', labelpad=1)
+    axes1.set_xlabel(r'$z$')
+    axes2.set_xlabel(r'$z$')
+    axes3.set_xlabel(r'$z$')
+    axes1.set_yticks([1,2,3]);
+    axes1.set_xticks([0.0, 0.5, 1.0, 1.5, 2.0]);
+    axes2.set_xticks([0.0, 0.5, 1.0, 1.5, 2.0]);
+    axes3.set_xticks([0.0, 0.5, 1.0, 1.5, 2.0]);
+    axes1.set_xlim(np.min(z),np.max(z));
+    axes2.set_xlim(np.min(z),np.max(z));
+    axes2.set_xlim(np.min(z),np.max(z));
+    axes1.set_ylim(0,np.max(nz_mean))
+    axes2.set_ylim(-1,+1)
+    axes2.set_yticks([-1,-0.5, 0,0.5,1])
+    # fig.align_ylabels(axes1)
+    # axes[1,0].grid(False)
+    plt.tight_layout()
+    plt.savefig('redshift_delta_sc1bd4_v2.pdf');    
+    return None
+
+# nz_Delta_LensingEfficiencyKernel()

@@ -273,24 +273,20 @@ def get_inline_latex_lcdm():
     combined_indx = list(range(81,81+NPCs+1)) + \
                     list(range(102,102+NPCs+1)) + \
                     list(range(123,123+NPCs+1))
-    baseline  = [22,23,24]
+    baseline  = [22,23,24] 
+    baseline_extended  = [22,23,24,  # Prior: 0.003
+                          25,26,27,  # Prior: 0.01
+                        #   28,29,30 # Prior: 0.1
+                          ]  
 
     chains = [] 
     chains_baseline = [] 
     label = ''
     pattern = r"=\s*([\d.]+)\^\{\+([\d.]+)\}_\{\-([\d.]+)\}"
 
-    fig = plt.figure(figsize=(10, 4), constrained_layout=True)
-    gs = fig.add_gridspec(2, 2, wspace=0.0, hspace=0.0, width_ratios=[3,1])
-
-    # Left column axes (share y)
-    axes00 = fig.add_subplot(gs[0,0])
-    axes10 = fig.add_subplot(gs[1,0],sharex=axes00)  # shares y with top-left
-
-    # Right column axes (share y)
-    axes01 = fig.add_subplot(gs[0,1],sharey=axes00)
-    axes11 = fig.add_subplot(gs[1,1],sharey=axes10)  # shares y with top-right
-
+    ###################
+    ### LOAD CHAINS ###
+    ###################
     for i in combined_indx:
         samples = loadMCSamples(f"{chains_w_path}{i}", settings=settings)
         sigma8,omegam = samples["sigma8"],samples["omegam"]
@@ -298,36 +294,40 @@ def get_inline_latex_lcdm():
         samples.addDerived(S8,name="S8",label="S_8")
         chains.append(samples) 
 
-    for i in baseline:
+    for i in baseline_extended:
         samples = loadMCSamples(f"{chain_baseline}{i}", settings=settings)
         sigma8,omegam = samples["sigma8"],samples["omegam"]
         S8 = sigma8*np.sqrt(omegam/0.3)
         samples.addDerived(S8,name="S8",label="S_8")
         chains_baseline.append(samples) 
 
-    omegams = []
-    S8s = []
-    # PCs
+    ######################
+    ### PCA 95% ERRORS ###
+    ######################
+    omegams_pca = []
+    S8s_pca = []
     for ch in chains:
         omegam_stats = ch.getInlineLatex("omegam", limit=2)
         S8_stats = ch.getInlineLatex("S8", limit=2)
         match1 = re.search(pattern, omegam_stats)
         match2 = re.search(pattern, S8_stats)
-        print("PCs:",omegam_stats,S8_stats)                    
+        print("PCs:",omegam_stats,S8_stats)  
         if match1:
             central = float(match1.group(1))
             upper = float(match1.group(2))
             lower = -float(match1.group(3))  # make it negative explicitly
-            omegams.append([central,lower,upper])
+            omegams_pca.append([central,lower,upper])
         if match2:
             central = float(match2.group(1))
             upper = float(match2.group(2))
             lower = -float(match2.group(3))  # make it negative explicitly
-            S8s.append([central,lower,upper])
+            S8s_pca.append([central,lower,upper])
 
-    ## Baseline (Shift)
-    omegams_shift = []
-    S8s_shift = []
+    ###################################
+    ### BASELINE (SHIFT) 95% ERRORS ###
+    ###################################
+    omegams_baseline = []
+    S8s_baseline = []
     for ch in chains_baseline:
         omegam_stats = ch.getInlineLatex("omegam", limit=2)
         S8_stats = ch.getInlineLatex("S8", limit=2)
@@ -338,18 +338,34 @@ def get_inline_latex_lcdm():
             central = float(match1.group(1))
             upper = float(match1.group(2))
             lower = -float(match1.group(3))  # make it negative explicitly
-            omegams_shift.append([central,lower,upper])
+            omegams_baseline.append([central,lower,upper])
         if match2:
             central = float(match2.group(1))
             upper = float(match2.group(2))
             lower = -float(match2.group(3))  # make it negative explicitly
-            S8s_shift.append([central,lower,upper])
+            S8s_baseline.append([central,lower,upper])
     
-    print("omegams_shift:",omegams_shift)
-    print("S8s_shift:",S8s_shift)
+    print("omegams_pca:",omegams_pca)
+    print("S8s_pca:",S8s_pca)
+    print("omegams_baseline:",omegams_baseline)
+    print("S8s_baseline:",S8s_baseline)
     
     omegam_fid = 0.3
     S8_fid = 0.8277*(0.3/0.3)**0.5
+
+    ############
+    ### PLOT ###
+    ############
+    fig = plt.figure(figsize=(10, 4), constrained_layout=True)
+    gs = fig.add_gridspec(2, 2, wspace=0.0, hspace=0.0, width_ratios=[3,1])
+
+    # Left column axes (share y)
+    axes00 = fig.add_subplot(gs[0,0])
+    axes10 = fig.add_subplot(gs[1,0],sharex=axes00)  # shares y with top-left
+
+    # Right column axes (share y)
+    axes01 = fig.add_subplot(gs[0,1],sharey=axes00)
+    axes11 = fig.add_subplot(gs[1,1],sharey=axes10)  # shares y with top-right
 
     axes00.axhline(y=omegam_fid, color='gray', linestyle='--', linewidth=1.2)
     axes10.axhline(y=S8_fid, color='gray', linestyle='--', linewidth=1.2)
@@ -364,9 +380,9 @@ def get_inline_latex_lcdm():
            ["^"]*(NPCs+1)+\
            ["s"]*(NPCs+1)
     
-    shift = [-.1]*(NPCs+1)+\
-            [0]*(NPCs+1)+\
-            [.1]*(NPCs+1)
+    dx = [-.1]*(NPCs+1)+\
+         [0]*(NPCs+1)+\
+         [.1]*(NPCs+1)
 
     cases = list(range(len(combined_indx)))
     npcs = list(range(NPCs+1))
@@ -375,32 +391,52 @@ def get_inline_latex_lcdm():
     for p in pairs:
         npc = p[0]
         case = p[1]
-        axes00.errorbar(x=npc+shift[case], y=omegams[case][0], yerr=[[abs(omegams[case][1])], [omegams[case][2]]],
+        axes00.errorbar(x=npc+dx[case], y=omegams_pca[case][0], yerr=[[abs(omegams_pca[case][1])], [omegams_pca[case][2]]],
                         fmt=fmts[case], capsize=4, color=ecolors[case],ecolor=ecolors[case], elinewidth=1.2)
-        axes10.errorbar(x=npc+shift[case], y=S8s[case][0], yerr=[[abs(S8s[case][1])], [S8s[case][2]]],
+        axes10.errorbar(x=npc+dx[case], y=S8s_pca[case][0], yerr=[[abs(S8s_pca[case][1])], [S8s_pca[case][2]]],
                         fmt=fmts[case], capsize=4, color=ecolors[case], ecolor=ecolors[case], elinewidth=1.2)
     
-    ecolors = ["#1b5f6f","#E69F00","#882255"]
-    fmts = ["o","^","s"]
-    shift = [-.01,0,.01]
-    for case in [0,1,2]:
-        axes01.errorbar(x=shift[case], y=omegams_shift[case][0], yerr=[[abs(omegams_shift[case][1])], [omegams_shift[case][2]]],
-                    fmt=fmts[case], capsize=4, color=ecolors[case],ecolor=ecolors[case], elinewidth=1.2)
-        axes11.errorbar(x=shift[case], y=S8s_shift[case][0], yerr=[[abs(S8s_shift[case][1])], [S8s_shift[case][2]]],
-                    fmt=fmts[case], capsize=4, color=ecolors[case],ecolor=ecolors[case], elinewidth=1.2)
+    ecolors = ["#1b5f6f","#E69F00","#882255", # Prior 0.003  
+               "#1b5f6f","#E69F00","#882255", # Prior 0.01  
+               ]
+    mfcs = ["#1b5f6f","#E69F00","#882255", # Prior 0.003  
+             "none","none","none",         # Prior 0.01  
+               ]
+    fmts = ["o","^","s", # Prior 0.003  
+            "o","^","s", # Prior 0.01  
+            ]
+    dx = [-0.01,0.00,0.01,    # Prior 0.003  
+          -0.008,0.002,0.012  # Prior 0.01  
+          ]
+    for case in [0,1,2, 
+                 3,4,5, 
+                 ]:
+        axes01.errorbar(x=dx[case], y=omegams_baseline[case][0], yerr=[[abs(omegams_baseline[case][1])], [omegams_baseline[case][2]]],
+                    fmt=fmts[case], capsize=4, color=ecolors[case],ecolor=ecolors[case],mfc=mfcs[case], elinewidth=1.2)
+        axes11.errorbar(x=dx[case], y=S8s_baseline[case][0], yerr=[[abs(S8s_baseline[case][1])], [S8s_baseline[case][2]]],
+                    fmt=fmts[case], capsize=4, color=ecolors[case],ecolor=ecolors[case],mfc=mfcs[case], elinewidth=1.2)
     
-    print(omegams)
-    print(S8s)
+    print(omegams_pca)
+    print(S8s_pca)
+    
     axes00.set_ylabel(r"$\Omega_m$")
     axes10.set_ylabel(r"$S_8$")
     axes10.set_xlabel(r"# of PCs")
     axes01.set_title(r"Shift $\Delta_z^i$")
     axes10.set_xticks([0, 1, 2, 3, 4, 5])
     axes10.set_xlim(-0.2,5.2)
+    axes11.set_xlabel(r"Prior")
+    axes11.set_xticks(list(np.sort(dx)))
+    axes11.set_xticklabels(['a', 'b']*3)
     axes00.xaxis.set_visible(False)
-    for ax in [axes01, axes11]:
+    # for ax in [axes01, axes11]:
+    #     ax.yaxis.set_visible(False)
+    #     ax.xaxis.set_visible(False)    
+    for ax in [axes01]:
         ax.yaxis.set_visible(False)
-        ax.xaxis.set_visible(False)    
+        ax.xaxis.set_visible(False)
+    for ax in [axes11]:
+        ax.yaxis.set_visible(False)    
 
     # Legend for marker types
     from matplotlib.lines import Line2D
@@ -422,8 +458,326 @@ def get_inline_latex_lcdm():
     )
 
     fig_name="mitigation_least_intermediate_most_extreme.pdf"
-    plt.savefig(fig_name) # Paper Figure 12 
+    plt.savefig(fig_name) # Paper Figure 11 
     print(fig_name)
+    return None
+
+def bias_error_mitigation_lcdm(submit_bias=False,want_plot=True,submit_errors=False):
+    """
+    submit_bias: submit job in case you don't have the file samps_stats.txt
+    want_plot: if you have the file, then you likely want to make the plot, otherwise, not. 
+    (Likely need to run twice if the file doesn't exist.)
+    submit_errors: if true, plot 0.5sigma errors (see arxiv 1809.01146 Figure 11) 
+    """
+    print(f"EXECUTING bias_error_mitigation_lcdm @ LINE {inspect.currentframe().f_lineno}")
+    NPCs = 5
+    combined_indx = list(range(81,81+NPCs+1)) + \
+                    list(range(102,102+NPCs+1)) + \
+                    list(range(123,123+NPCs+1))
+
+                         # least, intermediate, most - extreme
+    baseline_extended  = [22,23,24,  # Prior: 0.003
+                          25,26,27,  # Prior: 0.01
+                          ]  
+
+    #######################################################
+    #### IF THE FILE DON'T EXIST, UNCOMMENT AND SUBMIT ####
+    #######################################################
+    if submit_bias:
+        print("PCA STARTS")
+        for i in combined_indx:
+            samples = loadMCSamples(f"{chains_w_path}{i}", settings=settings)
+            samps_stats = samples.getLikeStats()
+
+            print(f"sample {i}")
+            print(samps_stats)
+        print("PCA ENDS")
+
+        print("BASELINE STARTS")
+        for i in baseline_extended:
+            samples_base = loadMCSamples(f"{chain_baseline}{i}", settings=settings)
+            samps_stats_base = samples_base.getLikeStats()
+
+            print(f"sample {i}")
+            print(samps_stats_base)
+        print("BASELINE ENDS")
+        print('DONE ALL - PCA AND BASELINE')    
+    #######################################################
+    #### IF THE FILE DON'T EXIST, UNCOMMENT AND SUBMIT #### 
+    #######################################################  
+    sigma_stas=2
+    if submit_errors:
+        print("PCA AND BASELINE 0.5*SIGMA ERRORS - STARTS")
+        """include_errors: if true, plot 0.5sigma errors (see arxiv 1809.01146 Figure 11) """
+        chains=[]
+        chains_baseline=[]
+        pattern_asymmetric = r"=\s*([\d.]+)\^\{\+([\d.]+)\}_\{\-([\d.]+)\}"
+        pattern_symmetric = r"(?:\\pm|±)\s*([\d.]+)"
+        ###################
+        ### LOAD CHAINS ###
+        ###################
+        for i in combined_indx:
+            samples = loadMCSamples(f"{chains_w_path}{i}", settings=settings)
+            sigma8,omegam = samples["sigma8"],samples["omegam"]
+            S8 = sigma8*np.sqrt(omegam/0.3)
+            samples.addDerived(S8,name="S8",label="S_8")
+            chains.append(samples) 
+
+        for i in baseline_extended:
+            samples = loadMCSamples(f"{chain_baseline}{i}", settings=settings)
+            sigma8,omegam = samples["sigma8"],samples["omegam"]
+            S8 = sigma8*np.sqrt(omegam/0.3)
+            samples.addDerived(S8,name="S8",label="S_8")
+            chains_baseline.append(samples) 
+
+        ######################
+        ### PCA 95% ERRORS ###
+        ######################
+        omegams_pca_errors = []
+        S8s_pca_errors = []
+        for ch in chains:
+            omegam_stats = ch.getInlineLatex("omegam", limit=sigma_stas)
+            S8_stats = ch.getInlineLatex("S8", limit=sigma_stas)
+            match1_asy = re.search(pattern_asymmetric, omegam_stats)
+            match2_asy = re.search(pattern_asymmetric, S8_stats)
+            match1_sy = re.search(pattern_symmetric, omegam_stats)
+            match2_sy = re.search(pattern_symmetric, S8_stats)
+            print("PCs:",omegam_stats,S8_stats)    
+            # ASSYMETRIC OR SYMMETRIC ERRORS - OMEGA       
+            if match1_asy is not None:
+                upper, lower = float(match1_asy.group(2)), float(match1_asy.group(3))  
+                half_sigma = (upper+lower)*0.5
+                omegams_pca_errors.append(half_sigma)
+                print('0.5sigma omega [asy]: ', half_sigma)
+            if match1_sy is not None:
+                print("match1_sy:",match1_sy)
+                upper = float(match1_sy.group(1))
+                omegams_pca_errors.append(upper)
+                print('0.5sigma omega [sy]: ', upper)
+            # ASSYMETRIC OR SYMMETRIC ERRORS - S8       
+            if match2_asy is not None:
+                upper, lower = float(match2_asy.group(2)), float(match2_asy.group(3)) 
+                half_sigma = (upper+lower)*0.5
+                S8s_pca_errors.append(half_sigma)
+                print('0.5sigma S8 [asy]: ', half_sigma)
+            if match2_sy is not None:
+                print("match2_sy:",match2_sy)
+                upper = float(match2_sy.group(1))
+                S8s_pca_errors.append(upper)
+                print('0.5sigma S8 [sy]: ', upper)
+        print("pca omegam errors (0.5sigma): ", omegams_pca_errors)        
+        print("pca S8 errors (0.5sigma): ", S8s_pca_errors)        
+        print("PCA ENDS")
+        ###################################
+        ### BASELINE (SHIFT) 95% ERRORS ###
+        ###################################
+        omegams_baseline_errors = []
+        S8s_baseline_errors = []
+        for ch in chains_baseline:
+            omegam_stats = ch.getInlineLatex("omegam", limit=sigma_stas)
+            S8_stats = ch.getInlineLatex("S8", limit=sigma_stas)
+            match1_asy = re.search(pattern_asymmetric, omegam_stats)
+            match2_asy = re.search(pattern_asymmetric, S8_stats)
+            match1_sy = re.search(pattern_symmetric, omegam_stats)
+            match2_sy = re.search(pattern_symmetric, S8_stats)
+            print("Baseline",omegam_stats,S8_stats)  
+            # ASSYMETRIC OR SYMMETRIC ERRORS - OMEGA                  
+            if match1_asy is not None:
+                upper, lower = float(match1_asy.group(2)), float(match1_asy.group(3)) 
+                half_sigma = (upper+lower)*0.5
+                omegams_baseline_errors.append(half_sigma)
+            if match1_sy is not None:
+                upper = float(match1_sy.group(1))
+                omegams_baseline_errors.append(upper)
+            # ASSYMETRIC OR SYMMETRIC ERRORS - S8                  
+            if match2_asy is not None:
+                upper, lower = float(match2_asy.group(2)), float(match2_asy.group(3))
+                half_sigma = (upper+lower)*0.5
+                S8s_baseline_errors.append(half_sigma)
+            if match2_sy is not None:
+                upper = float(match2_sy.group(1))
+                S8s_baseline_errors.append(upper)
+
+        print("baseline omegam errors (0.5sigma): ", omegams_baseline_errors)        
+        print("baseline S8 errors (0.5sigma): ", S8s_baseline_errors)  
+        print("BASELINE ENDS")
+        print("PCA AND BASELINE 0.5*SIGMA ERRORS - ENDS")
+    if want_plot:
+
+        # Fiducial values
+        omegam_fid = 0.3
+        S8_fid = 0.8277*(0.3/0.3)**0.5
+
+        # Empty list for bias
+        omegams_pca_bias = []
+        S8s_pca_bias = []
+
+        ############################
+        ### LOAD BEST FIT VALUES ###
+        ############################
+        with open("/gpfs/scratch/pit-roman-hlis/Diogo/cocoa/Cocoa/samps_stats_bestfit.txt","r") as f:
+            lines = f.readlines()  
+        for line in lines:
+            if re.match(r'^omegam\b', line):
+                parts = line.split()
+                omegam_bestfit = float(parts[1])
+                omegams_pca_bias.append(abs(omegam_fid-omegam_bestfit))  
+            if re.match(r'^sigma8*\b', line):
+                # JUST BECAUSE omegam COME FIRST!
+                parts = line.split()
+                sigma8_bestfit = float(parts[1])
+                S8_bestfit = sigma8_bestfit*np.sqrt(omegam_bestfit/0.3)
+                S8s_pca_bias.append(abs(S8_fid-S8_bestfit))  
+
+        #################################
+        ### LOAD BEST 0.5SIGMA ERRORS ###
+        #################################
+        import ast
+        print(f"USING {sigma_stas} SIGMAS")
+        with open(f"/gpfs/scratch/pit-roman-hlis/Diogo/cocoa/Cocoa/samps_stats_0.5_{sigma_stas}sigma_erros.txt","r") as f:
+            lines = f.readlines()  
+        for line in lines:
+            # PCA
+            if line.startswith("pca omegam errors (0.5sigma):"):
+                _, list_str = line.split(":", 1)
+                omegams_pca_errors = ast.literal_eval(list_str.strip())
+            if line.startswith("pca S8 errors (0.5sigma):"):
+                _, list_str = line.split(":", 1)
+                S8s_pca_errors = ast.literal_eval(list_str.strip())
+            # BASELINE
+            if line.startswith("baseline omegam errors (0.5sigma):"):
+                _, list_str = line.split(":", 1)
+                omegams_baseline_errors = ast.literal_eval(list_str.strip())
+            if line.startswith("baseline S8 errors (0.5sigma):"):
+                _, list_str = line.split(":", 1)
+                S8s_baseline_errors = ast.literal_eval(list_str.strip())
+
+        ############
+        ### PLOT ###
+        ############
+        fig = plt.figure(figsize=(10, 4), constrained_layout=True)
+        gs = fig.add_gridspec(2, 2, wspace=0.0, hspace=0.0, width_ratios=[3,1])
+
+        # Left column axes (share y)
+        axes00 = fig.add_subplot(gs[0,0])
+        axes10 = fig.add_subplot(gs[1,0],sharex=axes00)  # shares y with top-left
+
+        # Right column axes (share y)
+        axes01 = fig.add_subplot(gs[0,1],sharey=axes00)
+        axes11 = fig.add_subplot(gs[1,1],sharey=axes10,sharex=axes01)  # shares y with top-right
+
+        colors = ["#1b5f6f","#E69F00","#882255"]
+        fmts = ["o","^","s"]
+        labels=['Least Extreme', 'Intermediate', 'Most Extreme']
+
+        ################
+        ### PCA BIAS ###
+        ################
+        for k in [0,1,2]:
+            axes00.plot(list(range(len(omegams_pca_bias[6*k:6*(k+1)]))),omegams_pca_bias[6*k:6*(k+1)],
+                    color=colors[k], marker=fmts[k], label=labels[k])
+        for k in [0,1,2]:
+            axes10.plot(list(range(len(S8s_pca_bias[6*k:6*(k+1)]))),S8s_pca_bias[6*k:6*(k+1)],
+                    color=colors[k], marker=fmts[k], label=labels[k])
+        ##################
+        ### PCA ERRORS ###
+        ##################
+        print("omegams_pca_errors: ",omegams_pca_errors)
+        print("S8s_pca_errors: ",S8s_pca_errors)
+        for k in [0,1,2]:
+            axes00.plot(list(range(len(omegams_pca_errors[6*k:6*(k+1)]))),omegams_pca_errors[6*k:6*(k+1)],
+                    color=colors[k], marker=fmts[k], label=labels[k],ls="--",alpha=0.5)
+        for k in [0,1,2]:
+            axes10.plot(list(range(len(S8s_pca_errors[6*k:6*(k+1)]))),S8s_pca_errors[6*k:6*(k+1)],
+                    color=colors[k], marker=fmts[k], label=labels[k],ls="--",alpha=0.5)
+        
+        #############################
+        ### BASELINE (SHIFT) BIAS ###
+        #############################
+        # Baseline values is on the same list as pca.
+        # Lines
+        axes01.plot([0,1],[omegams_pca_bias[18],omegams_pca_bias[21]],color=colors[0]) # Least extreme 0.003 & 0.01
+        axes01.plot([0,1],[omegams_pca_bias[19],omegams_pca_bias[22]],color=colors[1]) # Intermediate  0.003 & 0.01
+        axes01.plot([0,1],[omegams_pca_bias[20],omegams_pca_bias[23]],color=colors[2]) # Most extreme  0.003 & 0.01
+        axes11.plot([0,1],[S8s_pca_bias[18],S8s_pca_bias[21]]        ,color=colors[0]) # Least extreme 0.003 & 0.01
+        axes11.plot([0,1],[S8s_pca_bias[19],S8s_pca_bias[22]]        ,color=colors[1]) # Intermediate  0.003 & 0.01
+        axes11.plot([0,1],[S8s_pca_bias[20],S8s_pca_bias[23]]        ,color=colors[2]) # Most extreme  0.003 & 0.01
+        # Dots
+        axes01.scatter([0,1],[omegams_pca_bias[18],omegams_pca_bias[21]],color=[colors[0],colors[0]],marker=fmts[0],facecolors=[colors[0],'none']) # Least extreme 0.003 & 0.01
+        axes01.scatter([0,1],[omegams_pca_bias[19],omegams_pca_bias[22]],color=[colors[1],colors[1]],marker=fmts[1],facecolors=[colors[1],'none']) # Intermediate  0.003 & 0.01
+        axes01.scatter([0,1],[omegams_pca_bias[20],omegams_pca_bias[23]],color=[colors[2],colors[2]],marker=fmts[2],facecolors=[colors[2],'none']) # Most extreme  0.003 & 0.01
+        axes11.scatter([0,1],[S8s_pca_bias[18],S8s_pca_bias[21]]        ,color=[colors[0],colors[0]],marker=fmts[0],facecolors=[colors[0],'none']) # Least extreme 0.003 & 0.01
+        axes11.scatter([0,1],[S8s_pca_bias[19],S8s_pca_bias[22]]        ,color=[colors[1],colors[1]],marker=fmts[1],facecolors=[colors[1],'none']) # Intermediate  0.003 & 0.01
+        axes11.scatter([0,1],[S8s_pca_bias[20],S8s_pca_bias[23]]        ,color=[colors[2],colors[2]],marker=fmts[2],facecolors=[colors[2],'none']) # Most extreme  0.003 & 0.01
+
+        ###############################
+        ### BASELINE (SHIFT) ERRORS ###
+        ###############################
+        # Baseline values is on the same list as pca.
+        # Lines
+        axes01.plot([0,1],[omegams_pca_errors[0],omegams_pca_errors[3]],color=colors[0],ls="--",alpha=0.5) # Least extreme 0.003 & 0.01
+        axes01.plot([0,1],[omegams_pca_errors[1],omegams_pca_errors[4]],color=colors[1],ls="--",alpha=0.5) # Intermediate  0.003 & 0.01
+        axes01.plot([0,1],[omegams_pca_errors[2],omegams_pca_errors[5]],color=colors[2],ls="--",alpha=0.5) # Most extreme  0.003 & 0.01
+        axes11.plot([0,1],[S8s_pca_errors[0],S8s_pca_errors[3]]        ,color=colors[0],ls="--",alpha=0.5) # Least extreme 0.003 & 0.01
+        axes11.plot([0,1],[S8s_pca_errors[1],S8s_pca_errors[4]]        ,color=colors[1],ls="--",alpha=0.5) # Intermediate  0.003 & 0.01
+        axes11.plot([0,1],[S8s_pca_errors[2],S8s_pca_errors[5]]        ,color=colors[2],ls="--",alpha=0.5) # Most extreme  0.003 & 0.01
+        # Dots
+        axes01.scatter([0,1],[omegams_pca_errors[0],omegams_pca_errors[3]],color=[colors[0],colors[0]],marker=fmts[0],facecolors=[colors[0],'none'],alpha=0.5) # Least extreme 0.003 & 0.01
+        axes01.scatter([0,1],[omegams_pca_errors[1],omegams_pca_errors[4]],color=[colors[1],colors[1]],marker=fmts[1],facecolors=[colors[1],'none'],alpha=0.5) # Intermediate  0.003 & 0.01
+        axes01.scatter([0,1],[omegams_pca_errors[2],omegams_pca_errors[5]],color=[colors[2],colors[2]],marker=fmts[2],facecolors=[colors[2],'none'],alpha=0.5) # Most extreme  0.003 & 0.01
+        axes11.scatter([0,1],[S8s_pca_errors[0],S8s_pca_errors[3]]        ,color=[colors[0],colors[0]],marker=fmts[0],facecolors=[colors[0],'none'],alpha=0.5) # Least extreme 0.003 & 0.01
+        axes11.scatter([0,1],[S8s_pca_errors[1],S8s_pca_errors[4]]        ,color=[colors[1],colors[1]],marker=fmts[1],facecolors=[colors[1],'none'],alpha=0.5) # Intermediate  0.003 & 0.01
+        axes11.scatter([0,1],[S8s_pca_errors[2],S8s_pca_errors[5]]        ,color=[colors[2],colors[2]],marker=fmts[2],facecolors=[colors[2],'none'],alpha=0.5) # Most extreme  0.003 & 0.01
+
+        # Axes labels 
+        axes00.set_ylabel(r"$\Omega_m$ bias, error")
+        axes10.set_ylabel(r"$S_8$ bias, error")
+        axes10.set_xlabel(r"# of PCs")
+        axes10.set_xticks([0, 1, 2, 3, 4, 5])
+        axes10.set_xlim(-0.2,5.2)
+        axes01.set_title(r"Shift $\Delta_z^i$")
+        axes11.set_xlabel(r"Prior")
+        axes11.set_xticks([0, 1])
+        axes11.set_xticklabels(['a', 'b'])
+        axes00.xaxis.set_visible(False)
+        for ax in [axes01]:
+            ax.yaxis.set_visible(False)
+            ax.xaxis.set_visible(False)
+        for ax in [axes11]:
+            ax.yaxis.set_visible(False)
+
+        # Legend for marker types
+        from matplotlib.lines import Line2D
+        marker_labels = {'o': 'Least Extreme', '^': 'Intermediate', 's': 'Most Extreme'}
+        colors = ["#1b5f6f", "#E69F00", "#882255"]
+
+        legend_handles = [
+        Line2D([0], [0], marker=m, color=c, linestyle='None', markersize=8, label=l)
+        for (m, l), c in zip(marker_labels.items(), colors)]
+
+        # Add line-style legend entries
+        line_styles = {'-': 'Bias','--': r'$1\sigma$ Error',}
+        line_handles = [
+        Line2D([0], [0], color='gray', linestyle=ls, linewidth=2, label=lbl)
+        for ls, lbl in line_styles.items()]
+
+        # Combine both lists
+        legend_handles.extend(line_handles)
+
+        # Place legend above axes[0]
+        axes00.legend(
+        handles=legend_handles,
+        ncol=5,               # horizontal layout
+        title=None,           # no title
+        fontsize=10.8,
+        loc='lower center',   # anchor at bottom center of bbox_to_anchor
+        bbox_to_anchor=(0.5, 1.0)  # x=0.5 centered, y=1.05 slightly above axes
+        )
+
+        fig_name="bias_error_mitigation_least_intermediate_most_extreme.pdf"
+        plt.savefig(fig_name)  
+        print(fig_name)
+
     return None
 
 def get_inline_latex_w0wa():
@@ -453,8 +807,8 @@ def get_inline_latex_w0wa():
         samples.addDerived(S8,name="S8",label="S_8")
         chains.append(samples) 
 
-    omegams = []
-    S8s = []
+    omegams_pca = []
+    S8s_pca = []
     w0s = []
     was = []
     # PCs
@@ -472,12 +826,12 @@ def get_inline_latex_w0wa():
             central = float(match0.group(1))
             upper = float(match0.group(2))
             lower = -float(match0.group(3))  # make it negative explicitly
-            omegams.append([central,lower,upper])
+            omegams_pca.append([central,lower,upper])
         if match1:
             central = float(match1.group(1))
             upper = float(match1.group(2))
             lower = -float(match1.group(3))  # make it negative explicitly
-            S8s.append([central,lower,upper])
+            S8s_pca.append([central,lower,upper])
         if match2:
             central = float(match2.group(1))
             upper = float(match2.group(2))
@@ -507,7 +861,7 @@ def get_inline_latex_w0wa():
            ["^"]*(NPCs+1)+\
            ["s"]*(NPCs+1)
     
-    shift = [-.1]*(NPCs+1)+\
+    dx = [-.1]*(NPCs+1)+\
             [0]*(NPCs+1)+\
             [.1]*(NPCs+1)
 
@@ -515,28 +869,28 @@ def get_inline_latex_w0wa():
     npcs = list(range(NPCs+1))
     pairs = [(npcs[i % len(npcs)], c) for i, c in enumerate(cases)]
     print("pairs:",pairs)
-    print("omegam:",omegams)
-    print("S8:",S8s)
+    print("omegam:",omegams_pca)
+    print("S8:",S8s_pca)
     print("w0:",w0s)
     print("wa:",was)
     for p in pairs:
         npc = p[0]
         case = p[1]
-        axes0.errorbar(x=npc+shift[case], y=omegams[case][0], yerr=[[abs(omegams[case][1])], [omegams[case][2]]],
+        axes0.errorbar(x=npc+dx[case], y=omegams_pca[case][0], yerr=[[abs(omegams_pca[case][1])], [omegams_pca[case][2]]],
                         fmt=fmts[case], capsize=4, color=ecolors[case],ecolor=ecolors[case], elinewidth=1.2)
-        axes1.errorbar(x=npc+shift[case], y=S8s[case][0], yerr=[[abs(S8s[case][1])], [S8s[case][2]]],
+        axes1.errorbar(x=npc+dx[case], y=S8s_pca[case][0], yerr=[[abs(S8s_pca[case][1])], [S8s_pca[case][2]]],
                         fmt=fmts[case], capsize=4, color=ecolors[case], ecolor=ecolors[case], elinewidth=1.2)
-        axes2.errorbar(x=npc+shift[case], y=w0s[case][0], yerr=[[abs(w0s[case][1])], [w0s[case][2]]],
+        axes2.errorbar(x=npc+dx[case], y=w0s[case][0], yerr=[[abs(w0s[case][1])], [w0s[case][2]]],
                         fmt=fmts[case], capsize=4, color=ecolors[case], ecolor=ecolors[case], elinewidth=1.2)
-        axes3.errorbar(x=npc+shift[case], y=was[case][0], yerr=[[abs(was[case][1])], [was[case][2]]],
+        axes3.errorbar(x=npc+dx[case], y=was[case][0], yerr=[[abs(was[case][1])], [was[case][2]]],
                         fmt=fmts[case], capsize=4, color=ecolors[case], ecolor=ecolors[case], elinewidth=1.2)
     
     ecolors = ["#1b5f6f","#E69F00","#882255"]
     fmts = ["o","^","s"]
-    shift = [-.01,0,.01]
+    dx = [-.01,0,.01]
     
-    print(omegams)
-    print(S8s)
+    print(omegams_pca)
+    print(S8s_pca)
     print(w0s)
     print(was)
     axes0.set_ylabel(r"$\Omega_m$")
@@ -794,8 +1148,8 @@ def get_inline_latex_mixing_scenarios():
             chains.append(samples) 
             info_chains.append((samples,i,mod,fid,ecolors[mod],fmts[fid],shifts[mod]))
 
-    omegams = []
-    S8s = []
+    omegams_pca = []
+    S8s_pca = []
     w0s = []
     was = []
     for chi,ch in enumerate(chains):
@@ -808,15 +1162,15 @@ def get_inline_latex_mixing_scenarios():
             central = float(match1.group(1))
             upper = float(match1.group(2))
             lower = -float(match1.group(3))  # make it negative explicitly
-            omegams.append([central,lower,upper])
+            omegams_pca.append([central,lower,upper])
         if match2:
             central = float(match2.group(1))
             upper = float(match2.group(2))
             lower = -float(match2.group(3))  # make it negative explicitly
-            S8s.append([central,lower,upper])               
+            S8s_pca.append([central,lower,upper])               
     
-    print("omegams: ",omegams)
-    print("S8s: ",S8s)
+    print("omegams_pca: ",omegams_pca)
+    print("S8s_pca: ",S8s_pca)
 
     omegam_fid = 0.3
     S8_fid = 0.8277*(0.3/0.3)**0.5
@@ -828,8 +1182,8 @@ def get_inline_latex_mixing_scenarios():
     for i,info_chain in enumerate(info_chains):
         samples,npc,mod,fid,ecolor,fmt,shift = info_chain
         x_pos = x_positions[fid][mod]["npc"][f"{npc}"]
-        axes0.errorbar(x=x_pos, y=omegams[i][0], yerr=[[abs(omegams[i][1])], [omegams[i][2]]],fmt=fmt, color=ecolor, ecolor=ecolor)
-        axes1.errorbar(x=x_pos, y=S8s[i][0]    , yerr=[[abs(S8s[i][1])]    , [S8s[i][2]]]    ,fmt=fmt, color=ecolor, ecolor=ecolor)
+        axes0.errorbar(x=x_pos, y=omegams_pca[i][0], yerr=[[abs(omegams_pca[i][1])], [omegams_pca[i][2]]],fmt=fmt, color=ecolor, ecolor=ecolor)
+        axes1.errorbar(x=x_pos, y=S8s_pca[i][0]    , yerr=[[abs(S8s_pca[i][1])]    , [S8s_pca[i][2]]]    ,fmt=fmt, color=ecolor, ecolor=ecolor)
     
     axes0.set_ylabel(r"$\Omega_m$")
     axes1.set_ylabel(r"$S_8$")
@@ -905,6 +1259,7 @@ if __name__ == "__main__":
         "plot_chisq":plot_chisq,
         "plot_2d":plot_2d,
         "get_inline_latex_lcdm":get_inline_latex_lcdm,
+        "bias_error_mitigation_lcdm":bias_error_mitigation_lcdm,
         "get_inline_latex_w0wa":get_inline_latex_w0wa,
         "triangle_alphas_non_mixing":triangle_alphas_non_mixing,
         # "triangle_plot_mixing":triangle_plot_mixinglot_type="roman_alphas",combination="Model_sc1bd6_Fiducial_sc1bd4"),
