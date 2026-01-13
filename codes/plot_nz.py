@@ -55,7 +55,7 @@ scenarios_label = [
 
 # A thousand random integers between 1 and 1M
 np.random.seed(42)
-sims_indexes = np.random.randint(1, 10**6 + 1, size=50)
+sims_indexes = np.random.randint(1, 10**6 + 1, size=100)
 tot = len(sims_indexes)
 
 # Colors
@@ -83,7 +83,7 @@ def plot_scenarios(sc='sc1b_d4'):
                             sharex=False, sharey=False,
                             gridspec_kw={'wspace':0.0, 'hspace':0.0})
     axes = axes.flatten()  # flatten to easily iterate
-
+ 
     for ax,(sc,scl) in list(enumerate(zip(scenarios,scenarios_label))):
         nzr = f'{path}roman_nz_realizations/{sc}/nz_samples_LHC0_pointZ_1e6_Roman_{sc}.h5'
         nzr = h5py.File(nzr,'r') 
@@ -107,32 +107,38 @@ def plot_scenarios(sc='sc1b_d4'):
         if nzmax_temp > nzmax:
             nzmax = nzmax_temp
 
-        info = {"color":colors[ax],"alpha":0.01,"lw":1} 
-
+        info = {"color":colors[ax],"alpha":0.03,"lw":1} 
+        temp=0
+        # The nz realizations
         for r in range(tot):
-            [axes[ax].plot(zr,rows[r][Nz*k:Nz*(k+1)],**info,label=scl if k==0 else None) for k in range(9)]
+            if ax==10: temp=1
+            [axes[ax+temp].plot(zr,rows[r][Nz*k:Nz*(k+1)],**info,label=scl if k==0 else None) for k in range(9)]
             if r == 0:
-                axes[ax].legend(loc='upper right',fontsize=17, handlelength=0, handletextpad=0)
+                axes[ax+temp].legend(loc='upper right',fontsize=17, handlelength=0, handletextpad=0)
+        # The mean nz
         for i in range(1,9+1):
-            axes[ax].plot(zr,nbar[:,i],color=colors[ax],lw=1.5,ls="--")        
-        # Hide unused subplot
-        if len(axes) > len(scenarios):
-            axes[len(scenarios)].axis('off')
+            axes[ax+temp].plot(zr,nbar[:,i],color=colors[ax],lw=1.5,ls="--")        
 
-    for i in [7,8,9,10]:
+    # Hide the axis of scenario M3-D3 
+    axes[10].axis('off')
+
+    for i in [6,8,9,10,11]:
         axes[i].set_xlabel(r'$z$', fontsize=20)
         axes[i].set_xticks([0,0.5,1,1.5,2,2.5])
     for i in [0,4,8]:
         axes[i].set_ylabel(r'$n(z)$', fontsize=20)
         axes[i].set_yticks([0,1,2,3,4])
-    for i in [1,2,3,5,6,7,9,10]:
+    for i in [1,2,3,5,6,7,9,10,11]:
         axes[i].set_yticks([])
     for i in range(11):
-        axes[i].set_xlim(np.min(zr),np.max(zr))
+        if i != 8:
+            axes[i].set_xlim(np.min(zr),np.max(zr))
     for i in range(11):
         axes[i].set_ylim(0,nzmax)
     # plt.tight_layout()    
-    plt.savefig(f'roman_scenarios.pdf')
+    fig_name = "roman_scenarios.pdf"
+    plt.savefig(f"{fig_name}")
+    print(f"Figure {fig_name}")
     # n = np.vstack(rows)
     # print('Saving n')
     # print('n.shape: ',n.shape)
@@ -151,7 +157,7 @@ def plot_scenarios(sc='sc1b_d4'):
     # # np.savetxt('ndiff_roman_sc1bd4.txt',ndiff)
     # np.save('ndiff_roman_sc1bd4.npy',ndiff)
     return None
-# plot_scenarios()
+plot_scenarios()
 
 def plot_ndiff():
     nzr = f'{path}roman_nz_realizations/sc1b_d4/nz_samples_LHC0_pointZ_1e6_Roman_sc1b_d4.h5'
@@ -224,7 +230,7 @@ def distribution_violinplot(sc='sc1bd4'):
     axes[1,0].set_ylabel(r'$\text{Distribution}$',fontsize=18)
     axes[2,4].set_xlabel(r'$\mathrm{arg\,min}_{z_i} \, |z_i - \bar{z}|$', fontsize=18)
     plt.tight_layout()   
-    plt.savefig('test.pdf')
+    plt.savefig('distribution_violinplot.pdf')
     return None
 
 # distribution_violinplot()
